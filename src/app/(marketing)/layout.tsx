@@ -4,7 +4,7 @@ import SiteFooter from "@/components/layout/SiteFooter";
 export const metadata = {
   title: "PortersPrep — MBA Admissions Copilot",
   description: "Assess • Edit • Coach. We coach; you write.",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/favicon.png" },
   openGraph: {
     title: "PortersPrep — MBA Admissions Copilot",
     description: "Assess • Edit • Coach. We coach; you write.",

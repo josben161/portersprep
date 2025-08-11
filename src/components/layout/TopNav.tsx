@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -20,8 +21,15 @@ export default function TopNav() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="font-semibold">
-          <span className="text-primary">PortersPrep</span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/brand/portersprep.png"
+            alt="PortersPrep"
+            width={120}
+            height={32}
+            className="h-8 w-auto"
+            priority
+          />
         </Link>
         <nav className="hidden items-center gap-6 text-sm md:flex">
           {links.map(l => (
