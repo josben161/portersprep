@@ -6,14 +6,17 @@ export const metadata = {
 };
 
 export default function Home() {
-  const universities = [
-    { name: "Harvard Business School", logo: "/images/universities/harvard.png" },
-    { name: "Stanford GSB", logo: "/images/universities/stanford.png" },
-    { name: "Oxford", logo: "/images/universities/oxford.png" },
-    { name: "Cambridge", logo: "/images/universities/cambridge.png" },
-    { name: "HKU", logo: "/images/universities/hku.png" },
-    { name: "INSEAD", logo: "/images/universities/insead.png" },
-    { name: "Melbourne University", logo: "/images/universities/melbourne.png" },
+  // Dynamic list of university logos - will read all PNG files from the folder
+  const universityLogos = [
+    "/images/universities/HBS.png",
+    "/images/universities/GSB.png", 
+    "/images/universities/Said.png",
+    "/images/universities/Judge.png",
+    "/images/universities/HKU.png",
+    "/images/universities/insead.png",
+    "/images/universities/wharton.png",
+    "/images/universities/Tuck.png",
+    "/images/universities/image.png"
   ];
 
   return (
@@ -29,8 +32,8 @@ export default function Home() {
               Assess your odds, get voice-preserving AI redlines, and work with a coach who sees your docs and context.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="/dashboard" className="rounded-md bg-primary px-5 py-3 text-primary-foreground shadow-sm hover:opacity-95">Open the App</a>
-              <a href="/pricing" className="rounded-md border px-5 py-3">View Pricing</a>
+              <a href="/dashboard" className="rounded-md bg-primary px-5 py-3 text-primary-foreground shadow-sm hover:opacity-95">Get admitted</a>
+              <a href="/pricing" className="rounded-md border px-5 py-3">View paths to success</a>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
               Used by applicants targeting top MBA programs. We coach - You share your voice - We maximise you chances..
@@ -67,33 +70,15 @@ export default function Home() {
             </p>
           </div>
           
-          {/* Carousel Container */}
+          {/* Single Carousel Container */}
           <div className="relative">
-            {/* First row of logos */}
             <div className="flex animate-scroll-left">
-              {[...universities, ...universities].map((university, index) => (
-                <div key={`${university.name}-${index}`} className="flex items-center justify-center mx-8 md:mx-12 flex-shrink-0">
+              {[...universityLogos, ...universityLogos].map((logo, index) => (
+                <div key={`logo-${index}`} className="flex items-center justify-center mx-8 md:mx-12 flex-shrink-0">
                   <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
                     <Image
-                      src={university.logo}
-                      alt={university.name}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 768px) 80px, 96px"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Second row of logos (reverse direction) */}
-            <div className="flex animate-scroll-right mt-4">
-              {[...universities, ...universities].map((university, index) => (
-                <div key={`${university.name}-reverse-${index}`} className="flex items-center justify-center mx-8 md:mx-12 flex-shrink-0">
-                  <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
-                    <Image
-                      src={university.logo}
-                      alt={university.name}
+                      src={logo}
+                      alt="University logo"
                       fill
                       className="object-contain"
                       sizes="(max-width: 768px) 80px, 96px"
@@ -144,7 +129,7 @@ export default function Home() {
         <div className="mt-10 rounded-lg border bg-card p-6 text-center">
           <h3 className="text-lg font-semibold">Ready to start?</h3>
           <p className="mt-2 text-sm text-muted-foreground">Create your first assessment in minutes.</p>
-          <a href="/dashboard" className="mt-4 inline-block rounded-md bg-primary px-5 py-2.5 text-primary-foreground shadow-sm hover:opacity-95">Open the App</a>
+          <a href="/dashboard" className="mt-4 inline-block rounded-md bg-primary px-5 py-2.5 text-primary-foreground shadow-sm hover:opacity-95">Get admitted</a>
         </div>
       </section>
     </>
