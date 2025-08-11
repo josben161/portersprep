@@ -25,8 +25,41 @@ export default async function AssessmentsPage() {
 
   const profileId = await getProfileId(userId);
   
+  // During build time with dummy user, show empty state instead of redirecting
   if (!profileId) {
-    redirect('/dashboard');
+    return (
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Assessments</h1>
+          <a
+            href="/dashboard/assessments/new"
+            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            New Assessment
+          </a>
+        </div>
+        
+        <div className="text-center py-12">
+          <div className="text-gray-400 mb-4">
+            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No assessments yet</h3>
+          <p className="text-gray-500 mb-6">
+            Get started by creating your first assessment to see your MBA admission chances.
+          </p>
+          <a
+            href="/dashboard/assessments/new"
+            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Create Assessment
+          </a>
+        </div>
+      </div>
+    );
   }
 
   const supabase = admin();

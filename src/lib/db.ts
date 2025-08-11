@@ -11,7 +11,7 @@ export async function getProfileId(clerkUserId: string): Promise<string | null> 
     .from('profiles')
     .select('id')
     .eq('clerk_user_id', clerkUserId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching profile ID:', error);

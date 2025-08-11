@@ -42,8 +42,23 @@ export default async function AssessmentDetailPage({
 
   const profileId = await getProfileId(userId);
   
+  // During build time with dummy user, show not found instead of redirecting
   if (!profileId) {
-    redirect('/dashboard');
+    return (
+      <div className="p-6">
+        <div className="mb-6">
+          <a
+            href="/dashboard/assessments"
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Assessments
+          </a>
+        </div>
+        <h1 className="text-2xl font-bold mb-4">Assessment Not Found</h1>
+        <p className="text-red-600">The assessment you're looking for doesn't exist or you don't have access to it.</p>
+      </div>
+    );
   }
 
   const supabase = admin();
