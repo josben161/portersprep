@@ -3,10 +3,35 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 
 export default function Pricing() {
   const [isAnnual, setIsAnnual] = useState(false);
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+  const handleCheckout = async (tier: string) => {
+    setLoadingTier(tier);
+    try {
+      const response = await fetch('/api/billing/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tier }),
+      });
+
+      if (response.ok) {
+        const { url } = await response.json();
+        window.location.href = url;
+      } else {
+        console.error('Checkout failed');
+        setLoadingTier(null);
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      setLoadingTier(null);
+    }
+  };
 
   const plans = [
     {
@@ -128,25 +153,47 @@ export default function Pricing() {
                   </li>
                 ))}
               </ul>
-              <a
-                href="/dashboard"
-                className={`w-full inline-flex justify-center items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  plan.popular
-                    ? "bg-black text-white hover:bg-gray-800"
-                    : "border border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                {plan.cta}
-              </a>
+              {plan.name === "Free" ? (
+                <a
+                  href="/dashboard"
+                  className={`w-full inline-flex justify-center items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    plan.popular
+                      ? "bg-black text-white hover:bg-gray-800"
+                      : "border border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  {plan.cta}
+                </a>
+              ) : (
+                <button
+                  onClick={() => handleCheckout(plan.name.toLowerCase())}
+                  disabled={loadingTier === plan.name.toLowerCase()}
+                  className={`w-full inline-flex justify-center items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    plan.popular
+                      ? "bg-black text-white hover:bg-gray-800 disabled:opacity-50"
+                      : "border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+                  }`}
+                >
+                  {loadingTier === plan.name.toLowerCase() ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Loading...
+                    </>
+                  ) : (
+                    plan.cta
+                  )}
+                </button>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
 
       {/* Small Print */}
-      <p className="text-center text-xs text-muted-foreground mb-12">
-        We coach; you write. Cancel anytime.
-      </p>
+      <div className="text-center text-xs text-muted-foreground mb-12 space-y-1">
+        <p>We coach; you write. Cancel anytime.</p>
+        <p>Billed monthly; annual available on request.</p>
+      </div>
 
       {/* FAQ Section */}
       <div className="max-w-2xl mx-auto">
