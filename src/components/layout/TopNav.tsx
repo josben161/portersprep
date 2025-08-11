@@ -1,0 +1,62 @@
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/features", label: "Features" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/faq", label: "FAQ" },
+];
+
+export default function TopNav() {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  return (
+    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+        <Link href="/" className="font-semibold">
+          PortersPrep
+        </Link>
+        <nav className="hidden items-center gap-6 text-sm md:flex">
+          {links.map(l => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={`transition-colors hover:text-foreground ${pathname===l.href ? "text-foreground" : "text-muted-foreground"}`}
+            >
+              {l.label}
+            </Link>
+          ))}
+          <Link href="/dashboard" className="rounded-md bg-foreground px-3 py-1.5 text-background">Open App</Link>
+        </nav>
+        <button
+          aria-label="Menu"
+          onClick={() => setOpen(!open)}
+          className="inline-flex items-center rounded md:hidden"
+        >
+          <svg width="24" height="24" fill="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+      {open && (
+        <div className="border-t bg-background md:hidden">
+          <div className="mx-auto max-w-6xl px-4 py-3 flex flex-col gap-2">
+            {links.map(l => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className={`py-1 ${pathname===l.href ? "text-foreground" : "text-muted-foreground"}`}
+              >
+                {l.label}
+              </Link>
+            ))}
+            <Link href="/dashboard" onClick={() => setOpen(false)} className="mt-1 rounded-md bg-foreground px-3 py-2 text-background text-center">Open App</Link>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+} 
