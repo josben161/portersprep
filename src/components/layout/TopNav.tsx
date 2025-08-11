@@ -41,7 +41,7 @@ export default function TopNav() {
               {l.label}
             </Link>
           ))}
-          <Link href="/dashboard" className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground shadow-sm hover:opacity-95">Open App</Link>
+          <Link href="/dashboard" className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground shadow-sm hover:opacity-95">Get admitted</Link>
         </nav>
         <button
           aria-label="Menu"
@@ -64,7 +64,11 @@ export default function TopNav() {
                 {l.label}
               </Link>
             ))}
-            <Link href="/dashboard" onClick={() => setOpen(false)} className="mt-1 rounded-md bg-primary px-3 py-2 text-primary-foreground text-center shadow-sm hover:opacity-95">Open App</Link>
+            <Link href="/dashboard" onClick={() => setOpen(false)} className="mt-1 rounded-md bg-primary px-3 py-2 text-primary-foreground text-center shadow-sm hover:opacity-95">Get admitted</Link>
+            <div className="border-t pt-2 mt-2">
+              <Link href="/sign-in" onClick={() => setOpen(false)} className="block py-1 text-muted-foreground">Sign In</Link>
+              <Link href="/sign-up" onClick={() => setOpen(false)} className="block py-1 text-muted-foreground">Sign Up</Link>
+            </div>
           </div>
         </div>
       )}
