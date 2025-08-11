@@ -1,9 +1,21 @@
+import Image from "next/image";
+
 export const metadata = {
   title: "Your MBA Admissions Copilot — PortersPrep",
   description: "Assess your odds, sharpen essays with coaching-style feedback, and book an expert coach."
 };
 
 export default function Home() {
+  const universities = [
+    { name: "Harvard Business School", logo: "/images/universities/harvard.png" },
+    { name: "Stanford GSB", logo: "/images/universities/stanford.png" },
+    { name: "Oxford", logo: "/images/universities/oxford.png" },
+    { name: "Cambridge", logo: "/images/universities/cambridge.png" },
+    { name: "HKU", logo: "/images/universities/hku.png" },
+    { name: "INSEAD", logo: "/images/universities/insead.png" },
+    { name: "Melbourne University", logo: "/images/universities/melbourne.png" },
+  ];
+
   return (
     <>
       <section className="relative overflow-hidden mx-auto max-w-6xl px-4 py-20">
@@ -26,23 +38,53 @@ export default function Home() {
           </div>
           <div className="flex justify-center lg:justify-end">
             <div className="relative w-full max-w-sm">
-              <div className="aspect-[4/5] rounded-xl border bg-gradient-to-br from-primary/10 to-primary/5 p-8 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center">
-                    <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground">Success Story</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Image placeholder: Student celebrating acceptance to elite MBA program
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    "Accepted to Harvard Business School"
-                  </p>
+              {/* Replace this with your actual image */}
+              <div className="aspect-[4/5] rounded-xl border bg-gradient-to-br from-primary/10 to-primary/5 overflow-hidden">
+                <Image
+                  src="/images/success-story.jpg" // Add your image here
+                  alt="Student celebrating MBA acceptance"
+                  width={400}
+                  height={500}
+                  className="w-full h-full object-cover"
+                  priority
+                />
+                {/* Optional overlay with success text */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                  <p className="text-white text-sm font-medium">"Accepted to Harvard Business School"</p>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* University Logos Ribbon */}
+      <section className="border-t border-b bg-muted/20">
+        <div className="mx-auto max-w-6xl px-4 py-8">
+          <div className="text-center mb-6">
+            <p className="text-sm text-muted-foreground font-medium">
+              Trusted by applicants targeting leading institutions worldwide
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-8 md:gap-12 flex-wrap">
+            {universities.map((university) => (
+              <div key={university.name} className="flex items-center justify-center">
+                <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
+                  <Image
+                    src={university.logo}
+                    alt={university.name}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 768px) 80px, 96px"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-4">
+            <p className="text-xs text-muted-foreground">
+              University logos are trademarks of their respective institutions
+            </p>
           </div>
         </div>
       </section>
