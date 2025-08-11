@@ -1,5 +1,5 @@
 import { Poppins } from "next/font/google";
-// import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import TopNav from "@/components/layout/TopNav";
 import SiteFooter from "@/components/layout/SiteFooter";
 import "./globals.css";
@@ -19,7 +19,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // <ClerkProvider>
+    <ClerkProvider>
       <html lang="en" className={poppins.variable}>
         <body className="min-h-screen font-sans">
           <div className="min-h-screen bg-background text-foreground">
@@ -29,6 +29,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </body>
       </html>
-    // </ClerkProvider>
+    </ClerkProvider>
   );
 } 
