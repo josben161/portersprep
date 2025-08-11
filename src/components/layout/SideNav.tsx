@@ -19,9 +19,9 @@ export default function SideNav() {
         <Image
           src="/brand/portersprep.png"
           alt="PortersPrep"
-          width={100}
-          height={26}
-          className="h-6 w-auto"
+          width={120}
+          height={30}
+          className="h-8 w-auto"
         />
       </div>
       <nav className="px-2 pb-4 text-sm">

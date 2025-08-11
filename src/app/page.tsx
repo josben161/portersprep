@@ -8,8 +8,8 @@ export default function Home() {
     <>
       <section className="relative overflow-hidden mx-auto max-w-6xl px-4 py-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_-10%,_hsl(var(--primary)/0.15),_transparent_70%)]" />
-        <div className="relative grid items-center gap-10 md:grid-cols-2">
-          <div>
+        <div className="relative grid items-center gap-10 lg:grid-cols-3">
+          <div className="lg:col-span-2">
             <h1 className="text-4xl font-bold leading-tight md:text-5xl">
               Your MBA Admissions Copilot
             </h1>
@@ -24,23 +24,24 @@ export default function Home() {
               Used by applicants targeting top MBA programs. We coach; you write.
             </p>
           </div>
-          <div className="rounded-xl border bg-card p-6 shadow-sm hover:shadow-md hover:translate-y-[1px] transition">
-            <div className="rounded-md border bg-background p-4">
-              <div className="mb-2 text-sm font-medium">Assessment preview</div>
-              <ul className="text-sm text-muted-foreground space-y-2">
-                <li>• Admit bands by school</li>
-                <li>• Angles to lean into</li>
-                <li>• Gap analysis & next steps</li>
-                <li>• Timeline plan</li>
-              </ul>
-            </div>
-            <div className="mt-4 rounded-md border bg-background p-4">
-              <div className="mb-2 text-sm font-medium">Essay redlines</div>
-              <ul className="text-sm text-muted-foreground space-y-2">
-                <li>• Trim filler & passive voice</li>
-                <li>• Clarify goals (short vs long-term)</li>
-                <li>• Keep your voice — no ghostwriting</li>
-              </ul>
+          <div className="flex justify-center lg:justify-end">
+            <div className="relative w-full max-w-sm">
+              <div className="aspect-[4/5] rounded-xl border bg-gradient-to-br from-primary/10 to-primary/5 p-8 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center">
+                    <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Success Story</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Image placeholder: Student celebrating acceptance to elite MBA program
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    "Accepted to Harvard Business School"
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
