@@ -44,7 +44,7 @@ export default function About() {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">We Coach; You Write</h3>
+                <h3 className="font-semibold mb-2">We coach - You share your voice - We maximise you chances.</h3>
                 <p className="text-muted-foreground">
                   Your voice matters. We provide feedback, suggestions, and guidance, but the 
                   writing is always yours. This ensures authenticity and helps you develop 

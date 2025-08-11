@@ -33,7 +33,7 @@ export default function Home() {
               <a href="/pricing" className="rounded-md border px-5 py-3">View Pricing</a>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
-              Used by applicants targeting top MBA programs. We coach; you write.
+              Used by applicants targeting top MBA programs. We coach - You share your voice - We maximise you chances..
             </p>
           </div>
           <div className="flex justify-center lg:justify-end">
@@ -50,7 +50,7 @@ export default function Home() {
                 />
                 {/* Optional overlay with success text */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                  <p className="text-white text-sm font-medium">"Accepted to Harvard Business School"</p>
+                  <p className="text-white text-sm font-medium">Our users have been accepted to Harvard Business School, GSB, and more! See how you can join them.</p>
                 </div>
               </div>
             </div>
@@ -58,33 +58,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/* University Logos Ribbon */}
-      <section className="border-t border-b bg-muted/20">
+      {/* University Logos Carousel */}
+      <section className="border-t border-b bg-muted/20 overflow-hidden">
         <div className="mx-auto max-w-6xl px-4 py-8">
           <div className="text-center mb-6">
             <p className="text-sm text-muted-foreground font-medium">
               Trusted by applicants targeting leading institutions worldwide
             </p>
           </div>
-          <div className="flex items-center justify-center gap-8 md:gap-12 flex-wrap">
-            {universities.map((university) => (
-              <div key={university.name} className="flex items-center justify-center">
-                <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
-                  <Image
-                    src={university.logo}
-                    alt={university.name}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 768px) 80px, 96px"
-                  />
+          
+          {/* Carousel Container */}
+          <div className="relative">
+            {/* First row of logos */}
+            <div className="flex animate-scroll-left">
+              {[...universities, ...universities].map((university, index) => (
+                <div key={`${university.name}-${index}`} className="flex items-center justify-center mx-8 md:mx-12 flex-shrink-0">
+                  <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
+                    <Image
+                      src={university.logo}
+                      alt={university.name}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 768px) 80px, 96px"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-4">
-            <p className="text-xs text-muted-foreground">
-              University logos are trademarks of their respective institutions
-            </p>
+              ))}
+            </div>
+            
+            {/* Second row of logos (reverse direction) */}
+            <div className="flex animate-scroll-right mt-4">
+              {[...universities, ...universities].map((university, index) => (
+                <div key={`${university.name}-reverse-${index}`} className="flex items-center justify-center mx-8 md:mx-12 flex-shrink-0">
+                  <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
+                    <Image
+                      src={university.logo}
+                      alt={university.name}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 768px) 80px, 96px"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -112,7 +129,7 @@ export default function Home() {
             <ul className="mt-3 list-disc pl-5 text-sm text-muted-foreground space-y-2">
               <li>Instant, repeatable feedback — not calendar-bound.</li>
               <li>Clear timelines and actionables.</li>
-              <li>Ethics first: we coach; you write.</li>
+              <li>Ethics first: We coach - You share your voice - We maximise you chances..</li>
             </ul>
           </div>
           <div className="rounded-lg border p-6">

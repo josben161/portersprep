@@ -65,7 +65,7 @@ export default function HowItWorks() {
     {
       icon: CheckCircle,
       title: "Ethics First",
-      desc: "We coach; you write. No ghostwriting, just authentic guidance"
+      desc: "We coach - You share your voice - We maximise you chances.. No ghostwriting, just authentic guidance"
     }
   ];
 

@@ -28,7 +28,7 @@ export default function Pricing() {
           "∞ assessments (fair use)","20 essays (≤10k)","100 AI redlines","Priority coach + 2 calls"
         ]} cta="Go Pro" href="/dashboard" />
       </div>
-      <p className="mt-8 text-xs text-muted-foreground">We coach; you write. Cancel anytime. Annual pricing reflects 2 months free.</p>
+      <p className="mt-8 text-xs text-muted-foreground">We coach - You share your voice - We maximise you chances.. Cancel anytime. Annual pricing reflects 2 months free.</p>
     </section>
   );
 }

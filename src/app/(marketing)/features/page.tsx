@@ -120,7 +120,7 @@ export default function Features() {
               <h3 className="font-semibold mb-3">Voice-Preserving Principles</h3>
               <p className="text-sm text-muted-foreground">
                 Our AI is trained to enhance your writing without changing your voice. 
-                We coach; you write. No ghostwriting ever.
+                We coach - You share your voice - We maximise you chances.. No ghostwriting ever.
               </p>
             </div>
           </div>

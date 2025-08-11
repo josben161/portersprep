@@ -14,7 +14,7 @@ export function jsonLdOrganization() {
     "@type": "EducationalService",
     name: "PortersPrep",
     url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-    description: "We coach; you write.",
+    description: "We coach - You share your voice - We maximise you chances..",
     serviceType: "MBA Admissions Consulting",
     areaServed: "Worldwide",
     provider: {

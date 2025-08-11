@@ -2,7 +2,7 @@ export const metadata = { title: "FAQ — PortersPrep", description: "Answers to
 
 export default function FAQ() {
   const qas = [
-    ["Do you write essays?", "No. We coach; you write. Our tools deliver structured feedback and redlines that preserve your voice."],
+    ["Do you write essays?", "No. We coach - You share your voice - We maximise you chances.. Our tools deliver structured feedback and redlines that preserve your voice."],
     ["Can I cancel anytime?", "Yes. You can cancel from the billing portal; your plan runs through the paid period."],
     ["What happens if I hit monthly limits?", "Upgrade on the Pricing page or wait for the monthly reset."],
     ["Will you support all schools?", "Yes—our approach is school-agnostic and we adapt prompts per program."],
