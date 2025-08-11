@@ -6,8 +6,9 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <section className="mx-auto max-w-6xl px-4 py-20">
-        <div className="grid items-center gap-10 md:grid-cols-2">
+      <section className="relative overflow-hidden mx-auto max-w-6xl px-4 py-20">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_-10%,_hsl(var(--primary)/0.15),_transparent_70%)]" />
+        <div className="relative grid items-center gap-10 md:grid-cols-2">
           <div>
             <h1 className="text-4xl font-bold leading-tight md:text-5xl">
               Your MBA Admissions Copilot
@@ -16,14 +17,14 @@ export default function Home() {
               Assess your odds, get voice-preserving AI redlines, and work with a coach who sees your docs and context.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="/dashboard" className="rounded-md bg-foreground px-5 py-3 text-background">Open the App</a>
+              <a href="/dashboard" className="rounded-md bg-primary px-5 py-3 text-primary-foreground shadow-sm hover:opacity-95">Open the App</a>
               <a href="/pricing" className="rounded-md border px-5 py-3">View Pricing</a>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
               Used by applicants targeting top MBA programs. We coach; you write.
             </p>
           </div>
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
+          <div className="rounded-xl border bg-card p-6 shadow-sm hover:shadow-md hover:translate-y-[1px] transition">
             <div className="rounded-md border bg-background p-4">
               <div className="mb-2 text-sm font-medium">Assessment preview</div>
               <ul className="text-sm text-muted-foreground space-y-2">
@@ -52,7 +53,7 @@ export default function Home() {
             { title: "Edit", desc: "Collaborative editor with AI redlines that preserve your authentic voice." },
             { title: "Coach", desc: "Message a coach and book time; we bring your docs and context along." }
           ].map(c => (
-            <div key={c.title} className="rounded-lg border bg-card p-5 shadow-sm">
+            <div key={c.title} className="rounded-lg border bg-card p-5 shadow-sm hover:shadow-md hover:translate-y-[1px] transition">
               <div className="text-base font-semibold">{c.title}</div>
               <p className="mt-2 text-sm text-muted-foreground">{c.desc}</p>
             </div>
@@ -83,7 +84,7 @@ export default function Home() {
         <div className="mt-10 rounded-lg border bg-card p-6 text-center">
           <h3 className="text-lg font-semibold">Ready to start?</h3>
           <p className="mt-2 text-sm text-muted-foreground">Create your first assessment in minutes.</p>
-          <a href="/dashboard" className="mt-4 inline-block rounded-md bg-foreground px-5 py-2.5 text-background">Open the App</a>
+          <a href="/dashboard" className="mt-4 inline-block rounded-md bg-primary px-5 py-2.5 text-primary-foreground shadow-sm hover:opacity-95">Open the App</a>
         </div>
       </section>
     </>

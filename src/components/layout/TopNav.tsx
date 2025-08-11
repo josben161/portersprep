@@ -14,23 +14,26 @@ const links = [
 export default function TopNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  
+  const base = "transition-colors hover:text-foreground underline-offset-4 hover:underline";
+  
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="font-semibold">
-          PortersPrep
+          <span className="text-primary">PortersPrep</span>
         </Link>
         <nav className="hidden items-center gap-6 text-sm md:flex">
           {links.map(l => (
             <Link
               key={l.href}
               href={l.href}
-              className={`transition-colors hover:text-foreground ${pathname===l.href ? "text-foreground" : "text-muted-foreground"}`}
+              className={`${base} ${pathname===l.href ? "text-foreground" : "text-muted-foreground"}`}
             >
               {l.label}
             </Link>
           ))}
-          <Link href="/dashboard" className="rounded-md bg-foreground px-3 py-1.5 text-background">Open App</Link>
+          <Link href="/dashboard" className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground shadow-sm hover:opacity-95">Open App</Link>
         </nav>
         <button
           aria-label="Menu"
@@ -53,7 +56,7 @@ export default function TopNav() {
                 {l.label}
               </Link>
             ))}
-            <Link href="/dashboard" onClick={() => setOpen(false)} className="mt-1 rounded-md bg-foreground px-3 py-2 text-background text-center">Open App</Link>
+            <Link href="/dashboard" onClick={() => setOpen(false)} className="mt-1 rounded-md bg-primary px-3 py-2 text-primary-foreground text-center shadow-sm hover:opacity-95">Open App</Link>
           </div>
         </div>
       )}

@@ -9,7 +9,7 @@ export default function Pricing() {
     <section className="mx-auto max-w-6xl px-4 py-16">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold">Simple, fair pricing</h1>
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">Simple, fair pricing</h1>
           <p className="mt-2 text-muted-foreground">Start free. Upgrade when you need more.</p>
         </div>
         <div className="rounded-md border p-1 text-sm">
@@ -37,7 +37,7 @@ function Plan({ title, price, bullets, cta, href, highlight }:{
   title:string; price:string; bullets:string[]; cta:string; href:string; highlight?:boolean
 }) {
   return (
-    <div className={`rounded-lg border p-6 ${highlight ? "border-foreground" : ""}`}>
+    <div className={`rounded-lg border p-6 ${highlight ? "border-primary" : ""}`}>
       <div className="flex items-baseline justify-between">
         <h3 className="text-xl font-semibold">{title}</h3>
         <div className="text-muted-foreground">{price}</div>
@@ -45,7 +45,7 @@ function Plan({ title, price, bullets, cta, href, highlight }:{
       <ul className="mt-4 list-disc pl-5 text-sm text-muted-foreground space-y-1.5">
         {bullets.map(b => <li key={b}>{b}</li>)}
       </ul>
-      <a href={href} className={`mt-6 inline-block rounded px-4 py-2 ${highlight ? "bg-foreground text-background" : "border"}`}>{cta}</a>
+      <a href={href} className={`mt-6 inline-block rounded px-4 py-2 ${highlight ? "bg-primary text-primary-foreground shadow-sm hover:opacity-95" : "border"}`}>{cta}</a>
     </div>
   );
 } 

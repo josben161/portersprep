@@ -24,7 +24,7 @@ export default async function Dashboard() {
       <h1 className="text-2xl font-semibold">Welcome</h1>
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         {cards.map(c => (
-          <a key={c.href} href={c.href} className="rounded-lg border bg-card p-4 shadow-sm transition-colors hover:bg-muted/40">
+          <a key={c.href} href={c.href} className="rounded-lg border bg-card p-4 shadow-sm transition-colors hover:bg-muted/40 hover:border-primary/40 hover:shadow-sm">
             <div className="font-medium">{c.title}</div>
             <p className="text-sm text-muted-foreground">{c.desc}</p>
           </a>
