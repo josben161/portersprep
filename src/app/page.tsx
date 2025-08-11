@@ -6,17 +6,18 @@ export const metadata = {
 };
 
 export default function Home() {
-  // Dynamic list of university logos - will read all PNG files from the folder
+  // Complete list of university logos from the folder
   const universityLogos = [
     "/images/universities/HBS.png",
     "/images/universities/GSB.png", 
     "/images/universities/Said.png",
-    "/images/universities/Judge.png",
+    "/images/universities/judge.png",
     "/images/universities/HKU.png",
     "/images/universities/insead.png",
     "/images/universities/wharton.png",
     "/images/universities/Tuck.png",
-    "/images/universities/image.png"
+    "/images/universities/melbourne.png",
+    "/images/universities/sydney.png"
   ];
 
   return (
@@ -66,14 +67,14 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-4 py-8">
           <div className="text-center mb-6">
             <p className="text-sm text-muted-foreground font-medium">
-              Trusted by applicants targeting leading institutions worldwide
+              Used by applicants to get accepted to world leading institutions
             </p>
           </div>
           
-          {/* Single Carousel Container */}
+          {/* Continuous Carousel Container */}
           <div className="relative">
             <div className="flex animate-scroll-left">
-              {[...universityLogos, ...universityLogos].map((logo, index) => (
+              {[...universityLogos, ...universityLogos, ...universityLogos].map((logo, index) => (
                 <div key={`logo-${index}`} className="flex items-center justify-center mx-8 md:mx-12 flex-shrink-0">
                   <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
                     <Image

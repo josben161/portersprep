@@ -78,18 +78,18 @@
 }
 
 @layer utilities {
-  /* University logos carousel animation */
+  /* University logos carousel animation - truly continuous */
   @keyframes scroll-left {
     0% {
       transform: translateX(0);
     }
     100% {
-      transform: translateX(-50%);
+      transform: translateX(calc(-33.333%));
     }
   }
 
   .animate-scroll-left {
-    animation: scroll-left 30s linear infinite;
+    animation: scroll-left 45s linear infinite;
   }
 
   /* Pause animation on hover */
