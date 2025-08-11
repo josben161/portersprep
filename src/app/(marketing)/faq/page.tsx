@@ -1,47 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function FAQ() {
-  const [openItem, setOpenItem] = useState<number | null>(0);
-
-  const faqs = [
-    {
-      question: "How does PortersPrep's pricing work?",
-      answer: "We offer three tiers: Free (1 assessment/month, 1 essay, 3 redlines), Plus ($49/month for 3 assessments, 5 essays, 20 redlines), and Pro ($199/month for unlimited assessments, 20 essays, 100 redlines). All plans include coach messaging and consultation sessions."
-    },
-    {
-      question: "Do you write essays for me?",
-      answer: "No. We coach; you write. Our AI provides feedback and suggestions to improve your writing, but we never write essays for you. This ensures your voice and authenticity shine through in your application."
-    },
-    {
-      question: "How accurate are the school likelihood assessments?",
-      answer: "Our assessments are based on historical data and current admissions trends, but they're estimates, not guarantees. Many factors influence admissions decisions, and we provide likelihood bands rather than exact percentages."
-    },
-    {
-      question: "What makes your coaches qualified?",
-      answer: "Our coaches are experienced MBA admissions consultants with backgrounds in top business schools. They understand the application process, essay requirements, and what admissions committees look for in candidates."
-    },
-    {
-      question: "How do you protect my privacy and data?",
-      answer: "We take data security seriously. All personal information and essays are encrypted, and we never share your data with third parties. You can request deletion of your data at any time."
-    },
-    {
-      question: "Can I use PortersPrep for multiple school applications?",
-      answer: "Yes! Your subscription covers multiple school applications. Each assessment is school-specific, and you can create separate essays for different programs within your plan's limits."
-    },
-    {
-      question: "What if I exceed my plan's limits?",
-      answer: "You'll receive a notification when approaching your limits. You can upgrade your plan at any time to get more assessments, essays, or redlines. We also offer one-time purchases for additional usage."
-    },
-    {
-      question: "How do I get started?",
-      answer: "Simply sign up for a free account and start with your first assessment. Upload your resume, tell us about your goals, and we'll provide personalized school recommendations and strategy."
-    }
-  ];
-
   return (
-    <section className="mx-auto max-w-4xl px-6 py-16">
+    <main className="mx-auto max-w-4xl px-6 py-16">
+      {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Frequently Asked Questions</h1>
         <p className="text-lg text-muted-foreground">
@@ -49,38 +13,129 @@ export default function FAQ() {
         </p>
       </div>
 
-      <div className="space-y-4">
-        {faqs.map((faq, index) => (
-          <div key={index} className="border rounded-lg">
-            <button
-              className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50"
-              onClick={() => setOpenItem(openItem === index ? null : index)}
-            >
-              <span className="font-medium">{faq.question}</span>
-              <span className="text-gray-400">
-                {openItem === index ? '−' : '+'}
-              </span>
-            </button>
-            {openItem === index && (
-              <div className="px-6 pb-4">
-                <p className="text-muted-foreground">{faq.answer}</p>
-              </div>
-            )}
-          </div>
-        ))}
+      {/* FAQ Accordion */}
+      <div className="mb-12">
+        <Accordion type="single" collapsible className="w-full space-y-4">
+          <AccordionItem value="ethics" className="border rounded-lg px-6">
+            <AccordionTrigger className="text-left py-4">
+              Do you write essays for me?
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <p className="text-muted-foreground">
+                No, we coach; you write. Our AI provides feedback and suggestions to improve your writing, 
+                but we never write essays for you. This ensures your voice and authenticity shine through 
+                in your application. We believe in ethical coaching that helps you develop your own 
+                compelling narrative.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="privacy" className="border rounded-lg px-6">
+            <AccordionTrigger className="text-left py-4">
+              How do you protect my privacy and data?
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <p className="text-muted-foreground">
+                We take data security seriously. All personal information and essays are encrypted in transit 
+                and at rest. We never share your data with third parties, and you can request deletion of 
+                your data at any time. Our platform complies with GDPR and other privacy regulations.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="security" className="border rounded-lg px-6">
+            <AccordionTrigger className="text-left py-4">
+              What security measures do you have in place?
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <p className="text-muted-foreground">
+                We use industry-standard encryption, secure cloud infrastructure, and regular security audits. 
+                All data is stored in secure, SOC 2 compliant data centers. We implement strict access controls 
+                and monitor for any suspicious activity to protect your sensitive application materials.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="ownership" className="border rounded-lg px-6">
+            <AccordionTrigger className="text-left py-4">
+              Who owns my essays and application materials?
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <p className="text-muted-foreground">
+                You retain full ownership of all your essays and application materials. We provide coaching 
+                and feedback, but the content is always yours. You can export and download your materials 
+                at any time, and we don't use your content for any other purpose without your explicit consent.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="limits" className="border rounded-lg px-6">
+            <AccordionTrigger className="text-left py-4">
+              What happens if I hit my monthly limits?
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <p className="text-muted-foreground">
+                You'll receive notifications as you approach your limits. When you reach them, you can either 
+                upgrade to a higher tier for more capacity or wait until your limits reset at the beginning 
+                of your next billing cycle. We also offer one-time purchases for additional usage if needed.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="schools" className="border rounded-lg px-6">
+            <AccordionTrigger className="text-left py-4">
+              Which MBA programs do you support?
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <p className="text-muted-foreground">
+                We support applications to all major MBA programs globally, including top US programs, 
+                European business schools, and international MBA options. Our platform adapts to different 
+                application requirements and essay prompts across various schools and programs.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="refunds" className="border rounded-lg px-6">
+            <AccordionTrigger className="text-left py-4">
+              What's your refund policy?
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <p className="text-muted-foreground">
+                We offer a 30-day money-back guarantee for new subscribers. If you're not satisfied with 
+                our service within the first 30 days, we'll provide a full refund. For annual plans, 
+                we offer prorated refunds for unused months if you cancel early.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="support" className="border rounded-lg px-6">
+            <AccordionTrigger className="text-left py-4">
+              How do I get help if I have issues?
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <p className="text-muted-foreground">
+                We provide multiple support channels: in-app chat with coaches, email support, and 
+                comprehensive help documentation. Our team typically responds within 24 hours, and 
+                premium users get priority support. You can also book consultation sessions for 
+                more detailed assistance.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
 
-      <div className="text-center mt-12">
+      {/* Contact CTA */}
+      <div className="text-center">
         <p className="text-muted-foreground mb-4">
           Still have questions? We're here to help.
         </p>
         <a 
           href="/contact" 
-          className="inline-block bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
+          className="inline-block bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
         >
           Contact Us
         </a>
       </div>
-    </section>
+    </main>
   );
 } 
