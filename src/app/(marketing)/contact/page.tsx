@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Mail, MessageSquare, Phone } from 'lucide-react';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -26,7 +27,8 @@ export default function Contact() {
   };
 
   return (
-    <section className="mx-auto max-w-4xl px-6 py-16">
+    <main className="mx-auto max-w-4xl px-6 py-16">
+      {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
         <p className="text-lg text-muted-foreground">
@@ -35,55 +37,72 @@ export default function Contact() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-12">
+        {/* Contact Info */}
         <div>
           <h2 className="text-2xl font-semibold mb-6">Get in Touch</h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground mb-8">
             Whether you have questions about our services, need technical support, 
             or want to provide feedback, we're here to help.
           </p>
           
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">General Inquiries</h3>
-              <p className="text-muted-foreground text-sm">
-                For general questions about our services and pricing
-              </p>
-              <a 
-                href="mailto:hello@portersprep.com" 
-                className="text-blue-600 hover:underline text-sm"
-              >
-                hello@portersprep.com
-              </a>
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Mail className="h-5 w-5 text-blue-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">Email Support</h3>
+                <p className="text-muted-foreground text-sm mb-2">
+                  For general questions and support
+                </p>
+                <a 
+                  href="mailto:support@portersprep.com" 
+                  className="text-blue-600 hover:underline text-sm"
+                >
+                  support@portersprep.com
+                </a>
+              </div>
             </div>
             
-            <div>
-              <h3 className="font-semibold mb-2">Technical Support</h3>
-              <p className="text-muted-foreground text-sm">
-                For help with the platform or technical issues
-              </p>
-              <a 
-                href="mailto:support@portersprep.com" 
-                className="text-blue-600 hover:underline text-sm"
-              >
-                support@portersprep.com
-              </a>
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <MessageSquare className="h-5 w-5 text-green-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">In-App Chat</h3>
+                <p className="text-muted-foreground text-sm mb-2">
+                  Chat with coaches and get quick answers
+                </p>
+                <a 
+                  href="/dashboard" 
+                  className="text-green-600 hover:underline text-sm"
+                >
+                  Open the app
+                </a>
+              </div>
             </div>
             
-            <div>
-              <h3 className="font-semibold mb-2">Privacy & Legal</h3>
-              <p className="text-muted-foreground text-sm">
-                For privacy policy or terms of service questions
-              </p>
-              <a 
-                href="mailto:legal@portersprep.com" 
-                className="text-blue-600 hover:underline text-sm"
-              >
-                legal@portersprep.com
-              </a>
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Phone className="h-5 w-5 text-purple-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">Response Time</h3>
+                <p className="text-muted-foreground text-sm">
+                  We typically respond within 24 hours during business days
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* Contact Form */}
         <div>
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -99,6 +118,7 @@ export default function Contact() {
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="Your name"
                 />
               </div>
               
@@ -114,6 +134,7 @@ export default function Contact() {
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="your.email@example.com"
                 />
               </div>
               
@@ -129,12 +150,13 @@ export default function Contact() {
                   required
                   rows={5}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="How can we help you?"
                 />
               </div>
               
               <button
                 type="submit"
-                className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition-colors"
+                className="w-full bg-black text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors"
               >
                 Send Message
               </button>
@@ -160,17 +182,19 @@ export default function Contact() {
         </div>
       </div>
 
+      {/* Direct Email CTA */}
       <div className="mt-16 text-center">
         <p className="text-muted-foreground mb-4">
           Prefer to email us directly?
         </p>
         <a 
-          href="mailto:hello@portersprep.com?subject=Contact from PortersPrep Website" 
-          className="inline-block bg-gray-100 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-200 transition-colors"
+          href="mailto:support@portersprep.com?subject=Contact from PortersPrep Website" 
+          className="inline-flex items-center gap-2 bg-gray-100 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-200 transition-colors"
         >
+          <Mail className="h-4 w-4" />
           Send us an email
         </a>
       </div>
-    </section>
+    </main>
   );
 } 

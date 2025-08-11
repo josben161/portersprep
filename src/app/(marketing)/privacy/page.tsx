@@ -1,6 +1,12 @@
+export const metadata = {
+  title: "Privacy Policy — PortersPrep",
+  description: "Learn how PortersPrep protects your privacy and handles your data."
+};
+
 export default function Privacy() {
   return (
-    <section className="mx-auto max-w-4xl px-6 py-16">
+    <main className="mx-auto max-w-4xl px-6 py-16">
+      {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
         <p className="text-muted-foreground">
@@ -9,8 +15,9 @@ export default function Privacy() {
       </div>
 
       <div className="space-y-8 text-muted-foreground">
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 text-foreground">Information We Collect</h2>
+        {/* Data We Collect */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4 text-foreground">Data We Collect</h2>
           <p className="mb-4">
             We collect information you provide directly to us, such as when you create an account, 
             upload documents, or communicate with our coaches. This may include:
@@ -22,9 +29,10 @@ export default function Privacy() {
             <li>Communication with coaches</li>
             <li>Usage data and analytics</li>
           </ul>
-        </div>
+        </section>
 
-        <div>
+        {/* How We Use It */}
+        <section>
           <h2 className="text-2xl font-semibold mb-4 text-foreground">How We Use Your Information</h2>
           <p className="mb-4">
             We use the information we collect to:
@@ -37,18 +45,20 @@ export default function Privacy() {
             <li>Send important updates about our services</li>
             <li>Ensure security and prevent fraud</li>
           </ul>
-        </div>
+        </section>
 
-        <div>
+        {/* Data Security */}
+        <section>
           <h2 className="text-2xl font-semibold mb-4 text-foreground">Data Security</h2>
           <p>
             We implement appropriate security measures to protect your personal information 
             against unauthorized access, alteration, disclosure, or destruction. Your data 
             is encrypted in transit and at rest, and we regularly review our security practices.
           </p>
-        </div>
+        </section>
 
-        <div>
+        {/* Data Sharing */}
+        <section>
           <h2 className="text-2xl font-semibold mb-4 text-foreground">Data Sharing</h2>
           <p className="mb-4">
             We do not sell, trade, or otherwise transfer your personal information to third 
@@ -60,9 +70,10 @@ export default function Privacy() {
             <li>To protect our rights and safety</li>
             <li>With service providers who assist in our operations</li>
           </ul>
-        </div>
+        </section>
 
-        <div>
+        {/* Your Rights */}
+        <section>
           <h2 className="text-2xl font-semibold mb-4 text-foreground">Your Rights</h2>
           <p className="mb-4">
             You have the right to:
@@ -74,16 +85,17 @@ export default function Privacy() {
             <li>Opt out of marketing communications</li>
             <li>Export your data in a portable format</li>
           </ul>
-        </div>
+        </section>
 
-        <div>
+        {/* Contact */}
+        <section>
           <h2 className="text-2xl font-semibold mb-4 text-foreground">Contact Us</h2>
           <p>
             If you have questions about this Privacy Policy or our data practices, please 
-            contact us at privacy@portersprep.com or through our contact form.
+            contact us at <a href="mailto:privacy@portersprep.com" className="text-blue-600 hover:underline">privacy@portersprep.com</a> or through our contact form.
           </p>
-        </div>
+        </section>
       </div>
-    </section>
+    </main>
   );
 } 
