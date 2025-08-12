@@ -1,5 +1,5 @@
-import { listSchools } from "@/lib/apps";
+import { listSchoolsData } from "@/lib/schools";
 
 export async function GET() {
-  return Response.json(await listSchools());
+  return Response.json(await listSchoolsData());
 } 

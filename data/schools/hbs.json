@@ -1,0 +1,36 @@
+{
+  "id": "hbs",
+  "name": "Harvard Business School",
+  "country": "USA",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "short",
+      "title": "Leadership Example",
+      "prompt": "Briefly describe an example of when you led a team or group.",
+      "word_limit": 300,
+      "source_url": "https://www.stacyblackman.com/blog/harvard-business-school-application-essay-tips/"
+    },
+    {
+      "type": "short",
+      "title": "Significant Growth",
+      "prompt": "Briefly describe an example of when you experienced significant growth.",
+      "word_limit": 300,
+      "source_url": "https://www.stacyblackman.com/blog/harvard-business-school-application-essay-tips/"
+    },
+    {
+      "type": "short",
+      "title": "Contribution to Community/Diversity",
+      "prompt": "Briefly describe an example of when you contributed to your community or promoted diversity.",
+      "word_limit": 300,
+      "source_url": "https://www.stacyblackman.com/blog/harvard-business-school-application-essay-tips/"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 2,
+    "format": "School form"
+  },
+  "verify_in_portal": true,
+  "last_checked": "2024-12-19"
+} 

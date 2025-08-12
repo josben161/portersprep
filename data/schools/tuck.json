@@ -1,0 +1,36 @@
+{
+  "id": "tuck",
+  "name": "Tuck School of Business at Dartmouth",
+  "country": "USA",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "short",
+      "title": "Why Tuck",
+      "prompt": "Why are you pursuing an MBA and why Tuck?",
+      "word_limit": null,
+      "source_url": "https://tuck.dartmouth.edu/admissions/applying-to-tuck"
+    },
+    {
+      "type": "short",
+      "title": "Leadership Experience",
+      "prompt": "Tell us about a time when you led a team or group.",
+      "word_limit": null,
+      "source_url": "https://tuck.dartmouth.edu/admissions/applying-to-tuck"
+    },
+    {
+      "type": "short",
+      "title": "Personal Growth",
+      "prompt": "Tell us about a time when you experienced significant growth.",
+      "word_limit": null,
+      "source_url": "https://tuck.dartmouth.edu/admissions/applying-to-tuck"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 2,
+    "format": "GMAC Common LOR"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 

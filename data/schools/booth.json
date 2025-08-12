@@ -1,0 +1,29 @@
+{
+  "id": "booth",
+  "name": "Chicago Booth School of Business",
+  "country": "USA",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "long",
+      "title": "Why Booth",
+      "prompt": "How will the Booth MBA help you achieve your immediate and long-term post-MBA career goals?",
+      "word_limit": 500,
+      "source_url": "https://www.chicagobooth.edu/stories/introducing-chicago-booths-new-application-process"
+    },
+    {
+      "type": "short",
+      "title": "Impact",
+      "prompt": "An MBA is as much about personal growth as it is about professional development. In addition to sharing your experience and goals in terms of career, we'd like to learn more about you outside of the office. Use this opportunity to tell us something about who you are.",
+      "word_limit": 300,
+      "source_url": "https://www.chicagobooth.edu/stories/introducing-chicago-booths-new-application-process"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 1,
+    "format": "GMAC Common LOR"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 

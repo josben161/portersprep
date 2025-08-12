@@ -1,0 +1,43 @@
+{
+  "id": "cambridge-judge",
+  "name": "Cambridge Judge Business School",
+  "country": "UK",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "short",
+      "title": "Career Goals",
+      "prompt": "What are your short-term and long-term career goals? How will the Cambridge MBA help you achieve these goals?",
+      "word_limit": 200,
+      "source_url": "https://www.jbs.cam.ac.uk/mba/applying/"
+    },
+    {
+      "type": "short",
+      "title": "Leadership Experience",
+      "prompt": "Describe a time when you led a team or group. What did you learn about yourself as a leader?",
+      "word_limit": 200,
+      "source_url": "https://www.jbs.cam.ac.uk/mba/applying/"
+    },
+    {
+      "type": "short",
+      "title": "Personal Growth",
+      "prompt": "Describe a time when you experienced significant personal growth. What did you learn about yourself?",
+      "word_limit": 200,
+      "source_url": "https://www.jbs.cam.ac.uk/mba/applying/"
+    },
+    {
+      "type": "short",
+      "title": "Contribution to Community",
+      "prompt": "How have you contributed to your community or promoted diversity? What impact did you have?",
+      "word_limit": 200,
+      "source_url": "https://www.jbs.cam.ac.uk/mba/applying/"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 2,
+    "format": "School form"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 

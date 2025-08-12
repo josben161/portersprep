@@ -1,0 +1,22 @@
+{
+  "id": "usyd",
+  "name": "University of Sydney Business School",
+  "country": "Australia",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "long",
+      "title": "Statement of Motivation",
+      "prompt": "Please provide a statement of motivation explaining why you want to pursue an MBA and how it aligns with your career goals.",
+      "word_limit": null,
+      "source_url": "https://www.sydney.edu.au/business/news-and-events/news/mba/how-to-successfully-apply-for-an-mba.html"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 2,
+    "format": "School form"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 

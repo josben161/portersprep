@@ -1,0 +1,29 @@
+{
+  "id": "gsb",
+  "name": "Stanford Graduate School of Business",
+  "country": "USA",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "long",
+      "title": "What Matters Most",
+      "prompt": "What matters most to you, and why?",
+      "word_limit": 650,
+      "source_url": "https://www.gsb.stanford.edu/programs/mba/admission/application/essays"
+    },
+    {
+      "type": "short",
+      "title": "Why Stanford",
+      "prompt": "Why Stanford?",
+      "word_limit": 350,
+      "source_url": "https://www.gsb.stanford.edu/programs/mba/admission/application/essays"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 2,
+    "format": "School form"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 

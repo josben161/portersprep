@@ -1,0 +1,29 @@
+{
+  "id": "wharton",
+  "name": "The Wharton School",
+  "country": "USA",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "long",
+      "title": "Post-MBA Goals",
+      "prompt": "How do you plan to use the Wharton MBA program to help you achieve your future professional goals?",
+      "word_limit": 500,
+      "source_url": "https://mba.wharton.upenn.edu/mba-admissions/class-of-2028-application-now-open-and-newly-updated/"
+    },
+    {
+      "type": "short",
+      "title": "Impactful Experience",
+      "prompt": "Describe an impactful experience or accomplishment that is not reflected elsewhere in your application.",
+      "word_limit": 400,
+      "source_url": "https://mba.wharton.upenn.edu/mba-admissions/class-of-2028-application-now-open-and-newly-updated/"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 1,
+    "format": "GMAC Common LOR"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 

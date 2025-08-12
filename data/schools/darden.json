@@ -1,0 +1,36 @@
+{
+  "id": "darden",
+  "name": "Darden School of Business",
+  "country": "USA",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "short",
+      "title": "Career Goals",
+      "prompt": "What are your short-term and long-term career goals? How will the Darden MBA help you achieve these goals?",
+      "word_limit": 200,
+      "source_url": "https://blogs.darden.virginia.edu/admissions/2025/06/25/essays-and-deadlines-announced-for-2025-26-full-time-mba-application/"
+    },
+    {
+      "type": "short",
+      "title": "Leadership Experience",
+      "prompt": "Describe a time when you led a team or group. What did you learn about yourself as a leader?",
+      "word_limit": 200,
+      "source_url": "https://blogs.darden.virginia.edu/admissions/2025/06/25/essays-and-deadlines-announced-for-2025-26-full-time-mba-application/"
+    },
+    {
+      "type": "short",
+      "title": "Personal Growth",
+      "prompt": "Describe a time when you experienced significant personal growth. What did you learn about yourself?",
+      "word_limit": 200,
+      "source_url": "https://blogs.darden.virginia.edu/admissions/2025/06/25/essays-and-deadlines-announced-for-2025-26-full-time-mba-application/"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 1,
+    "format": "GMAC Common LOR"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 

@@ -1,0 +1,46 @@
+{
+  "id": "oxford-said",
+  "name": "Oxford Said Business School",
+  "country": "UK",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "short",
+      "title": "Supporting Statement",
+      "prompt": "Please provide a supporting statement that tells us about your motivation for studying the MBA and what you will contribute to the Oxford MBA community.",
+      "word_limit": 250,
+      "source_url": "https://www.sbs.ox.ac.uk/programmes/mbas/mba/application-requirements"
+    },
+    {
+      "type": "short",
+      "title": "Additional Essay 1",
+      "prompt": "Tell us about a time when you had to make a difficult decision and what you learned from it.",
+      "word_limit": 250,
+      "source_url": "https://www.sbs.ox.ac.uk/programmes/mbas/mba/application-requirements"
+    },
+    {
+      "type": "short",
+      "title": "Additional Essay 2",
+      "prompt": "Tell us about a time when you had to work with a diverse group of people and what you learned from the experience.",
+      "word_limit": 250,
+      "source_url": "https://www.sbs.ox.ac.uk/programmes/mbas/mba/application-requirements"
+    },
+    {
+      "type": "short",
+      "title": "Reapplicant Essay",
+      "prompt": "If you are reapplying, please tell us what has changed since your last application.",
+      "word_limit": 250,
+      "source_url": "https://www.sbs.ox.ac.uk/programmes/mbas/mba/application-requirements"
+    }
+  ],
+  "video_assessment": {
+    "provider": "Kira",
+    "notes": "3 competency-based questions"
+  },
+  "lor": {
+    "count": 2,
+    "format": "School form"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 

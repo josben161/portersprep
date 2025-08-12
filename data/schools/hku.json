@@ -1,0 +1,22 @@
+{
+  "id": "hku",
+  "name": "HKU Business School",
+  "country": "Hong Kong",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "long",
+      "title": "Personal Statement",
+      "prompt": "Please provide a personal statement outlining your motivation for pursuing an MBA and your career goals.",
+      "word_limit": null,
+      "source_url": "https://mba.hkubs.hku.hk/full-time-mba-admissions/"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 2,
+    "format": "School form"
+  },
+  "verify_in_portal": true,
+  "last_checked": "2024-12-19"
+} 

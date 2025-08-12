@@ -1,0 +1,32 @@
+{
+  "id": "insead",
+  "name": "INSEAD",
+  "country": "France/Singapore",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "long",
+      "title": "Job Description",
+      "prompt": "Briefly summarise your current (or most recent) job, including the nature of work, major responsibilities, and where relevant, employees under your supervision, size of budget, clients/products and results achieved.",
+      "word_limit": null,
+      "source_url": "https://www.insead.edu/master-programmes/master-business-administration/admissions"
+    },
+    {
+      "type": "long",
+      "title": "Motivation",
+      "prompt": "What would be your next step in terms of position if you were to remain in the same company?",
+      "word_limit": null,
+      "source_url": "https://www.insead.edu/master-programmes/master-business-administration/admissions"
+    }
+  ],
+  "video_assessment": {
+    "provider": "Kira",
+    "notes": "Video interview required"
+  },
+  "lor": {
+    "count": 2,
+    "format": "School form"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 

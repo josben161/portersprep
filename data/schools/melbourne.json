@@ -1,0 +1,43 @@
+{
+  "id": "melbourne",
+  "name": "Melbourne Business School",
+  "country": "Australia",
+  "cycle": "2025-2026",
+  "essays": [
+    {
+      "type": "short",
+      "title": "Personal Statement 1",
+      "prompt": "What are your career goals and how will the Melbourne MBA help you achieve them?",
+      "word_limit": 300,
+      "source_url": "https://mbs.edu/application-process-how-to-guide"
+    },
+    {
+      "type": "short",
+      "title": "Personal Statement 2",
+      "prompt": "Describe a significant leadership experience and what you learned from it.",
+      "word_limit": 300,
+      "source_url": "https://mbs.edu/application-process-how-to-guide"
+    },
+    {
+      "type": "short",
+      "title": "Personal Statement 3",
+      "prompt": "Tell us about a time when you faced a significant challenge and how you overcame it.",
+      "word_limit": 300,
+      "source_url": "https://mbs.edu/application-process-how-to-guide"
+    },
+    {
+      "type": "short",
+      "title": "Personal Statement 4",
+      "prompt": "How have you contributed to your community or promoted diversity and inclusion?",
+      "word_limit": 300,
+      "source_url": "https://mbs.edu/application-process-how-to-guide"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 2,
+    "format": "School form"
+  },
+  "verify_in_portal": false,
+  "last_checked": "2024-12-19"
+} 
