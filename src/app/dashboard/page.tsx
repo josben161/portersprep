@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, FileText, MessageSquare, CreditCard, Plus, ArrowRight } from "lucide-react";
+import { BarChart3, FileText, MessageSquare, CreditCard, Plus, ArrowRight, BookOpen } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export default function DashboardPage() {
@@ -62,6 +62,15 @@ export default function DashboardPage() {
       borderColor: "border-green-200"
     },
     {
+      title: "Story Bank",
+      description: "Manage your anchor stories",
+      icon: BookOpen,
+      href: "/dashboard/stories",
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
+      borderColor: "border-indigo-200"
+    },
+    {
       title: "Coach",
       description: "Message your personal MBA coach",
       icon: MessageSquare,
@@ -91,7 +100,7 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-8">
         {cards.map((card) => {
           const IconComponent = card.icon;
           return (
