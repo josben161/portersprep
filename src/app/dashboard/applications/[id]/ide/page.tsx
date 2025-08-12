@@ -7,6 +7,7 @@ import RightTabs from "@/components/appshell/RightTabs";
 import AnalysisPanel from "@/components/panels/AnalysisPanel";
 import SchoolBriefPanel from "@/components/panels/SchoolBriefPanel";
 import StoryBankPanel from "@/components/panels/StoryBankPanel";
+import WordLimitBar from "@/components/ui/WordLimitBar";
 // Reuse if present:
 let CoveragePanel: any = () => <div className='text-sm text-muted-foreground'>Add CoveragePanel to see cross‑school story usage.</div>;
 try { CoveragePanel = require("@/components/CoveragePanel").default; } catch {}
@@ -142,11 +143,8 @@ export default function IDE({ params }: { params: { id: string } }) {
             <div className="truncate text-sm text-muted-foreground">{selected ? selected.archetype : "Select a question"}</div>
             <div className="truncate text-base font-medium">{selected?.prompt ?? "—"}</div>
           </div>
-          <div className="flex items-center gap-3 text-xs">
-            <div className={`rounded px-2 py-1 ${selected?.word_limit && wc > selected.word_limit ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-200" : "bg-muted text-muted-foreground"}`}>
-              {wc} {selected?.word_limit ? `/ ${selected.word_limit}` : "words"}
-            </div>
-            <div className="text-muted-foreground">{saving ? "Saving…" : "Saved"}</div>
+          <div className="w-56">
+            <WordLimitBar count={wc} limit={selected?.word_limit ?? null} />
           </div>
         </div>
 

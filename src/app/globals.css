@@ -2,6 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Brand font via CSS variable; layout imports Poppins via next/font */
+:root {
+  --radius: 12px;
+  --brand: 39 109 255; /* brand.500 as rgb */
+  --bg: 248 249 251;
+  --fg: 15 23 42;
+  --card: 255 255 255;
+  --muted: 100 116 139;
+}
+
+.dark {
+  --bg: 13 17 23;
+  --fg: 226 232 240;
+  --card: 20 24 30;
+  --muted: 148 163 184;
+}
+
+html, body {
+  color: rgb(var(--fg));
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(var(--brand)/0.05), transparent), rgb(var(--bg));
+}
+
+* { transition: background-color .2s var(--ease, cubic-bezier(0.16,1,0.3,1)), color .2s var(--ease, cubic-bezier(0.16,1,0.3,1)); }
+
+.bg-card { background-color: rgb(var(--card)); }
+.text-muted-foreground { color: rgb(var(--muted)); }
+
+/* Hover states + focus rings */
+.btn {
+  @apply rounded-md px-3 py-2 transition;
+  transition-timing-function: cubic-bezier(0.16,1,0.3,1);
+}
+.btn-primary {
+  @apply text-white shadow;
+  background: linear-gradient(180deg, rgb(var(--brand)) 0%, rgba(var(--brand), 0.9) 100%);
+}
+.btn-primary:hover { filter: brightness(1.05); }
+.btn-outline { @apply border hover:bg-black/5 dark:hover:bg-white/5; }
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -96,4 +135,18 @@
   .animate-scroll-left:hover {
     animation-play-state: paused;
   }
-} 
+}
+
+/* Focus mode CSS */
+.focus-mode .hide-in-focus { display: none !important; }
+.focus-mode .editor-shell { max-width: 820px; margin: 0 auto; }
+
+/* Micro-animations on cards & buttons */
+.card {
+  @apply rounded-lg border bg-card shadow-sm transition;
+  transition-timing-function: cubic-bezier(0.16,1,0.3,1);
+}
+.card:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+
+a, button { transition: transform .15s cubic-bezier(0.16,1,0.3,1); }
+a:active, button:active { transform: scale(0.98); } 

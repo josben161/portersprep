@@ -17,9 +17,21 @@ const config: Config = {
   	},
   	extend: {
   		fontFamily: {
-  			sans: ["var(--font-poppins)", "ui-sans-serif", "system-ui", "sans-serif"]
+  			sans: ["var(--font-poppins)", "system-ui", "ui-sans-serif", "Inter", "sans-serif"]
   		},
   		colors: {
+  			brand: {
+  				50: "#eef4ff",
+  				100: "#dbe7ff",
+  				200: "#b8ceff",
+  				300: "#90b3ff",
+  				400: "#5f90ff",
+  				500: "#396dff",     // primary
+  				600: "#2a54db",
+  				700: "#1f41ad",
+  				800: "#182f7d",
+  				900: "#111f55"
+  			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
@@ -87,6 +99,9 @@ const config: Config = {
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out'
+  		},
+  		transitionTimingFunction: {
+  			"swift": "cubic-bezier(0.16, 1, 0.3, 1)"
   		}
   	}
   },
