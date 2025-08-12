@@ -15,7 +15,6 @@ export default function CoreProfileCard(){
   const [p, setP] = useState<any|null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
 
   useEffect(()=>{ (async()=>{
@@ -58,51 +57,6 @@ export default function CoreProfileCard(){
     }
   })(); },[]);
 
-  async function uploadCV(file: File){
-    setUploading(true);
-    setMessage(null);
-    
-    try {
-      console.log("Starting CV upload for file:", file.name);
-      
-      // Use server-side upload to avoid CORS issues
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const r = await apiFetch("/api/upload-cv", {
-        method: "POST",
-        body: formData
-      });
-      
-      if (!r.ok) {
-        const errorText = await r.text();
-        console.error("CV upload failed:", errorText);
-        setMessage({ type: 'error', text: `Upload failed: ${errorText}` });
-        return;
-      }
-      
-      const result = await r.json();
-      console.log("CV upload completed successfully:", result);
-      
-      // Refresh profile data
-      const rr = await fetch("/api/profile"); 
-      const updatedProfile = rr.ok ? await rr.json() : p;
-      console.log("Profile after CV upload:", updatedProfile);
-      setP(updatedProfile);
-      
-      setMessage({ type: 'success', text: `CV uploaded successfully!` });
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setMessage(null), 3000);
-      
-    } catch (error) {
-      console.error("CV upload error:", error);
-      setMessage({ type: 'error', text: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}` });
-    } finally {
-      setUploading(false);
-    }
-  }
-
   async function saveProfile(){
     setSaving(true);
     try {
@@ -123,45 +77,7 @@ export default function CoreProfileCard(){
       
       return () => clearTimeout(timeoutId);
     }
-  }, [p?.name, p?.industry, p?.years_exp, p?.gpa, p?.gmat, p?.goals]);
-
-  async function removeCV(){
-    if (!confirm("Remove CV from profile?")) return;
-    
-    setMessage(null);
-    
-    try {
-      await apiFetch("/api/profile", { 
-        method:"PUT", 
-        headers:{ "Content-Type":"application/json" }, 
-        body: JSON.stringify({ ...p, resume_key: null }) 
-      });
-      
-      // Refresh profile data
-      const rr = await fetch("/api/profile"); 
-      const updatedProfile = rr.ok ? await rr.json() : p;
-      setP(updatedProfile);
-      
-      setMessage({ type: 'success', text: 'CV removed successfully' });
-      setTimeout(() => setMessage(null), 3000);
-      
-    } catch (error) {
-      console.error("Failed to remove CV:", error);
-      setMessage({ type: 'error', text: 'Failed to remove CV' });
-    }
-  }
-
-  // Extract filename from S3 key
-  function getFileName(key: string) {
-    const parts = key.split('/');
-    return parts[parts.length - 1] || 'CV';
-  }
-
-  // Get file extension for icon
-  function getFileExtension(key: string) {
-    const fileName = getFileName(key);
-    return fileName.split('.').pop()?.toUpperCase() || 'PDF';
-  }
+  }, [p?.name]);
 
   if (loading) return <section className="card p-4 text-sm text-muted-foreground">Loading profile…</section>;
   if (!p) return <section className="card p-4 text-sm text-muted-foreground">Failed to load profile</section>;
@@ -181,11 +97,6 @@ export default function CoreProfileCard(){
         </div>
       )}
       
-      {/* Debug info - remove this later */}
-      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-        Debug: resume_key = {p.resume_key ? `"${p.resume_key}"` : 'null'}
-      </div>
-      
       <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
         <input className="rounded-md border px-3 py-2" placeholder="Name" value={p.name ?? ""} onChange={e=> setP((v:any)=>({...v, name: e.target.value}))} />
         <input className="rounded-md border px-3 py-2" placeholder="Industry" value={p.industry ?? ""} onChange={e=> setP((v:any)=>({...v, industry: e.target.value}))} />
@@ -196,89 +107,19 @@ export default function CoreProfileCard(){
       </div>
       
       <div className="mt-3">
-        {p.resume_key ? (
-          <div className="rounded-md border p-3 bg-gray-50 dark:bg-gray-900/50">
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-12 bg-blue-100 dark:bg-blue-900/30 rounded flex items-center justify-center">
-                  <DocumentIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {getFileName(p.resume_key)}
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {getFileExtension(p.resume_key)} • Available for applications
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button 
-                  className="btn btn-outline text-xs" 
-                  onClick={removeCV} 
-                  disabled={uploading}
-                  title="Remove CV"
-                >
-                  Remove
-                </button>
-                <label className={`btn btn-outline text-xs ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                  {uploading ? 'Uploading...' : 'Replace'}
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    accept=".pdf,.doc,.docx,.txt" 
-                    disabled={uploading}
-                    onChange={e=> { 
-                      const f = e.target.files?.[0]; 
-                      if (f) {
-                        const ext = f.name.split('.').pop()?.toLowerCase();
-                        const allowedExtensions = ['pdf', 'doc', 'docx', 'txt'];
-                        if (!allowedExtensions.includes(ext || '')) {
-                          setMessage({ type: 'error', text: `Please select a PDF, Word document, or text file. Got: .${ext}` });
-                          return;
-                        }
-                        uploadCV(f); 
-                      }
-                    }} 
-                  />
-                </label>
-              </div>
-            </div>
+        <div className="rounded-md border-2 border-dashed border-gray-300 dark:border-gray-600 p-6 text-center">
+          <DocumentIcon className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            CV upload temporarily disabled
           </div>
-        ) : (
-          <div className="rounded-md border-2 border-dashed border-gray-300 dark:border-gray-600 p-6 text-center">
-            <DocumentIcon className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              No CV uploaded yet
-            </div>
-            <label className={`btn btn-outline text-xs ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              {uploading ? 'Uploading...' : 'Upload CV'}
-              <input 
-                type="file" 
-                className="hidden" 
-                accept=".pdf,.doc,.docx,.txt" 
-                disabled={uploading}
-                onChange={e=> { 
-                  const f = e.target.files?.[0]; 
-                  if (f) {
-                    const ext = f.name.split('.').pop()?.toLowerCase();
-                    const allowedExtensions = ['pdf', 'doc', 'docx', 'txt'];
-                    if (!allowedExtensions.includes(ext || '')) {
-                      setMessage({ type: 'error', text: `Please select a PDF, Word document, or text file. Got: .${ext}` });
-                      return;
-                    }
-                    uploadCV(f); 
-                  }
-                }} 
-              />
-            </label>
+          <div className="text-xs text-muted-foreground">
+            Database migration in progress
           </div>
-        )}
+        </div>
       </div>
       
       <div className="mt-3 flex items-center gap-2 text-sm">
         {saving && <span className="text-xs text-muted-foreground">Saving…</span>}
-        {uploading && <span className="text-xs text-muted-foreground">Uploading CV…</span>}
       </div>
     </section>
   );
