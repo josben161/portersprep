@@ -46,7 +46,7 @@ function throwQuota(feature: string, limit: number | string){
 }
 
 /** Convenience: log AI usage after a successful call */
-export async function logAiUse(profileId: string, feature: "ai_design"|"ai_draft"|"ai_analyze"){
+export async function logAiUse(profileId: string, feature: "ai_design"|"ai_draft"|"ai_analyze"|"ai_redline"){
   const sb = getAdminSupabase();
   await sb.rpc("log_ai_usage", { p_user_id: profileId, p_feature: feature, p_delta: 1 });
 } 

@@ -1,16 +1,18 @@
 import { requireAuthedProfile } from "@/lib/authz";
-import { z } from "zod";
-
-const Input = z.object({ text: z.string().min(10) });
+import { getQuotaSnapshot, assertWithinLimit, logAiUse } from "@/lib/quota";
+import { chatJson } from "@/lib/ai";
 
 export async function POST(req: Request) {
-  const { profile } = await requireAuthedProfile();
-  const parsed = Input.safeParse(await req.json());
-  if (!parsed.success) return new Response("Bad Request", { status: 400 });
+  const { profile, clerkUserId } = await requireAuthedProfile();
+  const snap = await getQuotaSnapshot(clerkUserId);
+  try { assertWithinLimit("ai_calls", snap); } catch (e) { if(e instanceof Response) return e; throw e; }
 
-  // TODO: Implement actual redline logic with OpenAI
-  const comments = [{ pos: 0, len: 60, note: "Lead with quantified impact; trim passive voice." }];
-  const suggestions = ["Tighten goal to one sentence", "Remove filler adverbs", "Clarify short- vs long-term path"];
+  const { text, prompt } = await req.json();
+  
+  const system = "You are an MBA essay editing expert. Return JSON only.";
+  const user = `Text: ${text}\nPrompt: ${prompt}\n\nReturn {"redlines":[{"start":0,"end":10,"suggestion":"improved text","reason":"explanation"}],"overall_score":8,"feedback":"overall feedback"}`;
+  const result = await chatJson({ system, user, temperature: 0.4 });
 
-  return Response.json({ comments, suggestions });
+  await logAiUse(profile.id, "ai_redline");
+  return Response.json(result);
 } 
