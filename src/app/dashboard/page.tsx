@@ -35,6 +35,15 @@ export default function DashboardPage() {
 
   const cards = [
     {
+      title: "Applications",
+      description: "Manage your MBA applications",
+      icon: FileText,
+      href: "/dashboard/applications",
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
+      borderColor: "border-orange-200"
+    },
+    {
       title: "Assessments",
       description: "Get your MBA admission chances",
       icon: BarChart3,
@@ -82,7 +91,7 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
         {cards.map((card) => {
           const IconComponent = card.icon;
           return (
@@ -117,6 +126,16 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            <a
+              href="/dashboard/applications/new"
+              className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted transition-colors"
+            >
+              <div>
+                <div className="font-medium">New Application</div>
+                <div className="text-sm text-muted-foreground">Start a school application</div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </a>
             <a
               href="/dashboard/assessments/new"
               className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted transition-colors"
