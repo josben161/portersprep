@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Skeleton from "@/components/ui/Skeleton";
 import PrepPackModal from "./PrepPackModal";
 
-type Recommender = { id: string; name: string; email?: string|null; assigned?: number; completed?: number; };
+type Recommender = { id: string; name: string; email?: string|null; relationship?: string|null; assigned?: number; completed?: number; };
 
 export default function RecommendationsPanel(){
   const [data, setData] = useState<Recommender[]|null>(null);

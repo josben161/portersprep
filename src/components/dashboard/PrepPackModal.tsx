@@ -8,17 +8,20 @@ export default function PrepPackModal(){
   const [recommenderId, setRecommenderId] = useState<string>("");
   const [applicationId, setApplicationId] = useState<string>("");
 
-  async function generate(){
+  async function generate() {
     if (!recommenderId || !applicationId) return;
     setLoading(true);
-    const r = await fetch("/api/recommenders/packet", {
-      method: "POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify({ recommender_id: recommenderId, application_id: applicationId })
-    });
-    const j = await r.json();
-    setContent(j);
-    setLoading(false);
+    try {
+      const r = await fetch("/api/recommenders/packet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recommender_id: recommenderId, application_id: applicationId })
+      });
+      const j = await r.json();
+      setContent(j);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -41,9 +44,9 @@ export default function PrepPackModal(){
               </div>
             </div>
 
-            {content && (
+            {content?.draft_md && (
               <div className="mt-4 max-h-[50vh] overflow-auto rounded-md border p-3 text-sm">
-                <pre className="whitespace-pre-wrap">{content.draft_md || "(no draft)"}</pre>
+                <pre className="whitespace-pre-wrap">{content.draft_md}</pre>
               </div>
             )}
           </div>

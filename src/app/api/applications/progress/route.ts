@@ -8,6 +8,6 @@ export async function GET() {
     .from("v_application_progress_secure")
     .select("*")
     .eq("user_id", profile.id);
-  if (error) return new Response(error.message, { status: 400 });
+  if (error) return new Response((error as any).message ?? "Query error", { status: 400 });
   return Response.json(data ?? []);
 } 

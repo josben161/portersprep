@@ -5,12 +5,7 @@ import Skeleton from "@/components/ui/Skeleton";
 import ProgressRing from "@/components/ui/ProgressRing";
 import { fmtDate, daysUntil } from "@/lib/date";
 
-type AppCard = {
-  id: string;
-  school?: { id: string; name: string; deadline?: string|null };
-  status?: string;
-  progress?: { essays: number; total: number; recs?: number; recsTotal?: number };
-};
+type AppCard = { id: string; school?: { id: string; name: string; deadline?: string|null }; status?: string; };
 
 export default function ApplicationsGrid(){
   const [apps, setApps] = useState<AppCard[]|null>(null);
@@ -46,10 +41,10 @@ export default function ApplicationsGrid(){
   );
 }
 
-function AppItem({ a, pr }:{ a: AppCard, pr: { essays_total:number; essays_done:number; recs_total:number; recs_done:number } }){
+function AppItem({ a, pr }:{ a: AppCard, pr?: { essays_total:number; essays_done:number; recs_total:number; recs_done:number } }){
   const pct = useMemo(()=>{
-    const total = (pr.essays_total || 0) + (pr.recs_total || 0);
-    const done  = (pr.essays_done  || 0) + (pr.recs_done  || 0);
+    const total = (pr?.essays_total || 0) + (pr?.recs_total || 0);
+    const done  = (pr?.essays_done  || 0) + (pr?.recs_done  || 0);
     return Math.round((done / Math.max(1,total)) * 100);
   },[pr]);
 
@@ -69,7 +64,7 @@ function AppItem({ a, pr }:{ a: AppCard, pr: { essays_total:number; essays_done:
         <ProgressRing value={pct} />
       </div>
       <div className="mt-2 text-xs text-muted-foreground">
-        {pr.essays_done}/{pr.essays_total} essays • {pr.recs_done}/{pr.recs_total} recs
+        {(pr?.essays_done ?? 0)}/{(pr?.essays_total ?? 0)} essays • {(pr?.recs_done ?? 0)}/{(pr?.recs_total ?? 0)} recs
       </div>
       <div className="mt-3 flex gap-2">
         <Link href={`/dashboard/applications/${a.id}/ide`} className="btn btn-primary text-xs">Open workspace</Link>
