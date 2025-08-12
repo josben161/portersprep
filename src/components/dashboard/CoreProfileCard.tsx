@@ -62,15 +62,26 @@ export default function CoreProfileCard(){
       console.log("Got presigned URL:", url);
       
       // Upload to S3
-      const put = await fetch(url, { 
-        method:"PUT", 
-        headers: { "Content-Type": file.type || "application/octet-stream" }, 
-        body: file 
-      });
+      console.log("Uploading to S3 with URL:", url);
+      console.log("File type:", file.type, "File size:", file.size);
+      
+      let put;
+      try {
+        put = await fetch(url, { 
+          method:"PUT", 
+          headers: { "Content-Type": file.type || "application/octet-stream" }, 
+          body: file 
+        });
+      } catch (fetchError) {
+        console.error("Fetch error during S3 upload:", fetchError);
+        alert(`Network error during upload: ${fetchError instanceof Error ? fetchError.message : 'Unknown network error'}`);
+        return;
+      }
       
       if (!put.ok) { 
-        console.error("S3 upload failed:", put.status, put.statusText);
-        alert(`Upload failed: ${put.status} ${put.statusText}`); 
+        const errorText = await put.text().catch(() => "Unknown error");
+        console.error("S3 upload failed:", put.status, put.statusText, errorText);
+        alert(`Upload failed: ${put.status} ${put.statusText} - ${errorText}`); 
         return; 
       }
       

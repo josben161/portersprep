@@ -35,13 +35,22 @@ export async function GET(req: NextRequest) {
     
     console.log("Generating presigned URL for:", key);
     
+    const contentType = ext === 'pdf' ? 'application/pdf' : 
+                       ext === 'doc' ? 'application/msword' :
+                       ext === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
+                       'text/plain';
+    
+    console.log("Creating presigned URL with:", {
+      bucket: process.env.S3_BUCKET,
+      key,
+      contentType,
+      region: process.env.AWS_REGION
+    });
+    
     const url = await getSignedUrl(s3, new PutObjectCommand({
       Bucket: process.env.S3_BUCKET!,
       Key: key,
-      ContentType: ext === 'pdf' ? 'application/pdf' : 
-                   ext === 'doc' ? 'application/msword' :
-                   ext === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
-                   'text/plain'
+      ContentType: contentType
     }), { expiresIn: 60 });
     
     console.log("Presigned URL generated successfully");
