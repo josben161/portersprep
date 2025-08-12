@@ -18,13 +18,13 @@ interface Assessment {
 export default async function AssessmentsPage() {
   // const { userId } = auth();
   const userId = "dummy-user-id"; // Temporary for build
-  
+
   if (!userId) {
     redirect('/sign-in');
   }
 
   const profileId = await getProfileId(userId);
-  
+
   // During build time with dummy user, show empty state instead of redirecting
   if (!profileId) {
     return (
@@ -33,13 +33,13 @@ export default async function AssessmentsPage() {
           <h1 className="text-2xl font-bold">Assessments</h1>
           <a
             href="/dashboard/assessments/new"
-            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-95 transition-colors"
           >
             <Plus className="h-4 w-4" />
             New Assessment
           </a>
         </div>
-        
+
         <div className="text-center py-12">
           <div className="text-gray-400 mb-4">
             <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,7 +52,7 @@ export default async function AssessmentsPage() {
           </p>
           <a
             href="/dashboard/assessments/new"
-            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-95 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Create Assessment
@@ -63,7 +63,7 @@ export default async function AssessmentsPage() {
   }
 
   const supabase = admin();
-  
+
   const { data: assessments, error } = await supabase
     .from('assessments')
     .select('id, created_at, result')
@@ -87,7 +87,7 @@ export default async function AssessmentsPage() {
         <h1 className="text-2xl font-bold">Assessments</h1>
         <a
           href="/dashboard/assessments/new"
-          className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-95 transition-colors"
         >
           <Plus className="h-4 w-4" />
           New Assessment
@@ -163,7 +163,7 @@ export default async function AssessmentsPage() {
           </p>
           <a
             href="/dashboard/assessments/new"
-            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-95 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Create Assessment
