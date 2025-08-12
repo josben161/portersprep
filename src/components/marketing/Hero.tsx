@@ -1,8 +1,23 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Hero() {
+  // University logos for the carousel
+  const universityLogos = [
+    "/images/universities/HBS.png",
+    "/images/universities/GSB.png", 
+    "/images/universities/Said.png",
+    "/images/universities/judge.png",
+    "/images/universities/HKU.png",
+    "/images/universities/insead.png",
+    "/images/universities/wharton.png",
+    "/images/universities/Tuck.png",
+    "/images/universities/melbourne.png",
+    "/images/universities/sydney.png"
+  ];
+
   return (
     <section className="relative overflow-hidden">
       {/* Background */}
@@ -38,6 +53,39 @@ export default function Hero() {
 
           <div className="mt-6 text-xs text-muted-foreground">
             No fake stats. Just a clean start and real tools that help.
+          </div>
+        </motion.div>
+
+        {/* University Logos Carousel */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-16"
+        >
+          <div className="text-center mb-6">
+            <p className="text-sm text-muted-foreground font-medium">
+              Used by applicants to get accepted to world leading institutions
+            </p>
+          </div>
+          
+          {/* Continuous Carousel Container */}
+          <div className="relative overflow-hidden">
+            <div className="flex animate-scroll-left">
+              {[...universityLogos, ...universityLogos, ...universityLogos].map((logo, index) => (
+                <div key={`logo-${index}`} className="flex items-center justify-center mx-8 md:mx-12 flex-shrink-0">
+                  <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
+                    <Image
+                      src={logo}
+                      alt="University logo"
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 768px) 80px, 96px"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
       </div>

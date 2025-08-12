@@ -1,12 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, FileText, MessageSquare, CreditCard, Plus, ArrowRight, BookOpen } from "lucide-react";
+import { BarChart3, FileText, MessageSquare, CreditCard, Plus, ArrowRight, BookOpen, Target, Sparkles, CheckCircle, Play } from "lucide-react";
 import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const [isLoadingBilling, setIsLoadingBilling] = useState(false);
+  const [userStats, setUserStats] = useState({
+    applications: 0,
+    assessments: 0,
+    essays: 0,
+    stories: 0
+  });
+
+  // Simulate fetching user stats
+  useEffect(() => {
+    // In a real app, this would fetch from API
+    setUserStats({
+      applications: 0,
+      assessments: 0,
+      essays: 0,
+      stories: 0
+    });
+  }, []);
 
   const handleManageBilling = async () => {
     setIsLoadingBilling(true);
@@ -33,178 +51,275 @@ export default function DashboardPage() {
     }
   };
 
-  const cards = [
+  const isNewUser = userStats.applications === 0 && userStats.assessments === 0;
+
+  const onboardingSteps = [
     {
-      title: "Applications",
-      description: "Manage your MBA applications",
-      icon: FileText,
-      href: "/dashboard/applications",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      borderColor: "border-orange-200"
-    },
-    {
-      title: "Assessments",
-      description: "Get your MBA admission chances",
-      icon: BarChart3,
-      href: "/dashboard/assessments",
+      title: "Get Your Admission Chances",
+      description: "See where you stand with top MBA programs",
+      icon: Target,
+      href: "/dashboard/assessments/new",
       color: "text-blue-600",
       bgColor: "bg-blue-50",
-      borderColor: "border-blue-200"
+      completed: userStats.assessments > 0
     },
     {
-      title: "Essays",
-      description: "Write and edit your application essays",
+      title: "Create Your First Application",
+      description: "Set up your target school and requirements",
       icon: FileText,
-      href: "/dashboard/essays",
+      href: "/dashboard/applications/new",
       color: "text-green-600",
       bgColor: "bg-green-50",
-      borderColor: "border-green-200"
+      completed: userStats.applications > 0
     },
     {
-      title: "Story Bank",
-      description: "Manage your anchor stories",
+      title: "Build Your Story Bank",
+      description: "Organize your key experiences and achievements",
       icon: BookOpen,
       href: "/dashboard/stories",
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
-      borderColor: "border-indigo-200"
-    },
-    {
-      title: "Coach",
-      description: "Message your personal MBA coach",
-      icon: MessageSquare,
-      href: "/dashboard/coach",
       color: "text-purple-600",
       bgColor: "bg-purple-50",
-      borderColor: "border-purple-200"
+      completed: userStats.stories > 0
+    },
+    {
+      title: "Start Your First Essay",
+      description: "Begin drafting with AI-powered guidance",
+      icon: Sparkles,
+      href: "/dashboard/essays/new",
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
+      completed: userStats.essays > 0
+    }
+  ];
+
+  const quickActions = [
+    {
+      title: "New Assessment",
+      description: "Get your admission chances",
+      href: "/dashboard/assessments/new",
+      icon: Target
+    },
+    {
+      title: "New Application", 
+      description: "Start a school application",
+      href: "/dashboard/applications/new",
+      icon: FileText
+    },
+    {
+      title: "New Essay",
+      description: "Start writing your application",
+      href: "/dashboard/essays/new", 
+      icon: Sparkles
     }
   ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
-          <p className="text-muted-foreground">
-            Ready to work on your MBA application? Here's what you can do next.
-          </p>
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Welcome Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Welcome to PortersPrep</h1>
+        <p className="text-muted-foreground text-lg">
+          {isNewUser 
+            ? "Let's get you started on your MBA application journey. Follow these steps to set up your workspace."
+            : "Ready to continue your MBA application? Here's what you can work on next."
+          }
+        </p>
+      </div>
+
+      {/* Onboarding Flow for New Users */}
+      {isNewUser && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Play className="h-5 w-5 text-brand-500" />
+            <h2 className="text-xl font-semibold">Getting Started</h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {onboardingSteps.map((step, index) => {
+              const IconComponent = step.icon;
+              return (
+                <Link key={step.title} href={step.href}>
+                  <Card className={`h-full hover:shadow-md transition-all duration-200 border-2 ${
+                    step.completed 
+                      ? 'border-green-200 bg-green-50/50' 
+                      : 'border-muted hover:border-brand-200'
+                  }`}>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className={`p-3 rounded-lg ${step.bgColor}`}>
+                          {step.completed ? (
+                            <CheckCircle className="h-6 w-6 text-green-600" />
+                          ) : (
+                            <IconComponent className={`h-6 w-6 ${step.color}`} />
+                          )}
+                        </div>
+                        <div className="text-sm font-medium text-muted-foreground">
+                          Step {index + 1}
+                        </div>
+                      </div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        {step.title}
+                        {step.completed && <CheckCircle className="h-4 w-4 text-green-600" />}
+                      </CardTitle>
+                      <CardDescription>{step.description}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
         </div>
-        <button
-          onClick={handleManageBilling}
-          disabled={isLoadingBilling}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm border rounded-md hover:bg-muted transition-colors disabled:opacity-50"
-        >
-          <CreditCard className="h-4 w-4" />
-          {isLoadingBilling ? 'Loading...' : 'Manage billing'}
-        </button>
-      </div>
+      )}
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-8">
-        {cards.map((card) => {
-          const IconComponent = card.icon;
-          return (
-            <a
-              key={card.title}
-              href={card.href}
-              className="group block"
-            >
-              <Card className="h-full hover:shadow-md transition-shadow border-2 hover:border-primary/20">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className={`p-2 rounded-lg ${card.bgColor}`}>
-                      <IconComponent className={`h-6 w-6 ${card.color}`} />
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                  <CardTitle className="text-lg">{card.title}</CardTitle>
-                  <CardDescription>{card.description}</CardDescription>
-                </CardHeader>
-              </Card>
-            </a>
-          );
-        })}
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* Quick Stats */}
+      <div className="grid gap-4 md:grid-cols-4 mb-8">
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5" />
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <a
-              href="/dashboard/applications/new"
-              className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted transition-colors"
-            >
-              <div>
-                <div className="font-medium">New Application</div>
-                <div className="text-sm text-muted-foreground">Start a school application</div>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-50">
+                <Target className="h-5 w-5 text-blue-600" />
               </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
-            </a>
-            <a
-              href="/dashboard/assessments/new"
-              className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted transition-colors"
-            >
               <div>
-                <div className="font-medium">New Assessment</div>
-                <div className="text-sm text-muted-foreground">Get your admission chances</div>
+                <div className="text-2xl font-bold">{userStats.assessments}</div>
+                <div className="text-sm text-muted-foreground">Assessments</div>
               </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
-            </a>
-            <a
-              href="/dashboard/essays/new"
-              className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted transition-colors"
-            >
-              <div>
-                <div className="font-medium">New Essay</div>
-                <div className="text-sm text-muted-foreground">Start writing your application</div>
-              </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
-            </a>
+            </div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader>
-            <CardTitle>Your Plan</CardTitle>
-            <CardDescription>Current subscription details</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Current Plan</span>
-                <span className="font-medium">Free</span>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-green-50">
+                <FileText className="h-5 w-5 text-green-600" />
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Assessments Used</span>
-                <span className="font-medium">0 / 1</span>
+              <div>
+                <div className="text-2xl font-bold">{userStats.applications}</div>
+                <div className="text-sm text-muted-foreground">Applications</div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Essays Used</span>
-                <span className="font-medium">0 / 1</span>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-50">
+                <BookOpen className="h-5 w-5 text-purple-600" />
               </div>
-              <div className="pt-2">
-                <a
-                  href="/pricing"
-                  className="text-sm text-primary hover:underline"
-                >
-                  Upgrade for more capacity →
-                </a>
+              <div>
+                <div className="text-2xl font-bold">{userStats.stories}</div>
+                <div className="text-sm text-muted-foreground">Stories</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-orange-50">
+                <Sparkles className="h-5 w-5 text-orange-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{userStats.essays}</div>
+                <div className="text-sm text-muted-foreground">Essays</div>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h3 className="font-medium text-blue-900 mb-2">💡 Pro Tip</h3>
-        <p className="text-sm text-blue-800">
-          Start with a free assessment to see your admission chances, then upgrade to Plus or Pro for unlimited access and AI-powered essay feedback.
-        </p>
+      {/* Main Content Grid */}
+      <div className="grid gap-6 md:grid-cols-3">
+        {/* Quick Actions */}
+        <div className="md:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Quick Actions
+              </CardTitle>
+              <CardDescription>Get started with these common tasks</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {quickActions.map((action) => {
+                const IconComponent = action.icon;
+                return (
+                  <Link key={action.title} href={action.href}>
+                    <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted transition-colors group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-muted">
+                          <IconComponent className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="font-medium">{action.title}</div>
+                          <div className="text-sm text-muted-foreground">{action.description}</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Plan & Billing */}
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Plan</CardTitle>
+              <CardDescription>Current subscription details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Current Plan</span>
+                  <span className="font-medium">Free</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Schools</span>
+                  <span className="font-medium">{userStats.applications} / 1</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Essays</span>
+                  <span className="font-medium">{userStats.essays} / 2</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">AI Actions</span>
+                  <span className="font-medium">0 / 5</span>
+                </div>
+              </div>
+              
+              <div className="pt-3 border-t">
+                <Link
+                  href="/pricing"
+                  className="block w-full text-center rounded-md bg-brand-500 px-3 py-2 text-sm font-medium text-white hover:bg-brand-600 transition-colors"
+                >
+                  Upgrade to Plus
+                </Link>
+                <button
+                  onClick={handleManageBilling}
+                  disabled={isLoadingBilling}
+                  className="w-full mt-2 text-center text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                >
+                  {isLoadingBilling ? 'Loading...' : 'Manage billing'}
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Pro Tip */}
+      <div className="mt-8 p-4 bg-gradient-to-r from-brand-50 to-blue-50 rounded-lg border border-brand-200">
+        <div className="flex items-start gap-3">
+          <Sparkles className="h-5 w-5 text-brand-600 mt-0.5" />
+          <div>
+            <h3 className="font-medium text-brand-900 mb-1">💡 Pro Tip</h3>
+            <p className="text-sm text-brand-800">
+              Start with a free assessment to see your admission chances, then upgrade to Plus for unlimited schools, essays, and AI-powered feedback.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

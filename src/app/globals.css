@@ -149,4 +149,14 @@ html, body {
 .card:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
 
 a, button { transition: transform .15s cubic-bezier(0.16,1,0.3,1); }
-a:active, button:active { transform: scale(0.98); } 
+a:active, button:active { transform: scale(0.98); }
+
+/* University logo carousel animation */
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 30s linear infinite;
+} 

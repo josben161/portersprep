@@ -101,12 +101,15 @@ export default function TopNav() {
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <SignInButton>
                 <button className="text-sm text-muted-foreground hover:text-foreground">
                   Sign In
                 </button>
               </SignInButton>
+              <Link href="/sign-up" className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground text-sm shadow-sm hover:opacity-95">
+                Get Started
+              </Link>
             </div>
           )}
         </div>
