@@ -1,3 +1,5 @@
+import MarketingHeader from "@/components/marketing/Header";
+
 export const metadata = {
   title: "PortersPrep — MBA Admissions Copilot",
   description: "Assess • Edit • Coach. We coach - You share your voice - We maximise you chances..",
@@ -19,5 +21,10 @@ export const metadata = {
 };
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <MarketingHeader />
+      {children}
+    </>
+  );
 } 
