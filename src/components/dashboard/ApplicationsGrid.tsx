@@ -1,90 +1,105 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import Skeleton from "@/components/ui/Skeleton";
-import ProgressRing from "@/components/ui/ProgressRing";
-import { fmtDate, daysUntil } from "@/lib/date";
-import AddApplicationModal from "./AddApplicationModal";
+import { FitChip } from "./FitChip";
 
-function FitChip({ band }:{ band?: string }) {
-  if (!band) return null;
-  const cls =
-    band === "reach"
-      ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-200"
-      : band === "target"
-      ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200"
-      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200";
-  return <span className={`ml-2 rounded-full px-2 py-0.5 text-[10px] ${cls}`}>{band}</span>;
+interface Application {
+  id: string;
+  status: string;
+  school: {
+    id: string;
+    name: string;
+  };
 }
 
-type AppCard = { id: string; school?: { id: string; name: string; deadline?: string|null }; status?: string; };
+export default function ApplicationsGrid() {
+  const [apps, setApps] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function ApplicationsGrid(){
-  const [apps, setApps] = useState<AppCard[]|null>(null);
-  const [progress, setProgress] = useState<Record<string,{ essays_total:number; essays_done:number; recs_total:number; recs_done:number }>>({});
-  const [fit, setFit] = useState<Record<string,string>>({});
-  const [refreshTick, setTick] = useState(0);
+  useEffect(() => {
+    async function loadApps() {
+      try {
+        const r = await fetch("/api/applications");
+        if (r.ok) {
+          const data = await r.json();
+          setApps(data);
+        }
+      } catch (error) {
+        console.error("Failed to load applications:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadApps();
+  }, []);
 
-  useEffect(()=>{ fetch("/api/applications").then(r=>r.ok?r.json():null).then(setApps).catch(()=> setApps([])); },[refreshTick]);
-  useEffect(()=>{ fetch("/api/applications/progress").then(r=>r.ok?r.json():null).then((rows:any[])=>{
-    const map: any = {}; (rows||[]).forEach(row => { map[row.application_id] = { essays_total: row.essays_total, essays_done: row.essays_done, recs_total: row.recs_total, recs_done: row.recs_done }; });
-    setProgress(map);
-  }).catch(()=>{}); },[refreshTick]);
-  useEffect(()=>{ fetch("/api/predict").then(r=>r.ok?r.json():null).then((p)=>{
-    const f: Record<string,string> = {};
-    (p?.result?.schools ?? []).forEach((s:any)=> { if (s.school) f[s.school.toLowerCase()] = s.band; });
-    setFit(f);
-  }).catch(()=>{}); },[]);
+  if (loading) {
+    return (
+      <section className="card p-4">
+        <div className="text-xs text-muted-foreground mb-3">Applications</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <div className="card p-4">
-      <div className="flex items-center justify-between">
+    <section className="card p-4">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <div className="text-xs text-muted-foreground">Applications</div>
-          <h3 className="text-base font-semibold">Your schools</h3>
+          <h3 className="text-base font-semibold">My Applications</h3>
         </div>
-        <Link href="/dashboard/applications" className="btn btn-outline text-xs">Manage all</Link>
+        <Link 
+          href="/dashboard/applications/new"
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-3 py-2 text-xs transition-colors"
+        >
+          Add Application
+        </Link>
       </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {apps === null && (<><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/></>)}
-        {apps && apps.length === 0 && <div className="col-span-full text-center text-sm text-muted-foreground py-8">No applications yet. Add your first one!</div>}
-        {(apps ?? []).map(a => <AppItem key={a.id} a={a} pr={progress[a.id]} fitBand={fit[(a.school?.name ?? "").toLowerCase()]} />)}
-        <AddApplicationModal onCreated={()=> setTick(t=> t+1)} />
-      </div>
-    </div>
-  );
-}
-
-function AppItem({ a, pr, fitBand }:{ a: AppCard, pr?: { essays_total:number; essays_done:number; recs_total:number; recs_done:number }, fitBand?: string }){
-  const pct = useMemo(()=>{
-    const total = (pr?.essays_total || 0) + (pr?.recs_total || 0);
-    const done  = (pr?.essays_done  || 0) + (pr?.recs_done  || 0);
-    return Math.round((done / Math.max(1,total)) * 100);
-  },[pr]);
-
-  const schoolName = a.school?.name ?? "School";
-  const dd = daysUntil(a.school?.deadline ?? null);
-  const deadlineBadge = dd === null ? "—" : dd >= 0 ? `${dd}d` : "past";
-
-  return (
-    <div className="rounded-lg border p-3">
-      <div className="flex items-start justify-between">
-        <div className="min-w-0">
-          <div className="truncate text-sm font-medium">{schoolName} <FitChip band={fitBand} /></div>
-          <div className="mt-0.5 text-[11px] text-muted-foreground">
-            Deadline: {fmtDate(a.school?.deadline)} • <span className={dd !== null && dd <= 14 ? "text-rose-500" : ""}>{deadlineBadge}</span>
+      {apps.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
           </div>
+          <div className="text-sm font-medium mb-1">No applications yet</div>
+          <div className="text-xs text-muted-foreground mb-3">
+            Start your first application to get organized
+          </div>
+          <Link 
+            href="/dashboard/applications/new"
+            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Create Application →
+          </Link>
         </div>
-        <ProgressRing value={pct} />
-      </div>
-      <div className="mt-2 text-xs text-muted-foreground">
-        {(pr?.essays_done ?? 0)}/{(pr?.essays_total ?? 0)} essays • {(pr?.recs_done ?? 0)}/{(pr?.recs_total ?? 0)} recs
-      </div>
-      <div className="mt-3 flex gap-2">
-        <Link href={`/dashboard/applications/${a.id}/ide`} className="btn btn-primary text-xs">Open workspace</Link>
-        <Link href={`/dashboard/applications/${a.id}/recs`} className="btn btn-outline text-xs">Manage recs</Link>
-      </div>
-    </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {apps.map((app) => (
+            <Link
+              key={app.id}
+              href={`/dashboard/applications/${app.id}`}
+              className="block p-4 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {app.school.name}
+                </div>
+                <FitChip status={app.status} />
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Manage recs
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
   );
 } 
