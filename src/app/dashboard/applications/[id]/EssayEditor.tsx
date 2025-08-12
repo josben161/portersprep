@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
+import AnalysisResults from "@/components/AnalysisResults";
 
 interface Question {
   id: string;
@@ -190,85 +191,10 @@ export default function EssayEditor({ appId, question, answer }: EssayEditorProp
 
       {/* Analysis Results */}
       {analysis && (
-        <div className="rounded-lg border bg-card p-4">
-          <h3 className="font-medium mb-3">AI Analysis</h3>
-          
-          {/* School Focus */}
-          {analysis.rubric?.school_focus && (
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-sm font-medium">School Focus</div>
-                <div className="text-sm text-muted-foreground">
-                  Score: {analysis.rubric.school_focus.score}/5
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                  <div className="font-medium text-green-600 mb-1">Hits</div>
-                  <ul className="space-y-1">
-                    {analysis.rubric.school_focus.hits?.map((hit: string, i: number) => (
-                      <li key={i} className="text-green-700">• {hit}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <div className="font-medium text-red-600 mb-1">Misses</div>
-                  <ul className="space-y-1">
-                    {analysis.rubric.school_focus.misses?.map((miss: string, i: number) => (
-                      <li key={i} className="text-red-700">• {miss}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Narrative Fit */}
-          {analysis.rubric?.narrative && (
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-sm font-medium">Narrative Cohesion</div>
-                <div className="text-sm text-muted-foreground">
-                  Score: {analysis.rubric.narrative.cohesion}/5
-                </div>
-              </div>
-              {analysis.rubric.narrative.gaps?.length > 0 && (
-                <div className="text-xs">
-                  <div className="font-medium text-amber-600 mb-1">Gaps to Address:</div>
-                  <ul className="space-y-1">
-                    {analysis.rubric.narrative.gaps.map((gap: string, i: number) => (
-                      <li key={i} className="text-amber-700">• {gap}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Sentence Suggestions */}
-          {analysis.sentences?.length > 0 && (
-            <div>
-              <div className="text-sm font-medium mb-2">Sentence Enhancements</div>
-              <div className="space-y-2 text-xs">
-                {analysis.sentences.slice(0, 3).map((sentence: any, i: number) => (
-                  <div key={i} className="p-2 bg-muted/30 rounded">
-                    <div className="font-medium mb-1">"{sentence.text}"</div>
-                    {sentence.suggestions?.length > 0 && (
-                      <div className="text-muted-foreground">
-                        <div className="font-medium">Suggestions:</div>
-                        <ul className="mt-1 space-y-1">
-                          {sentence.suggestions.slice(0, 2).map((suggestion: any, j: number) => (
-                            <li key={j}>• {suggestion.text}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        <AnalysisResults 
+          analysis={analysis} 
+          onClose={() => setAnalysis(null)}
+        />
       )}
     </div>
   );

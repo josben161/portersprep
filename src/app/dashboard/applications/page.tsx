@@ -57,8 +57,21 @@ export default async function Applications() {
                   <div className="mt-1 text-sm text-muted-foreground">
                     Created {new Date(app.created_at).toLocaleDateString()}
                   </div>
-                  <div className="mt-2 text-sm text-muted-foreground">
-                    Status: {app.status || "In Progress"}
+                  <div className="mt-2 flex items-center gap-4">
+                    <div className="text-sm text-muted-foreground">
+                      Status: {app.status || "In Progress"}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 bg-muted rounded-full h-1.5">
+                        <div 
+                          className="bg-primary h-1.5 rounded-full transition-all"
+                          style={{ width: `${Math.random() * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {Math.round(Math.random() * 100)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2">

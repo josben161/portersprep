@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import EssayEditor from "./EssayEditor";
+import ApplicationProgress from "@/components/ApplicationProgress";
 
 interface Question {
   id: string;
@@ -39,6 +40,7 @@ export default function ApplicationWorkspace() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'workspace' | 'progress'>('workspace');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -130,72 +132,108 @@ export default function ApplicationWorkspace() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Questions Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="rounded-lg border bg-card">
-            <div className="p-4 border-b">
-              <h2 className="font-medium">Essays</h2>
-            </div>
-            <div className="p-2">
-              {questions.map((question, index) => {
-                const answer = getAnswerForQuestion(question.id);
-                const isSelected = selectedQuestionId === question.id;
-                const hasContent = answer && answer.word_count > 0;
-                
-                return (
-                  <button
-                    key={question.id}
-                    onClick={() => setSelectedQuestionId(question.id)}
-                    className={`w-full text-left p-3 rounded-md mb-1 transition ${
-                      isSelected 
-                        ? "bg-primary text-primary-foreground" 
-                        : "hover:bg-muted"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm truncate">
-                          {question.metadata?.title || `Essay ${index + 1}`}
-                        </div>
-                        <div className="text-xs opacity-70 mt-1">
-                          {question.word_limit ? `${question.word_limit} words` : "No limit"}
-                        </div>
-                      </div>
-                      {hasContent && (
-                        <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full ml-2">
-                          {answer.word_count} words
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Essay Editor */}
-        <div className="lg:col-span-3">
-          {selectedQuestion ? (
-            <EssayEditor
-              appId={appId}
-              question={selectedQuestion}
-              answer={selectedAnswer}
-              onSave={() => loadApplicationData()}
-            />
-          ) : (
-            <div className="rounded-lg border bg-card p-8 text-center">
-              <div className="text-lg font-medium text-muted-foreground mb-2">
-                Select an essay to start writing
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Choose an essay from the sidebar to begin drafting your response.
-              </div>
-            </div>
-          )}
+      {/* Tab Navigation */}
+      <div className="mb-6">
+        <div className="flex space-x-1 bg-muted p-1 rounded-lg">
+          <button
+            onClick={() => setActiveTab('workspace')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+              activeTab === 'workspace'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Workspace
+          </button>
+          <button
+            onClick={() => setActiveTab('progress')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+              activeTab === 'progress'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Progress
+          </button>
         </div>
       </div>
+
+      {activeTab === 'workspace' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Questions Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="rounded-lg border bg-card">
+              <div className="p-4 border-b">
+                <h2 className="font-medium">Essays</h2>
+              </div>
+              <div className="p-2">
+                {questions.map((question, index) => {
+                  const answer = getAnswerForQuestion(question.id);
+                  const isSelected = selectedQuestionId === question.id;
+                  const hasContent = answer && answer.word_count > 0;
+                  
+                  return (
+                    <button
+                      key={question.id}
+                      onClick={() => setSelectedQuestionId(question.id)}
+                      className={`w-full text-left p-3 rounded-md mb-1 transition ${
+                        isSelected 
+                          ? "bg-primary text-primary-foreground" 
+                          : "hover:bg-muted"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm truncate">
+                            {question.metadata?.title || `Essay ${index + 1}`}
+                          </div>
+                          <div className="text-xs opacity-70 mt-1">
+                            {question.word_limit ? `${question.word_limit} words` : "No limit"}
+                          </div>
+                        </div>
+                        {hasContent && (
+                          <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full ml-2">
+                            {answer.word_count} words
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Essay Editor */}
+          <div className="lg:col-span-3">
+            {selectedQuestion ? (
+              <EssayEditor
+                appId={appId}
+                question={selectedQuestion}
+                answer={selectedAnswer}
+                onSave={() => loadApplicationData()}
+              />
+            ) : (
+              <div className="rounded-lg border bg-card p-8 text-center">
+                <div className="text-lg font-medium text-muted-foreground mb-2">
+                  Select an essay to start writing
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Choose an essay from the sidebar to begin drafting your response.
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="max-w-4xl">
+          <ApplicationProgress
+            questions={questions}
+            answers={answers}
+            application={application}
+          />
+        </div>
+      )}
     </div>
   );
 } 
