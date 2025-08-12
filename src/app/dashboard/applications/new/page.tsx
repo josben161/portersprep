@@ -40,6 +40,7 @@ export default function NewApplicationPage() {
   const [deadline, setDeadline] = useState("");
   const [creating, setCreating] = useState(false);
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   // Load schools on mount
   useEffect(() => {
@@ -123,6 +124,9 @@ export default function NewApplicationPage() {
     
     setCreating(true);
     try {
+      console.log("Creating application with school:", selectedSchool);
+      console.log("School ID being sent:", selectedSchool.id);
+      
       const response = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -138,11 +142,13 @@ export default function NewApplicationPage() {
         router.push(`/dashboard/applications/${data.id}`);
       } else {
         const error = await response.text();
-        alert(`Failed to create application: ${error}`);
+        console.error("Application creation failed:", error);
+        // Replace alert with in-page error display
+        setError(`Failed to create application: ${error}`);
       }
     } catch (error) {
       console.error("Failed to create application:", error);
-      alert("Failed to create application. Please try again.");
+      setError("Failed to create application. Please try again.");
     } finally {
       setCreating(false);
     }
@@ -334,6 +340,11 @@ export default function NewApplicationPage() {
                   <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
                     Please select a school to continue
                   </p>
+                )}
+                {error && (
+                  <div className="mt-4 text-center text-red-500 text-sm">
+                    {error}
+                  </div>
                 )}
               </div>
             </div>

@@ -32,13 +32,26 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const { school_id, round, deadline } = body || {};
     
-    console.log("Creating application with data:", { school_id, round, deadline, user_id: profile.id });
+    console.log("=== APPLICATION CREATION DEBUG ===");
+    console.log("Full request body:", body);
+    console.log("Extracted values:", { school_id, round, deadline, user_id: profile.id });
+    console.log("School ID type:", typeof school_id);
+    console.log("School ID value:", school_id);
+    console.log("School ID length:", school_id?.length);
+    console.log("==================================");
     
     if (!school_id) return new Response("school_id required", { status: 400 });
 
     // Validate that school_id is a string (not a UUID)
     if (typeof school_id !== 'string') {
+      console.error("School ID is not a string:", typeof school_id, school_id);
       return new Response("school_id must be a string", { status: 400 });
+    }
+
+    // Additional validation for school_id format
+    if (!school_id.trim()) {
+      console.error("School ID is empty or whitespace");
+      return new Response("school_id cannot be empty", { status: 400 });
     }
 
     const sb = getAdminSupabase();
@@ -46,7 +59,7 @@ export async function POST(req: NextRequest) {
       .from("applications")
       .insert({
         user_id: profile.id, 
-        school_id: school_id, // This should be a string like "hbs"
+        school_id: school_id.trim(), // Trim whitespace
         round: round ?? null, 
         status: "planning"
         // Removed deadline for now to avoid column error
