@@ -40,6 +40,18 @@ export async function addSchoolQuestion(schoolId: string, q: { prompt: string; a
 
 export async function createApplication(userId: string, schoolId: string, round?: string | null) {
   const sb = getAdminSupabase();
+  
+  // Validate UUIDs
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(userId)) {
+    console.error("Invalid userId format:", userId);
+    throw new Error("Invalid user profile");
+  }
+  if (!uuidRegex.test(schoolId)) {
+    console.error("Invalid schoolId format:", schoolId);
+    throw new Error("Invalid school");
+  }
+  
   const { data, error } = await sb
     .from("applications")
     .insert({ user_id: userId, school_id: schoolId, round: round ?? null })
@@ -51,6 +63,14 @@ export async function createApplication(userId: string, schoolId: string, round?
 
 export async function listApplications(userId: string) {
   const sb = getAdminSupabase();
+  
+  // Validate UUID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(userId)) {
+    console.error("Invalid userId format:", userId);
+    return [];
+  }
+  
   const { data } = await sb
     .from("applications")
     .select("id, school_id, status, round, deadlines, created_at, updated_at, schools(name,slug)")
