@@ -56,24 +56,35 @@ export default function ApplicationWorkspace() {
       const appData = await appRes.json();
       setApplication(appData);
 
-      // Load questions
-      const questionsRes = await fetch(`/api/schools/${appData.schools.slug}/questions`);
-      if (!questionsRes.ok) throw new Error("Failed to load questions");
-      const questionsData = await questionsRes.json();
-      setQuestions(questionsData);
+      // Check if we have school data
+      if (!appData.schools) {
+        toast.error("School data not found");
+        return;
+      }
 
-      // Load answers
-      const answersRes = await fetch(`/api/applications/${appId}/answers`);
-      if (answersRes.ok) {
-        const answersData = await answersRes.json();
-        setAnswers(answersData);
+      // Load questions using the school slug
+      const questionsRes = await fetch(`/api/schools/${appData.schools.slug}/questions`);
+      if (!questionsRes.ok) {
+        console.warn("Failed to load questions, using empty array");
+        setQuestions([]);
+      } else {
+        const questionsData = await questionsRes.json();
+        setQuestions(questionsData);
         
         // Select first question if none selected
         if (questionsData.length > 0 && !selectedQuestionId) {
           setSelectedQuestionId(questionsData[0].id);
         }
       }
+
+      // Load answers
+      const answersRes = await fetch(`/api/applications/${appId}/answers`);
+      if (answersRes.ok) {
+        const answersData = await answersRes.json();
+        setAnswers(answersData);
+      }
     } catch (error) {
+      console.error("Failed to load application data:", error);
       toast.error("Failed to load application data");
     } finally {
       setLoading(false);
