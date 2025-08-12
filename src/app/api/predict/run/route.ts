@@ -1,6 +1,43 @@
 import { requireAuthedProfile } from "@/lib/authz";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 
+// Mock school data for demonstration
+const MOCK_SCHOOLS = [
+  { name: "Harvard Business School", band: "reach" },
+  { name: "Stanford Graduate School of Business", band: "reach" },
+  { name: "The Wharton School", band: "target" },
+  { name: "MIT Sloan School of Management", band: "target" },
+  { name: "Columbia Business School", band: "target" },
+  { name: "Chicago Booth School of Business", band: "target" },
+  { name: "Kellogg School of Management", band: "safety" },
+  { name: "Tuck School of Business", band: "safety" },
+  { name: "Ross School of Business", band: "safety" },
+  { name: "Darden School of Business", band: "safety" }
+];
+
+function generateMockPrediction(profile: any) {
+  // Generate realistic confidence scores based on profile data
+  const baseConfidence = 0.6;
+  let confidenceBoost = 0;
+  
+  // Boost confidence based on profile completeness
+  if (profile?.gpa && profile.gpa >= 3.5) confidenceBoost += 0.1;
+  if (profile?.gmat && profile.gmat >= 700) confidenceBoost += 0.15;
+  if (profile?.years_exp && profile.years_exp >= 3) confidenceBoost += 0.05;
+  if (profile?.resume_key) confidenceBoost += 0.05;
+  
+  const schools = MOCK_SCHOOLS.map(school => ({
+    school: school.name,
+    band: school.band,
+    confidence: Math.min(0.95, baseConfidence + confidenceBoost + (Math.random() * 0.2 - 0.1))
+  }));
+  
+  // Sort by confidence (highest first)
+  schools.sort((a, b) => b.confidence - a.confidence);
+  
+  return { schools };
+}
+
 export async function POST() {
   const { profile } = await requireAuthedProfile();
   const sb = getAdminSupabase();
@@ -20,9 +57,9 @@ export async function POST() {
     stories: (stories ?? []).map(s => ({ title: s.title, summary: s.summary ?? "" })),
   };
 
-  // Call the assessment/run route via DB logic (reuse your existing server code).
-  // Here we directly insert a row with mock result if your existing route handles AI.
-  const result = { schools: [] }; // Keep empty; your /api/assessment/run likely builds it.
+  // Generate mock prediction result
+  const result = generateMockPrediction(prof);
+  
   const { error } = await sb.from("assessments").insert({
     user_id: profile.id, inputs, result
   });
