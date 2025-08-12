@@ -1,74 +1,56 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import Skeleton from "@/components/ui/Skeleton";
+import { apiFetch } from "@/lib/apiFetch";
 
 export default function CoreProfileCard(){
-  const [usage, setUsage] = useState<any|null>(null);
-  const [stories, setStories] = useState<any[]|null>(null);
+  const [p, setP] = useState<any|null>(null);
+  const [saving, setSaving] = useState(false);
+  useEffect(()=>{ (async()=>{
+    const r = await fetch("/api/profile");
+    setP(r.ok? await r.json(): null);
+  })(); },[]);
 
-  useEffect(()=>{ fetch("/api/me/usage").then(r=>r.ok?r.json():null).then(setUsage).catch(()=>{}); },[]);
-  useEffect(()=>{ fetch("/api/stories").then(r=>r.ok?r.json():null).then(setStories).catch(()=>{}); },[]);
+  async function uploadCV(file: File){
+    const r = await apiFetch(`/api/s3-presign?ext=${encodeURIComponent(file.name.split(".").pop()||"pdf")}`);
+    if (!r.ok) { alert(await r.text()); return; }
+    const { url, key } = await r.json();
+    const put = await fetch(url, { method:"PUT", headers: { "Content-Type": file.type || "application/octet-stream" }, body: file });
+    if (!put.ok) { alert("Upload failed"); return; }
+    // Save resume_key on profile
+    await apiFetch("/api/profile", { method:"PUT", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ resume_key: key }) });
+    const rr = await fetch("/api/profile"); setP(rr.ok? await rr.json(): p);
+  }
 
-  const completePct = (() => {
-    const parts = [
-      Math.min(1, (usage?.stories_count ?? 0) / 3), // arbitrary baseline
-      1 // resume soon (placeholder)
-    ];
-    return Math.round((parts.reduce((a,b)=>a+b,0)/parts.length)*100);
-  })();
+  async function saveProfile(){
+    setSaving(true);
+    try {
+      await apiFetch("/api/profile", { method:"PUT", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(p) });
+      alert("Saved");
+    } catch { alert("Save failed"); } finally { setSaving(false); }
+  }
+
+  if (!p) return <section className="card p-4 text-sm text-muted-foreground">Loading profile…</section>;
 
   return (
-    <div className="card p-4">
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="text-xs text-muted-foreground">Core Profile</div>
-          <h3 className="text-base font-semibold">Resume & Story Bank</h3>
-        </div>
-        <div className="text-xs text-muted-foreground">{completePct}% complete</div>
+    <section className="card p-4">
+      <div className="text-xs text-muted-foreground">Core Profile</div>
+      <h3 className="text-base font-semibold">Resume & Story Bank</h3>
+      <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+        <input className="rounded-md border px-3 py-2" placeholder="Name" value={p.name ?? ""} onChange={e=> setP((v:any)=>({...v, name: e.target.value}))} />
+        <input className="rounded-md border px-3 py-2" placeholder="Industry" value={p.industry ?? ""} onChange={e=> setP((v:any)=>({...v, industry: e.target.value}))} />
+        <input className="rounded-md border px-3 py-2" placeholder="Years experience" value={p.years_exp ?? ""} onChange={e=> setP((v:any)=>({...v, years_exp: e.target.value}))} />
+        <input className="rounded-md border px-3 py-2" placeholder="GPA" value={p.gpa ?? ""} onChange={e=> setP((v:any)=>({...v, gpa: e.target.value}))} />
+        <input className="rounded-md border px-3 py-2" placeholder="GMAT" value={p.gmat ?? ""} onChange={e=> setP((v:any)=>({...v, gmat: e.target.value}))} />
+        <input className="sm:col-span-2 rounded-md border px-3 py-2" placeholder="Goals (1–2 lines)" value={p.goals ?? ""} onChange={e=> setP((v:any)=>({...v, goals: e.target.value}))} />
       </div>
-
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <div className="rounded-md border p-3">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-medium">Resume / CV</div>
-            <Link href="/dashboard/stories" className="text-xs text-brand-500 hover:underline">Open</Link>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Parse your resume to extract facts (education, roles, awards). Use them in essays with one click.
-          </p>
-          <div className="mt-3">
-            <button className="btn btn-outline text-xs">Upload or Paste</button>
-          </div>
-        </div>
-
-        <div className="rounded-md border p-3">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-medium">Story Bank</div>
-            <Link href="/dashboard/stories" className="text-xs text-brand-500 hover:underline">Manage</Link>
-          </div>
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-2">
-            {stories === null && (<>
-              <Skeleton className="h-14 w-40" />
-              <Skeleton className="h-14 w-40" />
-              <Skeleton className="h-14 w-40" />
-            </>)}
-            {(stories ?? []).slice(0,6).map((s:any)=>(
-              <div key={s.id} className="min-w-40 rounded-md border p-2">
-                <div className="line-clamp-1 text-xs font-medium">{s.title}</div>
-                <div className="mt-1 flex flex-wrap gap-1">
-                  {(s.tags ?? []).slice(0,3).map((t:string)=>(
-                    <span key={t} className="rounded-full border px-2 py-0.5 text-[10px] text-muted-foreground">{t}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-            {(stories ?? []).length === 0 && (
-              <div className="text-xs text-muted-foreground">No stories yet.</div>
-            )}
-          </div>
-        </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+        <label className="btn btn-outline text-xs">
+          Upload CV
+          <input type="file" className="hidden" accept=".pdf,.doc,.docx,.txt" onChange={e=> { const f = e.target.files?.[0]; if (f) uploadCV(f); }} />
+        </label>
+        <button className="btn btn-primary text-xs" onClick={saveProfile} disabled={saving}>{saving? "Saving…" : "Save profile"}</button>
+        {p.resume_key && <span className="text-xs text-muted-foreground">CV on file</span>}
       </div>
-    </div>
+    </section>
   );
 } 

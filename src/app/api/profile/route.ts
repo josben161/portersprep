@@ -1,40 +1,28 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { getOrCreateProfileByClerkId, updateProfile } from "@/lib/db";
+import { NextRequest } from "next/server";
+import { requireAuthedProfile } from "@/lib/authz";
+import { getAdminSupabase } from "@/lib/supabaseAdmin";
 
 export async function GET() {
-  const { userId } = auth();
-  if (!userId) return new Response("Unauthorized", { status: 401 });
-  
-  const u = await currentUser();
-  const profile = await getOrCreateProfileByClerkId(
-    userId, 
-    u?.emailAddresses?.[0]?.emailAddress, 
-    u?.firstName ?? undefined
-  );
-  
-  return Response.json(profile);
+  const { profile } = await requireAuthedProfile();
+  const sb = getAdminSupabase();
+  const { data, error } = await sb
+    .from("profiles")
+    .select("id, name, email, subscription_tier, resume_key, goals, industry, years_exp, gpa, gmat")
+    .eq("id", profile.id)
+    .single();
+  if (error) return new Response(error.message, { status: 400 });
+  return Response.json(data);
 }
 
-export async function PATCH(req: Request) {
-  const { userId } = auth();
-  if (!userId) return new Response("Unauthorized", { status: 401 });
-  
-  const body = await req.json();
-  const { name, email } = body;
-  
-  // Validate input
-  if (name !== undefined && typeof name !== 'string') {
-    return new Response("Invalid name", { status: 400 });
+export async function PUT(req: NextRequest) {
+  const { profile } = await requireAuthedProfile();
+  const body = await req.json().catch(()=> ({}));
+  const updates: any = {};
+  for (const k of ["name","goals","industry","years_exp","gpa","gmat","resume_key"]) {
+    if (k in body) updates[k] = body[k];
   }
-  
-  if (email !== undefined && typeof email !== 'string') {
-    return new Response("Invalid email", { status: 400 });
-  }
-  
-  const updates: Partial<{ name: string; email: string }> = {};
-  if (name !== undefined) updates.name = name;
-  if (email !== undefined) updates.email = email;
-  
-  const updatedProfile = await updateProfile(userId, updates);
-  return Response.json(updatedProfile);
+  const sb = getAdminSupabase();
+  const { error } = await sb.from("profiles").update(updates).eq("id", profile.id);
+  if (error) return new Response(error.message, { status: 400 });
+  return Response.json({ ok: true });
 } 

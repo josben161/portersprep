@@ -4,6 +4,7 @@ import Link from "next/link";
 import Skeleton from "@/components/ui/Skeleton";
 import ProgressRing from "@/components/ui/ProgressRing";
 import { fmtDate, daysUntil } from "@/lib/date";
+import AddApplicationModal from "./AddApplicationModal";
 
 function FitChip({ band }:{ band?: string }) {
   if (!band) return null;
@@ -22,12 +23,13 @@ export default function ApplicationsGrid(){
   const [apps, setApps] = useState<AppCard[]|null>(null);
   const [progress, setProgress] = useState<Record<string,{ essays_total:number; essays_done:number; recs_total:number; recs_done:number }>>({});
   const [fit, setFit] = useState<Record<string,string>>({});
+  const [refreshTick, setTick] = useState(0);
 
-  useEffect(()=>{ fetch("/api/applications").then(r=>r.ok?r.json():null).then(setApps).catch(()=> setApps([])); },[]);
+  useEffect(()=>{ fetch("/api/applications").then(r=>r.ok?r.json():null).then(setApps).catch(()=> setApps([])); },[refreshTick]);
   useEffect(()=>{ fetch("/api/applications/progress").then(r=>r.ok?r.json():null).then((rows:any[])=>{
     const map: any = {}; (rows||[]).forEach(row => { map[row.application_id] = { essays_total: row.essays_total, essays_done: row.essays_done, recs_total: row.recs_total, recs_done: row.recs_done }; });
     setProgress(map);
-  }).catch(()=>{}); },[]);
+  }).catch(()=>{}); },[refreshTick]);
   useEffect(()=>{ fetch("/api/predict").then(r=>r.ok?r.json():null).then((p)=>{
     const f: Record<string,string> = {};
     (p?.result?.schools ?? []).forEach((s:any)=> { if (s.school) f[s.school.toLowerCase()] = s.band; });
@@ -47,9 +49,7 @@ export default function ApplicationsGrid(){
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {apps === null && (<><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/></>)}
         {(apps ?? []).map(a => <AppItem key={a.id} a={a} pr={progress[a.id]} fitBand={fit[(a.school?.name ?? "").toLowerCase()]} />)}
-        <Link href="/dashboard/applications" className="flex h-28 items-center justify-center rounded-lg border text-sm hover:bg-black/5 dark:hover:bg-white/5">
-          + Add application
-        </Link>
+        <AddApplicationModal onCreated={()=> setTick(t=> t+1)} />
       </div>
     </div>
   );
@@ -82,7 +82,7 @@ function AppItem({ a, pr, fitBand }:{ a: AppCard, pr?: { essays_total:number; es
       </div>
       <div className="mt-3 flex gap-2">
         <Link href={`/dashboard/applications/${a.id}/ide`} className="btn btn-primary text-xs">Open workspace</Link>
-        <Link href={`/dashboard/applications/${a.id}`} className="btn btn-outline text-xs">Details</Link>
+        <Link href={`/dashboard/applications/${a.id}/recs`} className="btn btn-outline text-xs">Manage recs</Link>
       </div>
     </div>
   );

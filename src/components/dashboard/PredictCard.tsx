@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import RunPredictModal from "./RunPredictModal";
 
 function BandBadge({ band }: { band?: string }) {
   if (!band) return null;
@@ -17,6 +16,7 @@ function BandBadge({ band }: { band?: string }) {
 export default function PredictCard() {
   const [pred, setPred] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [running, setRunning] = useState(false);
 
   async function refresh() {
     setLoading(true);
@@ -26,6 +26,15 @@ export default function PredictCard() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function runFromProfile(){
+    setRunning(true);
+    try {
+      const r = await fetch("/api/predict/run", { method:"POST" });
+      if (!r.ok) alert(await r.text());
+      await refresh();
+    } finally { setRunning(false); }
   }
 
   useEffect(() => { refresh(); }, []);
@@ -39,19 +48,14 @@ export default function PredictCard() {
         </div>
         <div className="flex gap-2">
           <Link href="/dashboard/predict" className="btn btn-outline text-xs">History</Link>
-          <RunPredictModal onDone={refresh} />
+          <button className="btn btn-primary text-xs" onClick={runFromProfile} disabled={running}>{running? "Running…" : "Run from profile"}</button>
         </div>
       </div>
 
       {loading && <div className="mt-4 text-sm text-muted-foreground">Loading prediction…</div>}
 
       {!loading && !pred && (
-        <div className="mt-4 text-sm">
-          No prediction yet.
-          <div className="mt-2">
-            <RunPredictModal onDone={refresh} />
-          </div>
-        </div>
+        <div className="mt-4 text-sm">No prediction yet. Click <b>Run from profile</b> to generate.</div>
       )}
 
       {!loading && pred && (
