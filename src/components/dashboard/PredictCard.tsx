@@ -97,13 +97,35 @@ export default function PredictCard() {
       const r = await fetch("/api/predict/run", { method:"POST" });
       if (!r.ok) {
         const errorText = await r.text();
-        alert(`Failed to run prediction: ${errorText}`);
+        console.error("Prediction failed:", errorText);
+        
+        // Provide user-friendly error messages
+        let userMessage = "Failed to run prediction";
+        if (errorText.includes("Database permission error")) {
+          userMessage = "System error. Please try again or contact support.";
+        } else if (errorText.includes("Profile not found")) {
+          userMessage = "Profile not found. Please complete your profile first.";
+        } else if (errorText.includes("Failed to load profile")) {
+          userMessage = "Unable to load profile data. Please refresh and try again.";
+        } else if (errorText.includes("Duplicate assessment")) {
+          userMessage = "Prediction already running. Please wait.";
+        } else {
+          userMessage = `Prediction failed: ${errorText}`;
+        }
+        
+        alert(userMessage);
         return;
       }
+      
+      const result = await r.json();
+      console.log("Prediction completed:", result);
+      
+      // Refresh the predictions
       await refresh();
+      
     } catch (error) {
       console.error("Failed to run prediction:", error);
-      alert("Failed to run prediction. Please try again.");
+      alert("Network error. Please check your connection and try again.");
     } finally { 
       setRunning(false); 
     }
