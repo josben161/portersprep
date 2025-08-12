@@ -10,12 +10,20 @@ type AppCard = { id: string; school?: { id: string; name: string; deadline?: str
 export default function ApplicationsGrid(){
   const [apps, setApps] = useState<AppCard[]|null>(null);
   const [progress, setProgress] = useState<Record<string,{ essays_total:number; essays_done:number; recs_total:number; recs_done:number }>>({});
+  const [fit, setFit] = useState<Record<string,string>>({});
 
   useEffect(()=>{ fetch("/api/applications").then(r=>r.ok?r.json():null).then(setApps).catch(()=> setApps([])); },[]);
   useEffect(()=>{ fetch("/api/applications/progress").then(r=>r.ok?r.json():null).then((rows:any[])=>{
     const map: any = {}; (rows||[]).forEach(row => { map[row.application_id] = { essays_total: row.essays_total, essays_done: row.essays_done, recs_total: row.recs_total, recs_done: row.recs_done }; });
     setProgress(map);
   }).catch(()=>{}); },[]);
+  useEffect(()=>{
+    fetch("/api/predict").then(r=>r.json()).then((p)=>{
+      const map: Record<string,string> = {};
+      (p?.result?.schools ?? []).forEach((s:any)=> { map[s.school?.toLowerCase() ?? ""] = s.band; });
+      setFit(map);
+    }).catch(()=>{});
+  },[]);
 
   return (
     <div className="card p-4">
@@ -31,7 +39,7 @@ export default function ApplicationsGrid(){
         {apps === null && (<><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/></>)}
         {(apps ?? []).map(a => {
           const pr = progress[a.id] || { essays_total:0, essays_done:0, recs_total:0, recs_done:0 };
-          return <AppItem key={a.id} a={a} pr={pr} />;
+          return <AppItem key={a.id} a={a} pr={pr} fit={fit} />;
         })}
         <Link href="/dashboard/applications" className="flex h-28 items-center justify-center rounded-lg border text-sm hover:bg-black/5 dark:hover:bg-white/5">
           + Add application
@@ -41,7 +49,7 @@ export default function ApplicationsGrid(){
   );
 }
 
-function AppItem({ a, pr }:{ a: AppCard, pr?: { essays_total:number; essays_done:number; recs_total:number; recs_done:number } }){
+function AppItem({ a, pr, fit }:{ a: AppCard, pr?: { essays_total:number; essays_done:number; recs_total:number; recs_done:number }, fit: Record<string,string> }){
   const pct = useMemo(()=>{
     const total = (pr?.essays_total || 0) + (pr?.recs_total || 0);
     const done  = (pr?.essays_done  || 0) + (pr?.recs_done  || 0);
@@ -61,7 +69,19 @@ function AppItem({ a, pr }:{ a: AppCard, pr?: { essays_total:number; essays_done
             Deadline: {fmtDate(a.school?.deadline)} • <span className={dd !== null && dd <= 14 ? "text-rose-500" : ""}>{deadlineBadge}</span>
           </div>
         </div>
-        <ProgressRing value={pct} />
+        <div className="flex items-center gap-2">
+          {(() => {
+            const band = fit[(a.school?.name ?? "").toLowerCase()];
+            return band && (
+              <span className={`rounded-full px-2 py-0.5 text-[10px] ${
+                band==="reach" ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-200"
+                : band==="target" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200"
+                : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200"
+              }`}>{band}</span>
+            );
+          })()}
+          <ProgressRing value={pct} />
+        </div>
       </div>
       <div className="mt-2 text-xs text-muted-foreground">
         {(pr?.essays_done ?? 0)}/{(pr?.essays_total ?? 0)} essays • {(pr?.recs_done ?? 0)}/{(pr?.recs_total ?? 0)} recs
