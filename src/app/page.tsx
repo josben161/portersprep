@@ -6,7 +6,6 @@ import Testimonials from "@/components/marketing/Testimonials";
 import PricingTable from "@/components/marketing/PricingTable";
 import FAQ from "@/components/marketing/FAQ";
 import FinalCTA from "@/components/marketing/FinalCTA";
-import Footer from "@/components/marketing/Footer";
 
 export const metadata: Metadata = {
   title: "PortersPrep — The CoPilot for MBA Applicants",
@@ -43,7 +42,6 @@ export default function Home() {
       <PricingTable />
       <FAQ />
       <FinalCTA />
-      <Footer />
     </>
   );
 } 

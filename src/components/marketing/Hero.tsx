@@ -36,7 +36,7 @@ export default function Hero() {
             <span className="h-1.5 w-1.5 rounded-full bg-brand-500" /> Your MBA, but with a strategist in the loop
           </span>
           <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
-            The <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">IDE for MBA Applicants</span>
+            The <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">CoPilot for MBA Applicants</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
             Design your narrative, draft faster, and tailor every essay to each school's DNA. Strategy, writing, and feedback—all in one focused workspace.
