@@ -36,12 +36,17 @@ export async function POST(req: NextRequest) {
     
     if (!school_id) return new Response("school_id required", { status: 400 });
 
+    // Validate that school_id is a string (not a UUID)
+    if (typeof school_id !== 'string') {
+      return new Response("school_id must be a string", { status: 400 });
+    }
+
     const sb = getAdminSupabase();
     const { data, error } = await sb
       .from("applications")
       .insert({
         user_id: profile.id, 
-        school_id, 
+        school_id: school_id, // This should be a string like "hbs"
         round: round ?? null, 
         status: "planning"
         // Removed deadline for now to avoid column error
@@ -59,6 +64,8 @@ export async function POST(req: NextRequest) {
         return new Response("Applications table not found. Please contact support.", { status: 500 });
       } else if (error.code === '23503') {
         return new Response("Invalid school_id. Please select a valid school.", { status: 400 });
+      } else if (error.code === '22P02') {
+        return new Response("Invalid school_id format. Please try again.", { status: 400 });
       } else {
         return new Response(`Failed to create application: ${error.message}`, { status: 500 });
       }
