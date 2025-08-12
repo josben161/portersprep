@@ -2,21 +2,50 @@ import { getAdminSupabase } from "@/lib/supabaseAdmin";
 
 export async function getOrCreateProfileByClerkId(clerkUserId: string, email?: string | null, name?: string | null) {
   const sb = getAdminSupabase();
+  
+  // First try to get existing profile
   const { data: existing } = await sb.from("profiles").select("*").eq("clerk_user_id", clerkUserId).single();
   if (existing) return existing;
-  const { data, error } = await sb.from("profiles").insert({
-    clerk_user_id: clerkUserId,
-    email: email ?? "",
-    name: name ?? undefined
-  }).select("*").single();
-  if (error) throw error;
-  return data;
+  
+  // If no profile exists, create one with service role (should bypass RLS)
+  try {
+    const { data, error } = await sb.from("profiles").insert({
+      clerk_user_id: clerkUserId,
+      email: email ?? "",
+      name: name ?? undefined
+    }).select("*").single();
+    
+    if (error) {
+      console.error("Error creating profile:", error);
+      // If insert fails, try to get the profile again (might have been created by another process)
+      const { data: retry } = await sb.from("profiles").select("*").eq("clerk_user_id", clerkUserId).single();
+      if (retry) return retry;
+      throw error;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Failed to create profile:", error);
+    throw error;
+  }
 }
 
 export async function getProfileByClerkId(clerkUserId: string) {
   const sb = getAdminSupabase();
   const { data } = await sb.from("profiles").select("*").eq("clerk_user_id", clerkUserId).single();
   return data ?? null;
+}
+
+export async function updateProfile(clerkUserId: string, updates: Partial<{ name: string; email: string }>) {
+  const sb = getAdminSupabase();
+  const { data, error } = await sb
+    .from("profiles")
+    .update(updates)
+    .eq("clerk_user_id", clerkUserId)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data;
 }
 
 export async function listAssessments(profileId: string, limit = 20) {
