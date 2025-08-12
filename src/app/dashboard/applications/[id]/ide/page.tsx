@@ -1,354 +1,257 @@
 "use client";
+import { useEffect, useMemo, useRef, useState } from "react";
+import AppShell from "@/components/appshell/AppShell";
+import LeftNav from "@/components/appshell/LeftNav";
+import TopBar from "@/components/appshell/TopBar";
+import RightTabs from "@/components/appshell/RightTabs";
+import AnalysisPanel from "@/components/panels/AnalysisPanel";
+import SchoolBriefPanel from "@/components/panels/SchoolBriefPanel";
+import StoryBankPanel from "@/components/panels/StoryBankPanel";
+// Reuse if present:
+let CoveragePanel: any = () => <div className='text-sm text-muted-foreground'>Add CoveragePanel to see cross‑school story usage.</div>;
+try { CoveragePanel = require("@/components/CoveragePanel").default; } catch {}
+let RequirementsPanel: any = () => <div className='text-sm text-muted-foreground'>Add RequirementsPanel to quick‑start drafts from official prompts.</div>;
+try { RequirementsPanel = require("@/components/RequirementsPanel").default; } catch {}
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { toast } from "react-hot-toast";
-import ProgressRing from "@/components/ui/ProgressRing";
-import StoryVariantsPanel from "@/components/StoryVariantsPanel";
+type Question = { id:string; prompt:string; archetype:string; word_limit:number|null; metadata?: any };
 
-interface Question {
-  id: string;
-  prompt: string;
-  archetype: string;
-  word_limit: number | null;
-  metadata: any;
-}
+export default function IDE({ params }: { params: { id: string } }) {
+  const appId = params.id;
 
-interface Answer {
-  id: string;
-  question_id: string;
-  word_count: number;
-  rubric: any;
-}
-
-interface Application {
-  id: string;
-  school_id: string;
-  status: string;
-  round: string;
-  schools: {
-    name: string;
-    slug: string;
-  };
-}
-
-export default function IDEPage() {
-  const params = useParams();
-  const appId = params.id as string;
-  
-  const [application, setApplication] = useState<Application | null>(null);
+  // State
+  const [schoolsNav, setSchoolsNav] = useState<any[]>([]);
+  const [schoolJson, setSchoolJson] = useState<any|null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<Answer[]>([]);
-  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
-  const [content, setContent] = useState<string>("");
-  const [tab, setTab] = useState<'draft' | 'outline' | 'analysis'>('draft');
-  const [loading, setLoading] = useState(true);
-  const [showAdapt, setShowAdapt] = useState(false);
-  const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Question | null>(null);
+  const [answerId, setAnswerId] = useState<string | null>(null);
+  const [content, setContent] = useState("");
+  const [analysis, setAnalysis] = useState<any | null>(null);
+  const [saving, setSaving] = useState(false);
+  const saveTimer = useRef<any>(null);
 
-  useEffect(() => {
-    loadApplicationData();
-  }, [appId]);
+  // Load nav + questions
+  useEffect(()=>{
+    (async()=>{
+      // schools list for left nav
+      const apps = await fetch("/api/applications").then(r=>r.json()).catch(()=>[]);
+      setSchoolsNav(apps.map((a:any)=>({ id:a.id, name:a.schools?.name ?? "School", progress:a.progress ?? undefined })));
+      const app = apps.find((x:any)=> x.id === appId);
+      if (!app) return;
 
-  async function loadApplicationData() {
-    try {
-      // Load application
-      const appRes = await fetch(`/api/applications/${appId}`);
-      if (!appRes.ok) throw new Error("Failed to load application");
-      const appData = await appRes.json();
-      setApplication(appData);
+      // DB questions
+      const qs = await fetch(`/api/schools/${app.school_id}/questions`).then(r=>r.json()).catch(()=>[]);
+      setQuestions(qs);
 
-      // Load questions
-      const questionsRes = await fetch(`/api/schools/${appData.schools.slug}/questions`);
-      if (!questionsRes.ok) throw new Error("Failed to load questions");
-      const questionsData = await questionsRes.json();
-      setQuestions(questionsData);
+      // Try local JSON (slug in DB)
+      try {
+        const sb = await fetch(`/api/schools/${app.school_id}`).then(r=>r.json()); // if you mapped id->slug route differently, update
+        setSchoolJson(sb);
+      } catch {}
+    })();
+  },[appId]);
 
-      // Load answers
-      const answersRes = await fetch(`/api/applications/${appId}/answers`);
-      if (answersRes.ok) {
-        const answersData = await answersRes.json();
-        setAnswers(answersData);
-        
-        // Select first question if none selected
-        if (questionsData.length > 0 && !selectedQuestionId) {
-          setSelectedQuestionId(questionsData[0].id);
-        }
-      }
-    } catch (error) {
-      toast.error("Failed to load application data");
-    } finally {
-      setLoading(false);
-    }
+  async function openQuestion(q: Question) {
+    setSelected(q);
+    setAnalysis(null);
+    const res = await fetch(`/api/internal/ensure-answer`, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ appId, questionId: q.id, archetype: q.archetype })
+    });
+    const { id } = await res.json();
+    setAnswerId(id);
+    const text = await fetch(`/api/answers/${id}/content`).then(r=>r.text());
+    setContent(text);
   }
 
-  function getAnswerForQuestion(questionId: string): Answer | null {
-    return answers.find(a => a.question_id === questionId) || null;
+  // Autosave
+  useEffect(()=>{
+    if (!answerId) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async ()=>{
+      setSaving(true);
+      await fetch(`/api/answers/${answerId}/content`, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ text: content }) });
+      setSaving(false);
+    }, 800);
+    return ()=> clearTimeout(saveTimer.current);
+  }, [content, answerId]);
+
+  async function analyze() {
+    if (!answerId) return;
+    const r = await fetch(`/api/answers/${answerId}/analyze`, { method:"POST" });
+    if (r.ok) setAnalysis(await r.json());
   }
 
-  function getQuestionById(questionId: string): Question | null {
-    return questions.find(q => q.id === questionId) || null;
+  // Quick insert from StoryBank
+  function insertStory(text:string) {
+    setContent((c)=> c + (c.endsWith("\n") ? "" : "\n\n") + text);
   }
 
-  const selected = getQuestionById(selectedQuestionId || "");
-  const selectedAnswer = getAnswerForQuestion(selectedQuestionId || "");
-  const wc = content.split(/\s+/).filter(word => word.length > 0).length;
+  // Word count
+  const wc = useMemo(()=> (content.trim().match(/\S+/g)?.length ?? 0), [content]);
 
-  if (loading) {
-    return (
-      <div className="mx-auto max-w-6xl p-6">
-        <div className="text-center">
-          <div className="text-lg font-medium">Loading IDE...</div>
+  // Panels (Right Tabs)
+  const rightTabs = useMemo(()=>[
+    { label: "Analysis", node: <AnalysisPanel analysis={analysis} /> },
+    { label: "School Brief", node: <SchoolBriefPanel brief={schoolJson?.brief ?? null} /> },
+    { label: "Story Bank", node: <StoryBankPanel onInsert={insertStory} /> },
+    { label: "Coverage", node: <CoveragePanel applicationId={appId} /> },
+  ], [analysis, schoolJson]);
+
+  // Left: show questions list + button to open Requirements if available
+  const leftNavNode = (
+    <div className="flex h-full flex-col">
+      <div className="px-3 py-2 text-sm font-semibold">Questions</div>
+      <div className="flex-1 divide-y">
+        {questions.map(q=>(
+          <button key={q.id} onClick={()=>openQuestion(q)} className={`block w-full px-3 py-2 text-left text-sm hover:bg-accent ${selected?.id===q.id ? "bg-secondary" : ""}`}>
+            <div className="font-medium">{q.archetype.replace("_"," ")}</div>
+            <div className="text-xs text-muted-foreground line-clamp-2">{q.prompt}</div>
+            {q.word_limit ? <div className="mt-1 text-[10px] text-muted-foreground">≤ {q.word_limit} words</div> : null}
+          </button>
+        ))}
+      </div>
+      <div className="border-t p-3 text-xs">
+        <div className="text-muted-foreground mb-1">Requirements</div>
+        <div className="rounded-md border p-2">
+          <RequirementsPanel appId={appId} school={schoolJson ?? { id:"", name:"", essays:[], verify_in_portal:true, lor:null, video_assessment:null, country:"", cycle:"", last_checked:"" }} />
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 
-  if (!application) {
-    return (
-      <div className="mx-auto max-w-6xl p-6">
-        <div className="text-center">
-          <div className="text-lg font-medium">Application not found</div>
-        </div>
-      </div>
-    );
-  }
+  // Center: Tabs (Design / Draft / Analyze)
+  const [tab, setTab] = useState<"design"|"draft"|"analyze">("draft");
 
   return (
-    <div className="mx-auto max-w-6xl p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">{application.schools.name} - IDE</h1>
-            <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-              <span>Round {application.round}</span>
-              <span>•</span>
-              <span>Status: {application.status}</span>
+    <AppShell
+      top={<TopBar title={schoolJson?.name ?? "Application Workspace"} subtitle="IDE Mode" actions={
+        <div className="flex items-center gap-2">
+          <button onClick={()=>setTab("design")} className={`rounded-md border px-3 py-1.5 text-sm ${tab==="design"?"bg-secondary":""}`}>Design</button>
+          <button onClick={()=>setTab("draft")} className={`rounded-md border px-3 py-1.5 text-sm ${tab==="draft"?"bg-secondary":""}`}>Draft</button>
+          <button onClick={()=>{ setTab("analyze"); analyze(); }} className={`rounded-md border px-3 py-1.5 text-sm ${tab==="analyze"?"bg-secondary":""}`}>Analyze</button>
+        </div>
+      } />}
+      left={leftNavNode}
+      right={<RightTabs tabs={rightTabs} />}
+    >
+      <div className="flex h-full flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b p-3">
+          <div className="min-w-0">
+            <div className="truncate text-sm text-muted-foreground">{selected ? selected.archetype : "Select a question"}</div>
+            <div className="truncate text-base font-medium">{selected?.prompt ?? "—"}</div>
+          </div>
+          <div className="flex items-center gap-3 text-xs">
+            <div className={`rounded px-2 py-1 ${selected?.word_limit && wc > selected.word_limit ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-200" : "bg-muted text-muted-foreground"}`}>
+              {wc} {selected?.word_limit ? `/ ${selected.word_limit}` : "words"}
+            </div>
+            <div className="text-muted-foreground">{saving ? "Saving…" : "Saved"}</div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-auto p-3">
+          {tab === "design" && (
+            <DesignPane answerId={answerId} wordLimit={selected?.word_limit ?? null} onDraftReady={(key)=>{ /* noop; saved in S3 via API */ }} />
+          )}
+          {tab === "draft" && (
+            <textarea
+              className="h-[60vh] w-full rounded-md border p-3 leading-7"
+              placeholder="Start your draft or use Design → Create Coaching Draft"
+              value={content}
+              onChange={(e)=>setContent(e.target.value)}
+            />
+          )}
+          {tab === "analyze" && (
+            <div className="text-sm text-muted-foreground">Analysis appears in the right panel. Make fixes here in the draft tab.</div>
+          )}
+        </div>
+
+        {/* Sticky actions */}
+        <div className="sticky bottom-0 border-t bg-card/70 p-2 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-muted-foreground">Tip: Use Story Bank → Insert summary, then refine with metrics.</div>
+            <div className="flex items-center gap-2">
+              <button onClick={()=>setTab("design")} className="rounded-md border px-3 py-1.5 text-sm">Design</button>
+              <button onClick={()=>{ setTab("analyze"); analyze(); }} className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground">Analyze</button>
             </div>
           </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Questions Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="rounded-lg border bg-card">
-            <div className="p-4 border-b">
-              <h2 className="font-medium">Essays</h2>
-            </div>
-            <div className="p-2">
-              {questions.map((question, index) => {
-                const answer = getAnswerForQuestion(question.id);
-                const isSelected = selectedQuestionId === question.id;
-                const hasContent = answer && answer.word_count > 0;
-                
-                return (
-                  <button
-                    key={question.id}
-                    onClick={() => setSelectedQuestionId(question.id)}
-                    className={`w-full text-left p-3 rounded-md mb-1 transition ${
-                      isSelected 
-                        ? "bg-primary text-primary-foreground" 
-                        : "hover:bg-muted"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm truncate">
-                          {question.metadata?.title || `Essay ${index + 1}`}
-                        </div>
-                        <div className="text-xs opacity-70 mt-1">
-                          {question.word_limit ? `${question.word_limit} words` : "No limit"}
-                        </div>
-                      </div>
-                      {hasContent && (
-                        <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full ml-2">
-                          {answer.word_count} words
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Main Editor Area */}
-        <div className="lg:col-span-2">
-          {selected ? (
-            <div className="space-y-4">
-              {/* Tab Navigation */}
-              <div className="flex space-x-1 bg-muted p-1 rounded-lg">
-                <button
-                  onClick={() => setTab('draft')}
-                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-                    tab === 'draft'
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Draft
-                </button>
-                <button
-                  onClick={() => setTab('outline')}
-                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-                    tab === 'outline'
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Outline
-                </button>
-                <button
-                  onClick={() => setTab('analysis')}
-                  className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-                    tab === 'analysis'
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Analysis
-                </button>
-              </div>
-
-              {/* Draft Tab */}
-              {tab === 'draft' && (
-                <div>
-                  {/* Toolbar */}
-                  <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <ProgressRing value={Math.min(100, selected?.word_limit ? (wc/selected.word_limit)*100 : Math.min(100, wc/400)*100)} />
-                      <span className="text-xs text-muted-foreground">Drafting…</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button onClick={()=>setShowAdapt(true)} className="rounded-md border px-3 py-1.5 text-sm">Adapt & Insert</button>
-                    </div>
-                  </div>
-
-                  {/* Textarea */}
-                  <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Start writing your essay..."
-                    className="w-full h-96 rounded-lg border p-4 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                  
-                  <div className="mt-2 text-xs text-muted-foreground">
-                    {wc} words {selected.word_limit && `• ${selected.word_limit - wc} remaining`}
-                  </div>
-                </div>
-              )}
-
-              {/* Outline Tab */}
-              {tab === 'outline' && (
-                <div className="rounded-lg border p-4">
-                  <div className="text-sm text-muted-foreground">Outline view coming soon...</div>
-                </div>
-              )}
-
-              {/* Analysis Tab */}
-              {tab === 'analysis' && (
-                <div className="rounded-lg border p-4">
-                  <div className="text-sm text-muted-foreground">Analysis view coming soon...</div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-lg border bg-card p-8 text-center">
-              <div className="text-lg font-medium text-muted-foreground mb-2">
-                Select an essay to start writing
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Choose an essay from the sidebar to begin drafting your response.
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="lg:col-span-1">
-          {selectedStoryId && (
-            <StoryVariantsPanel storyId={selectedStoryId} applicationId={appId} />
-          )}
-        </div>
-      </div>
-
-      {/* Adapt Modal */}
-      {showAdapt && (
-        <AdaptModal 
-          appId={appId} 
-          onClose={() => setShowAdapt(false)} 
-          onInsert={(txt) => {
-            setContent(c => (c ? c + "\n\n" : "") + txt);
-            setSelectedStoryId("story-id"); // This would be set to the actual story ID
-          }} 
-        />
-      )}
-    </div>
+    </AppShell>
   );
 }
 
-// Adapt Modal Component
-function AdaptModal({ appId, onClose, onInsert }:{ appId:string; onClose:()=>void; onInsert:(text:string)=>void }){
+/* ===== Design Pane (inline component) ===== */
+function DesignPane({ answerId, wordLimit, onDraftReady }:{ answerId: string | null; wordLimit: number|null; onDraftReady: (key:string)=>void }) {
+  const [selectedStoryIds, setSelectedStoryIds] = useState<string[]>([]);
   const [stories, setStories] = useState<any[]>([]);
-  const [storyId, setStoryId] = useState<string>("");
-  const [tone, setTone] = useState<string>("balanced");
-  const [focus, setFocus] = useState<string>("leadership,analytics,community");
-  const [wl, setWl] = useState<string>("");
+  const [outline, setOutline] = useState<any|null>(null);
+  const [busy, setBusy] = useState(false);
 
-  useEffect(()=>{ fetch("/api/stories").then(r=>r.json()).then(setStories); },[]);
+  useEffect(()=>{ fetch("/api/stories").then(r=>r.json()).then(setStories).catch(()=>{}); },[]);
 
-  async function adapt(){
-    if(!storyId) return;
-    const payload = {
-      storyId, applicationId: appId,
-      tone, focusTags: focus.split(",").map(s=>s.trim()).filter(Boolean),
-      wordLimit: wl ? Number(wl) : null
-    };
-    const r = await fetch("/api/stories/adapt", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
-    if(!r.ok) return alert("Failed to adapt");
-    const { variant } = await r.json();
-    onInsert(variant.adapted_text);
-    onClose();
+  async function genOutline() {
+    if (!answerId) return;
+    setBusy(true);
+    const r = await fetch(`/api/answers/${answerId}/design`, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({ selectedStoryIds, wordLimit })
+    });
+    setBusy(false);
+    if (r.ok) setOutline(await r.json());
+  }
+
+  async function makeDraft() {
+    if (!answerId || !outline) return;
+    setBusy(true);
+    const r = await fetch(`/api/answers/${answerId}/draft`, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({ outline: outline.outline ?? outline, wordLimit })
+    });
+    setBusy(false);
+    if (r.ok) onDraftReady((await r.json()).key);
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
-      <div className="w-full max-w-lg rounded-lg border bg-card p-4 shadow-xl">
-        <div className="flex items-center justify-between">
-          <div className="text-sm font-semibold">Adapt story for this school</div>
-          <button onClick={onClose} className="rounded-md border px-2 py-1 text-xs">Close</button>
+    <div className="space-y-4">
+      <div className="rounded-lg border p-3">
+        <div className="text-sm font-semibold">Select stories to use</div>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {stories.map((s:any)=> {
+            const active = selectedStoryIds.includes(s.id);
+            return (
+              <button key={s.id} onClick={()=>{
+                setSelectedStoryIds((ids)=> active ? ids.filter((x)=>x!==s.id) : [...ids, s.id]);
+              }} className={`rounded-md border p-2 text-left text-sm ${active ? "bg-secondary" : "hover:bg-accent"}`}>
+                <div className="font-medium">{s.title}</div>
+                <div className="text-xs text-muted-foreground line-clamp-2">{s.summary}</div>
+              </button>
+            );
+          })}
         </div>
-        <div className="mt-3 space-y-3">
-          <div>
-            <div className="text-xs text-muted-foreground">Select story</div>
-            <select className="mt-1 w-full rounded-md border px-2 py-2 text-sm" value={storyId} onChange={e=>setStoryId(e.target.value)}>
-              <option value="">— Choose —</option>
-              {stories.map((s:any)=> <option key={s.id} value={s.id}>{s.title}</option>)}
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="text-xs text-muted-foreground">Tone</div>
-              <input className="mt-1 w-full rounded-md border px-2 py-2 text-sm" value={tone} onChange={e=>setTone(e.target.value)} placeholder="analytical / community / values"/>
-            </div>
-            <div>
-              <div className="text-xs text-muted-foreground">Word limit (optional)</div>
-              <input className="mt-1 w-full rounded-md border px-2 py-2 text-sm" value={wl} onChange={e=>setWl(e.target.value)} placeholder="e.g., 350"/>
-            </div>
-          </div>
-          <div>
-            <div className="text-xs text-muted-foreground">Focus tags (comma separated)</div>
-            <input className="mt-1 w-full rounded-md border px-2 py-2 text-sm" value={focus} onChange={e=>setFocus(e.target.value)} />
-          </div>
-        </div>
-        <div className="mt-4 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-md border px-3 py-1.5 text-sm">Cancel</button>
-          <button onClick={adapt} className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground">Adapt & Insert</button>
+        <div className="mt-3 flex gap-2">
+          <button onClick={genOutline} disabled={busy} className="rounded-md border px-3 py-1.5 text-sm">{busy?"Working…":"Create Outline"}</button>
+          <button onClick={makeDraft} disabled={!outline || busy} className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground">Create Coaching Draft</button>
         </div>
       </div>
+
+      {outline && (
+        <div className="rounded-lg border p-3">
+          <div className="text-sm font-semibold">Outline</div>
+          <div className="mt-2 space-y-2">
+            {(outline?.outline?.sections ?? outline?.sections ?? []).map((sec:any, i:number)=>(
+              <div key={i} className="rounded-md border p-2">
+                <div className="text-sm font-medium">{sec.title}</div>
+                <ul className="ml-4 list-disc text-sm">{(sec.bullets ?? []).map((b:string, j:number)=> <li key={j}>{b}</li>)}</ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

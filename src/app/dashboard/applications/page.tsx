@@ -83,9 +83,15 @@ export default async function Applications() {
                   </Link>
                   <Link 
                     href={`/dashboard/applications/${app.id}`}
-                    className="rounded-md bg-primary px-3 py-1 text-sm text-primary-foreground hover:opacity-95"
+                    className="rounded-md border px-3 py-1 text-sm hover:bg-muted"
                   >
                     Workspace
+                  </Link>
+                  <Link 
+                    href={`/dashboard/applications/${app.id}/ide`}
+                    className="rounded-md bg-primary px-3 py-1 text-sm text-primary-foreground hover:opacity-95"
+                  >
+                    Open IDE
                   </Link>
                 </div>
               </div>
