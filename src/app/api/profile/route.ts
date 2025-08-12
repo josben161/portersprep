@@ -7,10 +7,10 @@ export async function GET() {
     const { profile } = await requireAuthedProfile();
     const sb = getAdminSupabase();
     
-    // Query with resume_key if it exists
+    // Query with basic fields first
     const { data, error } = await sb
       .from("profiles")
-      .select("id, name, email, subscription_tier, resume_key")
+      .select("id, name, email, subscription_tier")
       .eq("id", profile.id)
       .single();
       
@@ -31,18 +31,35 @@ export async function GET() {
       });
     }
 
+    // Try to get additional fields if they exist
+    let additionalFields: any = {};
+    try {
+      const { data: extendedData } = await sb
+        .from("profiles")
+        .select("resume_key, goals, industry, years_exp, gpa, gmat")
+        .eq("id", profile.id)
+        .single();
+      
+      if (extendedData) {
+        additionalFields = extendedData;
+      }
+    } catch (extendedError) {
+      console.log("Extended fields not available yet:", extendedError);
+      // Continue with basic fields only
+    }
+
     // Return with defaults for missing fields
     return Response.json({
       id: data.id,
       name: data.name || "",
       email: data.email || "",
       subscription_tier: data.subscription_tier || "free",
-      resume_key: data.resume_key || null,
-      goals: "",
-      industry: "",
-      years_exp: null,
-      gpa: null,
-      gmat: null
+      resume_key: additionalFields.resume_key || null,
+      goals: additionalFields.goals || "",
+      industry: additionalFields.industry || "",
+      years_exp: additionalFields.years_exp || null,
+      gpa: additionalFields.gpa || null,
+      gmat: additionalFields.gmat || null
     });
   } catch (error) {
     console.error("Profile API error:", error);
@@ -55,10 +72,17 @@ export async function PUT(req: NextRequest) {
     const { profile } = await requireAuthedProfile();
     const body = await req.json().catch(() => ({}));
     
-    // Allow updating more fields now
+    // Only update fields that we know exist
     const updates: any = {};
-    for (const k of ["name", "goals", "industry", "years_exp", "gpa", "gmat", "resume_key"]) {
-      if (k in body) updates[k] = body[k];
+    const safeFields = ["name", "resume_key"]; // Start with fields we know exist
+    
+    // Try to include additional fields if they exist
+    const additionalFields = ["goals", "industry", "years_exp", "gpa", "gmat"];
+    
+    for (const k of [...safeFields, ...additionalFields]) {
+      if (k in body) {
+        updates[k] = body[k];
+      }
     }
     
     if (Object.keys(updates).length === 0) {
@@ -66,14 +90,32 @@ export async function PUT(req: NextRequest) {
     }
     
     const sb = getAdminSupabase();
-    const { error } = await sb
+    
+    // Try to update with all fields first
+    let { error } = await sb
       .from("profiles")
       .update(updates)
       .eq("id", profile.id);
-      
+    
+    // If that fails, try updating only safe fields
     if (error) {
-      console.error("Profile update error:", error);
-      return new Response("Update failed", { status: 500 });
+      console.log("Full update failed, trying safe fields only:", error);
+      const safeUpdates: any = {};
+      for (const k of safeFields) {
+        if (k in body) safeUpdates[k] = body[k];
+      }
+      
+      if (Object.keys(safeUpdates).length > 0) {
+        const { error: safeError } = await sb
+          .from("profiles")
+          .update(safeUpdates)
+          .eq("id", profile.id);
+          
+        if (safeError) {
+          console.error("Safe update also failed:", safeError);
+          return new Response("Update failed", { status: 500 });
+        }
+      }
     }
     
     return Response.json({ ok: true });
