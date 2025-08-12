@@ -9,11 +9,8 @@ import SchoolBriefPanel from "@/components/panels/SchoolBriefPanel";
 import StoryBankPanel from "@/components/panels/StoryBankPanel";
 import WordLimitBar from "@/components/ui/WordLimitBar";
 import { apiFetch } from "@/lib/fetcher";
-// Reuse if present:
-let CoveragePanel: any = () => <div className='text-sm text-muted-foreground'>Add CoveragePanel to see cross‑school story usage.</div>;
-try { CoveragePanel = require("@/components/CoveragePanel").default; } catch {}
-let RequirementsPanel: any = () => <div className='text-sm text-muted-foreground'>Add RequirementsPanel to quick‑start drafts from official prompts.</div>;
-try { RequirementsPanel = require("@/components/RequirementsPanel").default; } catch {}
+import CoveragePanel from "@/components/CoveragePanel";
+import RequirementsPanel from "@/components/RequirementsPanel";
 
 type Question = { id:string; prompt:string; archetype:string; word_limit:number|null; metadata?: any };
 
@@ -116,7 +113,13 @@ export default function IDE({ params }: { params: { id: string } }) {
       <div className="border-t p-3 text-xs">
         <div className="text-muted-foreground mb-1">Requirements</div>
         <div className="rounded-md border p-2">
-          <RequirementsPanel appId={appId} school={schoolJson ?? { id:"", name:"", essays:[], verify_in_portal:true, lor:null, video_assessment:null, country:"", cycle:"", last_checked:"" }} />
+          <RequirementsPanel 
+            school={schoolJson ?? { id:"", name:"", essays:[], verify_in_portal:true, lor:null, video_assessment:null, country:"", cycle:"", last_checked:"" }} 
+            onStart={(essayId) => {
+              // TODO: Implement draft creation logic
+              console.log("Start draft for essay:", essayId);
+            }}
+          />
         </div>
       </div>
     </div>

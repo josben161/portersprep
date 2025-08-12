@@ -1,88 +1,35 @@
 "use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import type { School } from "@/lib/schools";
-
-export default function RequirementsPanel({ appId, school }: { appId: string; school: School }) {
-  const r = useRouter();
-  const [busy, setBusy] = useState<number | null>(null);
-
+export default function RequirementsPanel({
+  school, onStart
+}:{ school: any; onStart?: (essayId:string)=>void }) {
+  const essays = school?.essays ?? [];
   return (
-    <div className="space-y-4">
-      {school.verify_in_portal && (
-        <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
-          Prompts may vary by round. Please confirm in the official portal before finalizing.
+    <div className="space-y-2 text-sm">
+      <div className="text-xs text-muted-foreground">Requirements</div>
+      {essays.length === 0 ? (
+        <div className="text-muted-foreground">No essays loaded.</div>
+      ) : essays.map((e:any, i:number)=>(
+        <div key={i} className="rounded-md border p-2">
+          <div className="flex items-center justify-between">
+            <div className="font-medium">{e.title}</div>
+            <div className="text-[10px] text-muted-foreground">{e.word_limit ? `≤ ${e.word_limit} words` : "no limit"}</div>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">{e.prompt}</p>
+          <div className="mt-2">
+            <button
+              className="btn btn-outline text-xs"
+              onClick={()=> onStart?.(e.id || e.title)}
+            >
+              Start Draft
+            </button>
+          </div>
+        </div>
+      ))}
+      {school?.verify_in_portal && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-[12px] text-amber-800 dark:border-amber-900/40 dark:bg-amber-900/20 dark:text-amber-100">
+          Prompts may vary; please confirm in the official application before finalizing.
         </div>
       )}
-
-      <div className="grid gap-4 md:grid-cols-2">
-        {school.essays.map((e, idx) => (
-          <div key={idx} className="rounded-lg border bg-card p-4 shadow-sm transition hover:shadow-md">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-sm font-semibold">{e.title}</div>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  Type: {e.type === "short" ? "Short" : "Long"} • {e.word_limit ? `≤ ${e.word_limit} words` : "Word limit: see source"}
-                </div>
-              </div>
-              <a 
-                href={e.source_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xs underline text-muted-foreground hover:text-foreground"
-              >
-                Source
-              </a>
-            </div>
-            <p className="mt-3 text-sm leading-6">{e.prompt}</p>
-            <div className="mt-4">
-              <button
-                disabled={busy === idx}
-                onClick={async () => {
-                  try {
-                    setBusy(idx);
-                    const res = await fetch("/api/requirements/start-draft", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ appId, schoolId: school.id, essayIndex: idx })
-                    });
-                    if (!res.ok) throw new Error("Failed to start draft");
-                    // Go to workspace; the draft will be present and selected once user clicks question
-                    r.push(`/dashboard/applications/${appId}`);
-                  } catch {
-                    alert("Could not start draft. Please try again.");
-                  } finally {
-                    setBusy(null);
-                  }
-                }}
-                className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground shadow-sm hover:opacity-95 disabled:pointer-events-none disabled:opacity-50"
-              >
-                {busy === idx ? "Starting…" : "Start Draft"}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="rounded-lg border p-4">
-        <div className="text-sm font-semibold">Other Requirements</div>
-        <dl className="mt-2 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-          <div>
-            <dt className="font-medium text-foreground">Letters of Recommendation</dt>
-            <dd>{school.lor ? `${school.lor.count} • ${school.lor.format}` : "See school website"}</dd>
-          </div>
-          <div>
-            <dt className="font-medium text-foreground">Video / Assessment</dt>
-            <dd>
-              {school.video_assessment 
-                ? `${school.video_assessment.provider}${school.video_assessment.notes ? ` — ${school.video_assessment.notes}` : ""}` 
-                : "None / varies"
-              }
-            </dd>
-          </div>
-        </dl>
-      </div>
     </div>
   );
 } 

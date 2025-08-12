@@ -20,5 +20,5 @@ export default async function Requirements({ appId }: { appId: string }) {
     );
   }
 
-  return <RequirementsPanel appId={appId} school={json} />;
+  return <RequirementsPanel school={json} />;
 } 
