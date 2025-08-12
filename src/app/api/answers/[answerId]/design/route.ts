@@ -40,5 +40,15 @@ export async function POST(req: Request, { params }: { params: { answerId: strin
   const next = (latest?.version ?? 0) + 1;
   await sb.from("essay_outline_versions").insert({ answer_id: ans.id, version: next, outline });
 
+  // Record story usage
+  for (const storyId of body.selectedStoryIds ?? []) {
+    await sb.from("story_usage").upsert({
+      story_id: storyId,
+      answer_id: ans.id,
+      application_id: app.id,
+      role: "primary"
+    });
+  }
+
   return Response.json({ version: next, outline });
 } 
