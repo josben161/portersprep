@@ -1,6 +1,7 @@
 "use client";
 import { Suspense } from "react";
 import CoreProfileCard from "@/components/dashboard/CoreProfileCard";
+import PredictCard from "@/components/dashboard/PredictCard";
 import ApplicationsGrid from "@/components/dashboard/ApplicationsGrid";
 import RecommendationsPanel from "@/components/dashboard/RecommendationsPanel";
 
@@ -14,6 +15,10 @@ export default function Dashboard(){
 
       <Suspense fallback={<div className="card p-6">Loading core profile…</div>}>
         <CoreProfileCard />
+      </Suspense>
+
+      <Suspense fallback={<div className="card p-6">Loading prediction…</div>}>
+        <PredictCard />
       </Suspense>
 
       <Suspense fallback={<div className="card p-6">Loading applications…</div>}>
