@@ -4,10 +4,45 @@ import { apiFetch } from "@/lib/apiFetch";
 
 export default function CoreProfileCard(){
   const [p, setP] = useState<any|null>(null);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  
   useEffect(()=>{ (async()=>{
-    const r = await fetch("/api/profile");
-    setP(r.ok? await r.json(): null);
+    try {
+      const r = await fetch("/api/profile");
+      if (r.ok) {
+        setP(await r.json());
+      } else {
+        // If profile doesn't exist, create a default one
+        setP({
+          name: "",
+          email: "",
+          subscription_tier: "free",
+          resume_key: null,
+          goals: "",
+          industry: "",
+          years_exp: null,
+          gpa: null,
+          gmat: null
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load profile:", error);
+      // Set default profile on error
+      setP({
+        name: "",
+        email: "",
+        subscription_tier: "free",
+        resume_key: null,
+        goals: "",
+        industry: "",
+        years_exp: null,
+        gpa: null,
+        gmat: null
+      });
+    } finally {
+      setLoading(false);
+    }
   })(); },[]);
 
   async function uploadCV(file: File){
@@ -29,7 +64,8 @@ export default function CoreProfileCard(){
     } catch { alert("Save failed"); } finally { setSaving(false); }
   }
 
-  if (!p) return <section className="card p-4 text-sm text-muted-foreground">Loading profile…</section>;
+  if (loading) return <section className="card p-4 text-sm text-muted-foreground">Loading profile…</section>;
+  if (!p) return <section className="card p-4 text-sm text-muted-foreground">Failed to load profile</section>;
 
   return (
     <section className="card p-4">
