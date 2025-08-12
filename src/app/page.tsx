@@ -1,4 +1,5 @@
 import Image from "next/image";
+import CampusCarousel from "@/components/CampusCarousel";
 
 export const metadata = {
   title: "Your MBA Admissions Copilot — PortersPrep",
@@ -41,23 +42,7 @@ export default function Home() {
             </p>
           </div>
           <div className="flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-sm">
-              {/* Replace this with your actual image */}
-              <div className="aspect-[4/5] rounded-xl border bg-gradient-to-br from-primary/10 to-primary/5 overflow-hidden">
-                <Image
-                  src="/images/success-story.jpg" // Add your image here
-                  alt="Student celebrating MBA acceptance"
-                  width={400}
-                  height={500}
-                  className="w-full h-full object-cover"
-                  priority
-                />
-                {/* Optional overlay with success text */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                  <p className="text-white text-sm font-medium">Our users have been accepted to Harvard Business School, GSB, and more! See how you can join them.</p>
-                </div>
-              </div>
-            </div>
+            <CampusCarousel />
           </div>
         </div>
       </section>
