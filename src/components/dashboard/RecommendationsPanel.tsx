@@ -1,20 +1,22 @@
 "use client";
 import { useEffect, useState } from "react";
 import Skeleton from "@/components/ui/Skeleton";
+import PrepPackModal from "./PrepPackModal";
 
-type Recommender = {
-  id: string;
-  name: string;
-  email?: string|null;
-  assigned?: number;
-  completed?: number;
-};
+type Recommender = { id: string; name: string; email?: string|null; assigned?: number; completed?: number; };
 
 export default function RecommendationsPanel(){
   const [data, setData] = useState<Recommender[]|null>(null);
-  useEffect(()=>{
-    fetch("/api/recommenders").then(r=>r.ok?r.json():null).then(setData).catch(()=> setData([]));
-  },[]);
+  const [newRec, setNewRec] = useState({ name:"", email:"", relationship:"" });
+
+  useEffect(()=>{ refresh(); },[]);
+  async function refresh(){ const r = await fetch("/api/recommenders"); setData(r.ok ? await r.json() : []); }
+
+  async function create(){
+    if(!newRec.name) return;
+    const r = await fetch("/api/recommenders", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(newRec) });
+    if (r.ok) { setNewRec({ name:"", email:"", relationship:"" }); refresh(); }
+  }
 
   return (
     <div className="card p-4">
@@ -23,7 +25,12 @@ export default function RecommendationsPanel(){
           <div className="text-xs text-muted-foreground">Recommendations</div>
           <h3 className="text-base font-semibold">Recommender progress</h3>
         </div>
-        <button className="btn btn-outline text-xs">Add recommender</button>
+        <div className="flex gap-2">
+          <input className="w-40 rounded-md border px-2 py-1 text-xs" placeholder="Name" value={newRec.name} onChange={e=>setNewRec(v=>({...v,name:e.target.value}))} />
+          <input className="w-44 rounded-md border px-2 py-1 text-xs" placeholder="Email (optional)" value={newRec.email} onChange={e=>setNewRec(v=>({...v,email:e.target.value}))} />
+          <button className="btn btn-outline text-xs" onClick={create}>Add</button>
+          <PrepPackModal />
+        </div>
       </div>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -14,10 +14,13 @@ type AppCard = {
 
 export default function ApplicationsGrid(){
   const [apps, setApps] = useState<AppCard[]|null>(null);
+  const [progress, setProgress] = useState<Record<string,{ essays_total:number; essays_done:number; recs_total:number; recs_done:number }>>({});
 
-  useEffect(()=>{
-    fetch("/api/applications").then(r=>r.ok?r.json():null).then(setApps).catch(()=> setApps([]));
-  },[]);
+  useEffect(()=>{ fetch("/api/applications").then(r=>r.ok?r.json():null).then(setApps).catch(()=> setApps([])); },[]);
+  useEffect(()=>{ fetch("/api/applications/progress").then(r=>r.ok?r.json():null).then((rows:any[])=>{
+    const map: any = {}; (rows||[]).forEach(row => { map[row.application_id] = { essays_total: row.essays_total, essays_done: row.essays_done, recs_total: row.recs_total, recs_done: row.recs_done }; });
+    setProgress(map);
+  }).catch(()=>{}); },[]);
 
   return (
     <div className="card p-4">
@@ -30,12 +33,11 @@ export default function ApplicationsGrid(){
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {apps === null && <>
-          <Skeleton className="h-28 w-full" />
-          <Skeleton className="h-28 w-full" />
-          <Skeleton className="h-28 w-full" />
-        </>}
-        {(apps ?? []).map(a => <AppItem key={a.id} a={a} />)}
+        {apps === null && (<><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/></>)}
+        {(apps ?? []).map(a => {
+          const pr = progress[a.id] || { essays_total:0, essays_done:0, recs_total:0, recs_done:0 };
+          return <AppItem key={a.id} a={a} pr={pr} />;
+        })}
         <Link href="/dashboard/applications" className="flex h-28 items-center justify-center rounded-lg border text-sm hover:bg-black/5 dark:hover:bg-white/5">
           + Add application
         </Link>
@@ -44,12 +46,12 @@ export default function ApplicationsGrid(){
   );
 }
 
-function AppItem({ a }:{ a: AppCard }){
+function AppItem({ a, pr }:{ a: AppCard, pr: { essays_total:number; essays_done:number; recs_total:number; recs_done:number } }){
   const pct = useMemo(()=>{
-    const done = a.progress?.essays ?? 0;
-    const total = a.progress?.total ?? 1;
-    return Math.round((done/Math.max(1,total))*100);
-  },[a]);
+    const total = (pr.essays_total || 0) + (pr.recs_total || 0);
+    const done  = (pr.essays_done  || 0) + (pr.recs_done  || 0);
+    return Math.round((done / Math.max(1,total)) * 100);
+  },[pr]);
 
   const schoolName = a.school?.name ?? "School";
   const dd = daysUntil(a.school?.deadline ?? null);
@@ -67,7 +69,7 @@ function AppItem({ a }:{ a: AppCard }){
         <ProgressRing value={pct} />
       </div>
       <div className="mt-2 text-xs text-muted-foreground">
-        {a.progress?.essays ?? 0}/{a.progress?.total ?? 0} essays • {a.progress?.recs ?? 0}/{a.progress?.recsTotal ?? 0} recs
+        {pr.essays_done}/{pr.essays_total} essays • {pr.recs_done}/{pr.recs_total} recs
       </div>
       <div className="mt-3 flex gap-2">
         <Link href={`/dashboard/applications/${a.id}/ide`} className="btn btn-primary text-xs">Open workspace</Link>
