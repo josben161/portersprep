@@ -1,6 +1,6 @@
 // import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { getProfileId, admin } from "@/lib/db";
+import { getProfileByClerkId, getDocument, updateDocumentMeta } from "@/lib/db";
 
 export async function PATCH(
   request: NextRequest,
@@ -14,8 +14,8 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const profileId = await getProfileId(userId);
-    if (!profileId) {
+    const profile = await getProfileByClerkId(userId);
+    if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
@@ -31,42 +31,27 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid content" }, { status: 400 });
     }
 
-    const supabase = admin();
-
     // First, verify ownership
-    const { data: existingEssay, error: fetchError } = await supabase
-      .from('essays')
-      .select('id')
-      .eq('id', params.id)
-      .eq('profile_id', profileId)
-      .single();
-
-    if (fetchError || !existingEssay) {
-      return NextResponse.json({ error: "Essay not found or access denied" }, { status: 404 });
+    const document = await getDocument(params.id);
+    if (!document || document.user_id !== profile.id) {
+      return NextResponse.json({ error: "Document not found or access denied" }, { status: 404 });
     }
 
-    // Update the essay
+    // Update the document
     const updateData: any = {};
     if (title !== undefined) updateData.title = title;
-    if (content !== undefined) updateData.content = content;
+    if (content !== undefined) {
+      // Count words for content
+      const wordCount = content.trim().split(/\s+/).filter((word: string) => word.length > 0).length;
+      updateData.word_count = wordCount;
+    }
     updateData.updated_at = new Date().toISOString();
 
-    const { data: updatedEssay, error: updateError } = await supabase
-      .from('essays')
-      .update(updateData)
-      .eq('id', params.id)
-      .eq('profile_id', profileId)
-      .select('id, title, content, updated_at')
-      .single();
+    await updateDocumentMeta(params.id, updateData);
 
-    if (updateError) {
-      console.error('Error updating essay:', updateError);
-      return NextResponse.json({ error: "Failed to update essay" }, { status: 500 });
-    }
-
-    return NextResponse.json(updatedEssay);
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in essay save route:', error);
+    console.error('Error in document save route:', error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 } 

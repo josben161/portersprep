@@ -1,6 +1,6 @@
-// import { auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
-import { getAdminSupabase } from "@/lib/supabaseAdmin";
+import { getOrCreateProfileByClerkId, createAssessment } from "@/lib/db";
 
 const Input = z.object({
   resumeText: z.string().min(50),
@@ -11,29 +11,21 @@ const Input = z.object({
 });
 
 export async function POST(req: Request) {
-  // const { userId } = auth();
-  // if (!userId) return new Response("Unauthorized", { status: 401 });
-  const userId = "dummy-user-id"; // Temporary for build
+  const { userId } = auth();
+  if (!userId) return new Response("Unauthorized", { status: 401 });
 
-  const json = await req.json();
-  const parsed = Input.safeParse(json);
+  const parsed = Input.safeParse(await req.json());
   if (!parsed.success) return new Response("Bad Request", { status: 400 });
 
-  const supabase = getAdminSupabase();
-  const { data: profile } = await supabase.from("profiles").select("id").eq("clerk_user_id", userId).single();
-
+  const profile = await getOrCreateProfileByClerkId(userId);
+  // TODO: call your AI logic here to compute `result`
   const result = {
-    bands: { ExampleSchool: "20–30%" },
-    angles: ["Impact + Quant spike"],
-    gaps: ["Math brushup"],
-    timeline: ["Book quant refresher in 2 weeks"]
+    bands: { "Example MBA": "20–30%" },
+    angles: ["Impact + quant spike"],
+    gaps: ["Clarify leadership scope"],
+    timeline: ["Book a mock interview in 3 weeks"]
   };
 
-  const { data, error } = await supabase
-    .from("assessments")
-    .insert({ user_id: profile!.id, inputs: parsed.data, result })
-    .select("id").single();
-
-  if (error) return new Response("DB error", { status: 500 });
-  return Response.json({ assessmentId: data.id });
+  const id = await createAssessment(profile.id, parsed.data, result);
+  return Response.json({ assessmentId: id });
 } 

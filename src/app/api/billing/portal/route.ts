@@ -1,6 +1,6 @@
 // import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { getProfileId, admin } from "@/lib/db";
+import { getProfileByClerkId } from "@/lib/db";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -16,21 +16,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const profileId = await getProfileId(userId);
-    if (!profileId) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-    }
-
-    const supabase = admin();
-
-    // Get the user's profile with stripe_customer_id
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('stripe_customer_id')
-      .eq('id', profileId)
-      .single();
-
-    if (profileError || !profile) {
+    const profile = await getProfileByClerkId(userId);
+    if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 

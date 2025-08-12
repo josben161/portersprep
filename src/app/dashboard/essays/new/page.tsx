@@ -1,6 +1,6 @@
 // import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getProfileId, admin } from "@/lib/db";
+import { getProfileByClerkId, createDocument } from "@/lib/db";
 
 export default async function NewEssayPage() {
   // const { userId } = auth();
@@ -10,31 +10,16 @@ export default async function NewEssayPage() {
     redirect('/sign-in');
   }
 
-  const profileId = await getProfileId(userId);
+  const profile = await getProfileByClerkId(userId);
 
   // During build time with dummy user, redirect to essays list
-  if (!profileId) {
+  if (!profile) {
     redirect('/dashboard/essays');
   }
 
-  const supabase = admin();
+  // Create a new document with default values
+  const id = await createDocument(profile.id, 'Untitled Essay');
 
-  // Create a new essay with default values
-  const { data: essay, error } = await supabase
-    .from('essays')
-    .insert({
-      profile_id: profileId,
-      title: 'Untitled Essay',
-      content: '',
-    })
-    .select('id')
-    .single();
-
-  if (error) {
-    console.error('Error creating essay:', error);
-    redirect('/dashboard/essays');
-  }
-
-  // Redirect to the new essay
-  redirect(`/dashboard/essays/${essay.id}`);
+  // Redirect to the new document
+  redirect(`/dashboard/essays/${id}`);
 } 

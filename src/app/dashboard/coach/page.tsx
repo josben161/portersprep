@@ -1,76 +1,46 @@
-// import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { getProfileId } from "@/lib/db";
-import Chat from "./Chat";
+"use client";
+import { useEffect, useState } from "react";
 
-export default async function CoachPage() {
-  // const { userId } = auth();
-  const userId = "dummy-user-id"; // Temporary for build
+export default function CoachPage() {
+  const [messages, setMessages] = useState<{id:number; sender:string; text:string; created_at:string}[]>([]);
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  if (!userId) {
-    redirect('/sign-in');
+  async function load() {
+    const res = await fetch("/api/coach/messages");
+    if (res.ok) setMessages(await res.json());
   }
 
-  const profileId = await getProfileId(userId);
+  useEffect(() => {
+    load();
+    const t = setInterval(load, 5000);
+    return () => clearInterval(t);
+  }, []);
 
-  // During build time with dummy user, show not found
-  if (!profileId) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Coach Not Available</h1>
-        <p className="text-red-600">Please sign in to access your coach.</p>
-      </div>
-    );
+  async function send() {
+    if (!text.trim()) return;
+    setLoading(true);
+    const res = await fetch("/api/coach/messages", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+    setLoading(false);
+    if (res.ok) { setText(""); load(); } else { alert("Failed to send"); }
   }
 
   return (
-    <div className="h-screen flex">
-      {/* Left Column - Coach Info */}
-      <div className="w-80 border-r bg-gray-50 p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-2">Coach Thread</h1>
-          <p className="text-sm text-muted-foreground">
-            Chat with your personal MBA admissions coach
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <div className="bg-white rounded-lg p-4 border">
-            <h3 className="font-medium mb-2">Your Coach</h3>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground font-medium">C</span>
-              </div>
-              <div>
-                <div className="font-medium">Coach Sarah</div>
-                <div className="text-sm text-muted-foreground">MBA Admissions Expert</div>
-              </div>
+    <div className="mx-auto max-w-4xl p-6">
+      <h1 className="text-2xl font-semibold">Coach</h1>
+      <div className="mt-6 rounded-lg border p-4">
+        <div className="space-y-3">
+          {messages.map(m => (
+            <div key={m.id} className={`max-w-[80%] rounded-md p-2 text-sm ${m.sender==="user" ? "ml-auto bg-primary text-primary-foreground" : "bg-muted/40"}`}>
+              <div>{m.text}</div>
+              <div className="mt-1 text-[10px] opacity-70">{new Date(m.created_at).toLocaleString()}</div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-lg p-4 border">
-            <h3 className="font-medium mb-2">What you can ask</h3>
-            <ul className="text-sm text-muted-foreground space-y-2">
-              <li>• Application strategy advice</li>
-              <li>• Essay feedback and guidance</li>
-              <li>• Interview preparation tips</li>
-              <li>• School selection help</li>
-              <li>• Timeline planning</li>
-            </ul>
-          </div>
-
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-            <h3 className="font-medium text-blue-900 mb-2">💡 Pro Tip</h3>
-            <p className="text-sm text-blue-800">
-              Be specific in your questions and share your background for the most helpful advice.
-            </p>
-          </div>
+          ))}
         </div>
-      </div>
-
-      {/* Right Column - Chat */}
-      <div className="flex-1 flex flex-col">
-        <Chat profileId={profileId} />
+        <div className="mt-4 flex gap-2">
+          <textarea className="min-h-[44px] flex-1 rounded-md border p-2" value={text} onChange={e=>setText(e.target.value)} placeholder="Type a message..." />
+          <button disabled={loading} onClick={send} className="rounded-md bg-primary px-4 py-2 text-primary-foreground">{loading ? "Sending..." : "Send"}</button>
+        </div>
       </div>
     </div>
   );
