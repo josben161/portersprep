@@ -1,17 +1,7 @@
-import type { Metadata } from "next";
+"use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { CheckCircle, ArrowRight, Target, FileText, Sparkles, Users } from "lucide-react";
-
-export const metadata: Metadata = {
-  title: "How PortersPrep Works — MBA Admissions CoPilot",
-  description: "See how PortersPrep guides you through every step of your MBA application process.",
-  openGraph: {
-    title: "How PortersPrep Works — MBA Admissions CoPilot",
-    description: "Step-by-step guide to using PortersPrep for your MBA applications.",
-    type: "website"
-  }
-};
 
 const steps = [
   {

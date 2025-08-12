@@ -1,17 +1,7 @@
-import type { Metadata } from "next";
+"use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Target, FileText, Sparkles, Users, BarChart3, BookOpen, Zap, Shield, Clock, TrendingUp } from "lucide-react";
-
-export const metadata: Metadata = {
-  title: "Features — PortersPrep MBA Admissions CoPilot",
-  description: "Discover the powerful features that make PortersPrep the ultimate MBA application workspace.",
-  openGraph: {
-    title: "Features — PortersPrep MBA Admissions CoPilot",
-    description: "AI-powered essay analysis, story management, and school-specific guidance.",
-    type: "website"
-  }
-};
 
 const features = [
   {
