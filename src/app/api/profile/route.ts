@@ -5,26 +5,26 @@ import { getAdminSupabase } from "@/lib/supabaseAdmin";
 export async function GET() {
   const { profile } = await requireAuthedProfile();
   const sb = getAdminSupabase();
-  const { data, error } = await sb
-    .from("profiles")
-    .select("id, name, email, subscription_tier, resume_key, goals, industry, years_exp, gpa, gmat")
-    .eq("id", profile.id)
-    .single();
+            const { data, error } = await sb
+            .from("profiles")
+            .select("id, name, email, subscription_tier, resume_key, goals, industry, years_exp, gpa, gmat")
+            .eq("id", profile.id)
+            .single();
   if (error) return new Response(error.message, { status: 400 });
   
-  // Return profile with default values for missing fields
-  return Response.json({
-    id: data.id,
-    name: data.name || "",
-    email: data.email || "",
-    subscription_tier: data.subscription_tier || "free",
-    resume_key: data.resume_key || null,
-    goals: data.goals || "",
-    industry: data.industry || "",
-    years_exp: data.years_exp || null,
-    gpa: data.gpa || null,
-    gmat: data.gmat || null
-  });
+            // Return profile with default values for missing fields
+          return Response.json({
+            id: data.id,
+            name: data.name || "",
+            email: data.email || "",
+            subscription_tier: data.subscription_tier || "free",
+            resume_key: data.resume_key || null,
+            goals: data.goals || "",
+            industry: data.industry || "",
+            years_exp: data.years_exp || null,
+            gpa: data.gpa || null,
+            gmat: data.gmat || null
+          });
 }
 
 export async function PUT(req: NextRequest) {

@@ -61,7 +61,10 @@ export async function POST(req: NextRequest) {
     const sb = getAdminSupabase();
     
     await sb.from("profiles")
-      .update({ resume_key: key })
+      .update({ 
+        resume_key: key,
+        updated_at: new Date().toISOString()
+      })
       .eq("clerk_user_id", userId);
 
     return Response.json({ 

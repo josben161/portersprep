@@ -84,8 +84,43 @@ export default function CoreProfileCard(){
     setSaving(true);
     try {
       await apiFetch("/api/profile", { method:"PUT", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(p) });
-      alert("Saved");
-    } catch { alert("Save failed"); } finally { setSaving(false); }
+      // Don't show alert for auto-save
+    } catch (error) { 
+      console.error("Profile save failed:", error);
+      // Only show error for manual saves
+    } finally { setSaving(false); }
+  }
+
+  // Auto-save profile changes
+  useEffect(() => {
+    if (p && !loading) {
+      const timeoutId = setTimeout(() => {
+        saveProfile();
+      }, 1000); // Debounce for 1 second
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [p?.name, p?.industry, p?.years_exp, p?.gpa, p?.gmat, p?.goals]);
+
+  async function removeCV(){
+    if (!confirm("Remove CV from profile?")) return;
+    
+    try {
+      await apiFetch("/api/profile", { 
+        method:"PUT", 
+        headers:{ "Content-Type":"application/json" }, 
+        body: JSON.stringify({ ...p, resume_key: null }) 
+      });
+      
+      // Refresh profile data
+      const rr = await fetch("/api/profile"); 
+      setP(rr.ok? await rr.json(): p);
+      
+      alert("CV removed");
+    } catch (error) {
+      console.error("Failed to remove CV:", error);
+      alert("Failed to remove CV");
+    }
   }
 
   if (loading) return <section className="card p-4 text-sm text-muted-foreground">Loading profile…</section>;
@@ -103,30 +138,56 @@ export default function CoreProfileCard(){
         <input className="rounded-md border px-3 py-2" placeholder="GMAT" value={p.gmat ?? ""} onChange={e=> setP((v:any)=>({...v, gmat: e.target.value}))} />
         <input className="sm:col-span-2 rounded-md border px-3 py-2" placeholder="Goals (1–2 lines)" value={p.goals ?? ""} onChange={e=> setP((v:any)=>({...v, goals: e.target.value}))} />
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-        <label className="btn btn-outline text-xs">
-          Upload CV
-          <input 
-            type="file" 
-            className="hidden" 
-            accept=".pdf,.doc,.docx,.txt" 
-            onChange={e=> { 
-              const f = e.target.files?.[0]; 
-              if (f) {
-                const ext = f.name.split('.').pop()?.toLowerCase();
-                const allowedExtensions = ['pdf', 'doc', 'docx', 'txt'];
-                if (!allowedExtensions.includes(ext || '')) {
-                  alert(`Please select a PDF, Word document, or text file. Got: .${ext}`);
-                  return;
-                }
-                uploadCV(f); 
-              }
-            }} 
-          />
-        </label>
-        <button className="btn btn-primary text-xs" onClick={saveProfile} disabled={saving}>{saving? "Saving…" : "Save profile"}</button>
-        {p.resume_key && <span className="text-xs text-muted-foreground">CV on file</span>}
-      </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                {p.resume_key ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-emerald-600 dark:text-emerald-400">✓ CV uploaded</span>
+                    <button className="btn btn-outline text-xs" onClick={removeCV}>Remove</button>
+                    <label className="btn btn-outline text-xs">
+                      Replace
+                      <input 
+                        type="file" 
+                        className="hidden" 
+                        accept=".pdf,.doc,.docx,.txt" 
+                        onChange={e=> { 
+                          const f = e.target.files?.[0]; 
+                          if (f) {
+                            const ext = f.name.split('.').pop()?.toLowerCase();
+                            const allowedExtensions = ['pdf', 'doc', 'docx', 'txt'];
+                            if (!allowedExtensions.includes(ext || '')) {
+                              alert(`Please select a PDF, Word document, or text file. Got: .${ext}`);
+                              return;
+                            }
+                            uploadCV(f); 
+                          }
+                        }} 
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <label className="btn btn-outline text-xs">
+                    Upload CV
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept=".pdf,.doc,.docx,.txt" 
+                      onChange={e=> { 
+                        const f = e.target.files?.[0]; 
+                        if (f) {
+                          const ext = f.name.split('.').pop()?.toLowerCase();
+                          const allowedExtensions = ['pdf', 'doc', 'docx', 'txt'];
+                          if (!allowedExtensions.includes(ext || '')) {
+                            alert(`Please select a PDF, Word document, or text file. Got: .${ext}`);
+                            return;
+                          }
+                          uploadCV(f); 
+                        }
+                      }} 
+                    />
+                  </label>
+                )}
+                {saving && <span className="text-xs text-muted-foreground">Saving…</span>}
+              </div>
     </section>
   );
 } 
