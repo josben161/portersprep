@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { getOrCreateProfileByClerkId } from "@/lib/db";
 import { getAnswer, getApplication } from "@/lib/apps";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
+import { getQuotaSnapshot, assertWithinLimit, logAiUse } from "@/lib/quota";
 
 export async function POST(req: Request, { params }: { params: { answerId: string }}) {
   const { userId } = auth(); if(!userId) return new Response("Unauthorized", {status:401});
@@ -12,6 +13,9 @@ export async function POST(req: Request, { params }: { params: { answerId: strin
   const ans = await getAnswer(params.answerId);
   const app = await getApplication(ans.application_id);
   if (app.user_id !== p.id) return new Response("Forbidden", { status: 403 });
+  
+  const snap = await getQuotaSnapshot(userId);
+  try { assertWithinLimit("ai_calls", snap); } catch (e) { if (e instanceof Response) return e; throw e; }
 
   const sb = getAdminSupabase();
   const { data: stories } = await sb.from("anchor_stories").select("*").in("id", body.selectedStoryIds ?? []).eq("user_id", p.id);
@@ -50,5 +54,6 @@ export async function POST(req: Request, { params }: { params: { answerId: strin
     });
   }
 
+  await logAiUse(snap.profile_id, "ai_design");
   return Response.json({ version: next, outline });
 } 

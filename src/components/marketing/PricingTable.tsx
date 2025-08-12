@@ -4,24 +4,46 @@ const TIERS = [
   {
     name: "Free",
     price: "$0",
-    sub: "Get started",
+    sub: "Start drafting",
     cta: { href: "/sign-up", label: "Start free" },
-    features: ["1 school workspace", "1 essay draft", "Basic analysis"],
+    features: [
+      "1 school workspace",
+      "2 essays total",
+      "Basic analysis",
+      "Story Bank up to 3 stories",
+      "No coverage heatmap",
+      "5 AI actions/month"
+    ],
   },
   {
     name: "Plus",
-    price: "$49/mo",
+    price: "$89/mo",
     sub: "Most popular",
     highlight: true,
     cta: { href: "/checkout/plus", label: "Choose Plus" },
-    features: ["Up to 3 schools", "5 essays", "Advanced analysis", "Story Bank", "Per‑school adaptation"],
+    features: [
+      "Up to 3 schools",
+      "10 essays total",
+      "Advanced analysis",
+      "Per‑school adaptation",
+      "Story Bank unlimited",
+      "Coverage heatmap",
+      "2 variants/story/school"
+    ],
   },
   {
     name: "Pro",
-    price: "$199/mo",
-    sub: "For full cycles",
+    price: "$399/mo",
+    sub: "For full cycles & pros",
     cta: { href: "/checkout/pro", label: "Choose Pro" },
-    features: ["20 schools", "Unlimited essays", "Deep analysis", "Coverage heatmap", "Coach priority"],
+    features: [
+      "Up to 20 schools",
+      "Unlimited essays",
+      "Unlimited analysis & adaptation",
+      "Unlimited Story Bank & variants",
+      "Coverage heatmap",
+      "Priority support & coach tools"
+    ],
   }
 ];
 
@@ -49,7 +71,7 @@ export default function PricingTable(){
           </div>
         ))}
       </div>
-      <p className="mt-4 text-center text-xs text-muted-foreground">Prices may change; taxes may apply. You can cancel anytime.</p>
+      <p className="mt-4 text-center text-xs text-muted-foreground">Prices may change; taxes may apply. Cancel anytime.</p>
     </section>
   );
 } 

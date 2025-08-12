@@ -8,6 +8,7 @@ import AnalysisPanel from "@/components/panels/AnalysisPanel";
 import SchoolBriefPanel from "@/components/panels/SchoolBriefPanel";
 import StoryBankPanel from "@/components/panels/StoryBankPanel";
 import WordLimitBar from "@/components/ui/WordLimitBar";
+import { apiFetch } from "@/lib/fetcher";
 // Reuse if present:
 let CoveragePanel: any = () => <div className='text-sm text-muted-foreground'>Add CoveragePanel to see cross‑school story usage.</div>;
 try { CoveragePanel = require("@/components/CoveragePanel").default; } catch {}

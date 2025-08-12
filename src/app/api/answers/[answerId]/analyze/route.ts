@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getAnswer, getApplication, listSchoolQuestions, listAnalyses, storeAnalysis, updateAnswerMeta } from "@/lib/apps";
 import { getOrCreateProfileByClerkId } from "@/lib/db";
+import { getQuotaSnapshot, assertWithinLimit, logAiUse } from "@/lib/quota";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({ region: process.env.AWS_REGION });
@@ -86,5 +87,6 @@ Keep style coaching-oriented, not ghostwriting. Suggestions should be concise an
 
   await storeAnalysis(ans.id, MODEL, json.rubric, json.sentences);
   await updateAnswerMeta(ans.id, { rubric: json.rubric });
+  await logAiUse(p.id, "ai_analyze");
   return Response.json(json);
 } 

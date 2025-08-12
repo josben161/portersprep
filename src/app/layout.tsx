@@ -5,6 +5,7 @@ import SiteFooter from "@/components/layout/SiteFooter";
 import { Toaster } from "react-hot-toast";
 import ThemeProvider from "@/components/ThemeProvider";
 import CommandMenu from "@/components/CommandMenu";
+import UpgradeModal from "@/components/UpgradeModal";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en" className={poppins.variable} suppressHydrationWarning>
         <body className="min-h-screen font-sans">
           <ThemeProvider>
+            <UpgradeModal />
             <CommandMenu />
             <div className="min-h-screen bg-background text-foreground">
               <TopNav />
