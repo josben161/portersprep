@@ -51,8 +51,18 @@ export async function getOrCreateProfileByClerkId(clerkUserId: string, email?: s
     // If all else fails, create a mock profile to prevent the app from crashing
     // This is a temporary workaround until the RLS issue is resolved
     console.warn("Creating mock profile due to RLS issues");
+    
+    // Generate a proper UUID for the mock profile
+    const generateUUID = () => {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    };
+    
     return {
-      id: `mock-${clerkUserId}`,
+      id: generateUUID(),
       clerk_user_id: clerkUserId,
       email: email ?? "",
       name: name ?? null,
@@ -83,6 +93,14 @@ export async function updateProfile(clerkUserId: string, updates: Partial<{ name
 
 export async function listAssessments(profileId: string, limit = 20) {
   const sb = getAdminSupabase();
+  
+  // Validate profileId is a proper UUID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(profileId)) {
+    console.error("Invalid profileId format:", profileId);
+    return [];
+  }
+  
   const { data, error } = await sb
     .from("assessments")
     .select("id, created_at, result")
@@ -102,6 +120,14 @@ export async function getAssessment(id: string) {
 
 export async function createAssessment(profileId: string, inputs: any, result: any) {
   const sb = getAdminSupabase();
+  
+  // Validate profileId is a proper UUID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(profileId)) {
+    console.error("Invalid profileId format:", profileId);
+    throw new Error("Invalid user profile");
+  }
+  
   const { data, error } = await sb
     .from("assessments")
     .insert({ user_id: profileId, inputs, result })
@@ -113,6 +139,14 @@ export async function createAssessment(profileId: string, inputs: any, result: a
 
 export async function listDocuments(profileId: string, limit = 50) {
   const sb = getAdminSupabase();
+  
+  // Validate profileId is a proper UUID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(profileId)) {
+    console.error("Invalid profileId format:", profileId);
+    return [];
+  }
+  
   const { data, error } = await sb
     .from("documents")
     .select("id, title, word_count, status, updated_at")
@@ -125,6 +159,14 @@ export async function listDocuments(profileId: string, limit = 50) {
 
 export async function createDocument(profileId: string, title = "Untitled") {
   const sb = getAdminSupabase();
+  
+  // Validate profileId is a proper UUID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(profileId)) {
+    console.error("Invalid profileId format:", profileId);
+    throw new Error("Invalid user profile");
+  }
+  
   const { data, error } = await sb
     .from("documents")
     .insert({ user_id: profileId, title })

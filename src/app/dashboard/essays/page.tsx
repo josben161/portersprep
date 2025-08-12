@@ -21,8 +21,14 @@ export default async function Essays() {
         <h1 className="text-2xl font-semibold">Essays</h1>
         <form action={async () => {
           "use server";
-          const id = await createDocument(profile.id);
-          return { redirect: `/dashboard/essays/${id}` };
+          try {
+            const id = await createDocument(profile.id);
+            return { redirect: `/dashboard/essays/${id}` };
+          } catch (error) {
+            console.error("Error creating document:", error);
+            // Return error state instead of crashing
+            return { error: "Failed to create essay" };
+          }
         }}>
           <button className="rounded-md bg-primary px-4 py-2 text-primary-foreground">New essay</button>
         </form>
