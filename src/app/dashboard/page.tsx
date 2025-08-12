@@ -1,6 +1,6 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import Skeleton from "@/components/ui/Skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, FileText, MessageSquare, CreditCard, Plus, ArrowRight, BookOpen, Target, Sparkles, CheckCircle, Play } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -8,22 +8,11 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const [isLoadingBilling, setIsLoadingBilling] = useState(false);
-  const [userStats, setUserStats] = useState({
-    applications: 0,
-    assessments: 0,
-    essays: 0,
-    stories: 0
-  });
+  const [usage, setUsage] = useState<any|null>(null);
 
-  // Simulate fetching user stats
+  // Fetch real usage data
   useEffect(() => {
-    // In a real app, this would fetch from API
-    setUserStats({
-      applications: 0,
-      assessments: 0,
-      essays: 0,
-      stories: 0
-    });
+    fetch("/api/me/usage").then(r=>r.json()).then(setUsage).catch(()=>{});
   }, []);
 
   const handleManageBilling = async () => {
@@ -51,7 +40,7 @@ export default function DashboardPage() {
     }
   };
 
-  const isNewUser = userStats.applications === 0 && userStats.assessments === 0;
+  const isNewUser = !usage || (usage.schools_count === 0 && usage.assessments_count === 0);
 
   const onboardingSteps = [
     {
@@ -61,7 +50,7 @@ export default function DashboardPage() {
       href: "/dashboard/assessments/new",
       color: "text-blue-600",
       bgColor: "bg-blue-50",
-      completed: userStats.assessments > 0
+      completed: usage ? usage.assessments_count > 0 : false
     },
     {
       title: "Create Your First Application",
@@ -70,7 +59,7 @@ export default function DashboardPage() {
       href: "/dashboard/applications/new",
       color: "text-green-600",
       bgColor: "bg-green-50",
-      completed: userStats.applications > 0
+      completed: usage ? usage.schools_count > 0 : false
     },
     {
       title: "Build Your Story Bank",
@@ -79,7 +68,7 @@ export default function DashboardPage() {
       href: "/dashboard/stories",
       color: "text-purple-600",
       bgColor: "bg-purple-50",
-      completed: userStats.stories > 0
+      completed: usage ? usage.stories_count > 0 : false
     },
     {
       title: "Start Your First Essay",
@@ -88,7 +77,7 @@ export default function DashboardPage() {
       href: "/dashboard/essays/new",
       color: "text-orange-600",
       bgColor: "bg-orange-50",
-      completed: userStats.essays > 0
+      completed: usage ? usage.essays_count > 0 : false
     }
   ];
 
@@ -179,7 +168,9 @@ export default function DashboardPage() {
                 <Target className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{userStats.assessments}</div>
+                <div className="text-2xl font-bold">
+                  {usage ? usage.assessments_count : <Skeleton className="h-6 w-14" />}
+                </div>
                 <div className="text-sm text-muted-foreground">Assessments</div>
               </div>
             </div>
@@ -192,7 +183,9 @@ export default function DashboardPage() {
                 <FileText className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{userStats.applications}</div>
+                <div className="text-2xl font-bold">
+                  {usage ? usage.schools_count : <Skeleton className="h-6 w-14" />}
+                </div>
                 <div className="text-sm text-muted-foreground">Applications</div>
               </div>
             </div>
@@ -205,7 +198,9 @@ export default function DashboardPage() {
                 <BookOpen className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{userStats.stories}</div>
+                <div className="text-2xl font-bold">
+                  {usage ? usage.stories_count : <Skeleton className="h-6 w-14" />}
+                </div>
                 <div className="text-sm text-muted-foreground">Stories</div>
               </div>
             </div>
@@ -218,7 +213,9 @@ export default function DashboardPage() {
                 <Sparkles className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{userStats.essays}</div>
+                <div className="text-2xl font-bold">
+                  {usage ? usage.essays_count : <Skeleton className="h-6 w-14" />}
+                </div>
                 <div className="text-sm text-muted-foreground">Essays</div>
               </div>
             </div>
@@ -277,11 +274,15 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Schools</span>
-                  <span className="font-medium">{userStats.applications} / 1</span>
+                  <span className="font-medium">
+                    {usage ? usage.schools_count : <Skeleton className="h-4 w-8" />} / 1
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Essays</span>
-                  <span className="font-medium">{userStats.essays} / 2</span>
+                  <span className="font-medium">
+                    {usage ? usage.essays_count : <Skeleton className="h-4 w-8" />} / 2
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">AI Actions</span>
