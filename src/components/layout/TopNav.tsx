@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useUser, SignInButton, SignOutButton } from "@clerk/nextjs";
 import { User, LogOut, Settings } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const links = [
   { href: "/", label: "Home" },
@@ -69,6 +70,7 @@ export default function TopNav() {
         
         {/* Desktop Profile Menu */}
         <div className="hidden md:flex items-center gap-4">
+          <ThemeToggle />
           {isSignedIn ? (
             <div className="relative" ref={profileRef}>
               <button
@@ -165,6 +167,12 @@ export default function TopNav() {
                 </div>
               </>
             )}
+            <div className="border-t pt-2 mt-2">
+              <div className="flex items-center justify-between py-1">
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <ThemeToggle />
+              </div>
+            </div>
           </div>
         </div>
       )}
