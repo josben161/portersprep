@@ -48,6 +48,7 @@ export default function ApplicationsGrid(){
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {apps === null && (<><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/><Skeleton className="h-28 w-full"/></>)}
+        {apps && apps.length === 0 && <div className="col-span-full text-center text-sm text-muted-foreground py-8">No applications yet. Add your first one!</div>}
         {(apps ?? []).map(a => <AppItem key={a.id} a={a} pr={progress[a.id]} fitBand={fit[(a.school?.name ?? "").toLowerCase()]} />)}
         <AddApplicationModal onCreated={()=> setTick(t=> t+1)} />
       </div>
