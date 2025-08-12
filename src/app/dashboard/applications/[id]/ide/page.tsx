@@ -92,7 +92,7 @@ export default function IDE({ params }: { params: { id: string } }) {
   // Panels (Right Tabs)
   const rightTabs = useMemo(()=>[
     { label: "Analysis", node: <AnalysisPanel analysis={analysis} /> },
-    { label: "School Brief", node: <SchoolBriefPanel brief={schoolJson?.brief ?? null} /> },
+    { label: "School Brief", node: <SchoolBriefPanel brief={schoolJson?.brief ?? null} schoolName={schoolJson?.name} /> },
     { label: "Story Bank", node: <StoryBankPanel onInsert={insertStory} /> },
     { label: "Coverage", node: <CoveragePanel applicationId={appId} /> },
   ], [analysis, schoolJson]);
