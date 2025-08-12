@@ -9,10 +9,10 @@ import FinalCTA from "@/components/marketing/FinalCTA";
 import Footer from "@/components/marketing/Footer";
 
 export const metadata: Metadata = {
-  title: "PortersPrep — The IDE for MBA Applicants",
+  title: "PortersPrep — The CoPilot for MBA Applicants",
   description: "Design your narrative, draft faster, and tailor every essay to each school's DNA.",
   openGraph: {
-    title: "PortersPrep — The IDE for MBA Applicants",
+    title: "PortersPrep — The CoPilot for MBA Applicants",
     description: "Narrative-aware, school-specific coaching for your MBA applications.",
     type: "website"
   },
