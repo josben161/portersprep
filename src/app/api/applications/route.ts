@@ -43,8 +43,8 @@ export async function POST(req: NextRequest) {
         user_id: profile.id, 
         school_id, 
         round: round ?? null, 
-        status: "planning", 
-        deadline: deadline ?? null
+        status: "planning"
+        // Removed deadline for now to avoid column error
       })
       .select("id")
       .single();
