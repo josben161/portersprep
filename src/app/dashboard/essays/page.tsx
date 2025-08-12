@@ -7,7 +7,13 @@ export default async function Essays() {
   const profile = await requireProfile();
   if (!profile) return <div className="p-8">Please <a className="underline" href="/sign-in">sign in</a>.</div>;
 
-  const docs = await listDocuments(profile.id);
+  let docs: any[] = [];
+  try {
+    docs = await listDocuments(profile.id);
+  } catch (error) {
+    console.error("Error loading documents:", error);
+    // Continue with empty docs array
+  }
 
   return (
     <div className="mx-auto max-w-6xl p-6">

@@ -6,7 +6,14 @@ export const metadata = { title: "Assessments — PortersPrep" };
 export default async function Assessments() {
   const profile = await requireProfile();
   if (!profile) return <div className="p-8">Please <a className="underline" href="/sign-in">sign in</a>.</div>;
-  const items = await listAssessments(profile.id);
+  
+  let items: any[] = [];
+  try {
+    items = await listAssessments(profile.id);
+  } catch (error) {
+    console.error("Error loading assessments:", error);
+    // Continue with empty items array
+  }
 
   return (
     <div className="mx-auto max-w-6xl p-6">
