@@ -107,7 +107,7 @@ export default function TopNav() {
                   Sign In
                 </button>
               </SignInButton>
-              <Link href="/sign-up" className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground text-sm shadow-sm hover:opacity-95">
+              <Link href="/sign-up" className="rounded-md bg-brand-500 px-3 py-1.5 text-white text-sm shadow-sm hover:bg-brand-600 transition-colors">
                 Get Started
               </Link>
             </div>
