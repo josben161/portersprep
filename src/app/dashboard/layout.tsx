@@ -1,10 +1,10 @@
 import AppShell from "@/components/layout/AppShell";
-import { requireUser } from "./_auth";
+import { auth } from "@clerk/nextjs/server";
 
 export const metadata = { title: "Dashboard — PortersPrep" };
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const userId = await requireUser();
+  const { userId } = auth();
   
   if (!userId) {
     return (
