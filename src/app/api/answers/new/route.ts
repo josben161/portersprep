@@ -1,16 +1,25 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { requireAuthedProfile } from "@/lib/authz";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
-import { getQuotaSnapshot, assertWithinLimit } from "@/lib/quota";
 
 export async function POST(req: Request) {
-  const { userId } = auth(); if(!userId) return new Response("Unauthorized",{status:401});
-  const u = await currentUser();
-  const snap = await getQuotaSnapshot(userId);
-  try { assertWithinLimit("essays", snap); } catch (e) { if (e instanceof Response) return e; throw e; }
+  const { profile } = await requireAuthedProfile();
+  const body = await req.json();
+  const { application_id, title, prompt, word_limit } = body || {};
+  if (!application_id || !title) return new Response("Missing application_id or title", { status: 400 });
 
-  const body = await req.json(); // { application_id, question_id }
   const sb = getAdminSupabase();
-  const { data, error } = await sb.from("application_answers").insert({ application_id: body.application_id, question_id: body.question_id, content_key: null }).select("*").single();
+  const { data: app } = await sb.from("applications").select("id,user_id").eq("id", application_id).single();
+  if (!app || app.user_id !== profile.id) return new Response("Not found", { status: 404 });
+
+  const { data, error } = await sb.from("application_answers").insert({
+    application_id,
+    title,
+    prompt,
+    word_limit,
+    body: null,
+    content_key: null
+  }).select("id").single();
   if (error) return new Response(error.message, { status: 400 });
-  return Response.json(data);
+
+  return Response.json({ id: data.id });
 } 

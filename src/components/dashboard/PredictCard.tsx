@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import RunPredictModal from "./RunPredictModal";
 
 function BandBadge({ band }: { band?: string }) {
   if (!band) return null;
@@ -17,16 +18,17 @@ export default function PredictCard() {
   const [pred, setPred] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const r = await fetch("/api/predict");
-        if (r.ok) setPred(await r.json());
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  async function refresh() {
+    setLoading(true);
+    try {
+      const r = await fetch("/api/predict");
+      if (r.ok) setPred(await r.json());
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { refresh(); }, []);
 
   return (
     <section className="card p-4">
@@ -35,9 +37,10 @@ export default function PredictCard() {
           <div className="text-xs text-muted-foreground">Predict My Chances</div>
           <h3 className="text-base font-semibold">Fit score by school</h3>
         </div>
-        <Link href="/dashboard/predict" className="btn btn-outline text-xs">
-          History
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/dashboard/predict" className="btn btn-outline text-xs">History</Link>
+          <RunPredictModal onDone={refresh} />
+        </div>
       </div>
 
       {loading && <div className="mt-4 text-sm text-muted-foreground">Loading prediction…</div>}
@@ -46,9 +49,7 @@ export default function PredictCard() {
         <div className="mt-4 text-sm">
           No prediction yet.
           <div className="mt-2">
-            <Link href="/dashboard/assessments" className="btn btn-primary text-xs">
-              Run Prediction
-            </Link>
+            <RunPredictModal onDone={refresh} />
           </div>
         </div>
       )}

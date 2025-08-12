@@ -4,18 +4,26 @@ import Skeleton from "@/components/ui/Skeleton";
 import PrepPackModal from "./PrepPackModal";
 
 type Recommender = { id: string; name: string; email?: string|null; relationship?: string|null; assigned?: number; completed?: number; };
+type AppOpt = { id: string; label: string };
 
 export default function RecommendationsPanel(){
   const [data, setData] = useState<Recommender[]|null>(null);
   const [newRec, setNewRec] = useState({ name:"", email:"", relationship:"" });
+  const [apps, setApps] = useState<AppOpt[]>([]);
 
-  useEffect(()=>{ refresh(); },[]);
   async function refresh(){ const r = await fetch("/api/recommenders"); setData(r.ok ? await r.json() : []); }
+  useEffect(()=>{ refresh(); },[]);
+  useEffect(()=>{ (async()=>{ const r = await fetch("/api/applications"); const j = r.ok ? await r.json() : []; setApps(j.map((x:any)=>({ id:x.id, label: x.school?.name || "School" }))); })(); },[]);
 
   async function create(){
     if(!newRec.name) return;
     const r = await fetch("/api/recommenders", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(newRec) });
     if (r.ok) { setNewRec({ name:"", email:"", relationship:"" }); refresh(); }
+  }
+  async function assign(recommenderId: string, applicationId: string){
+    if (!applicationId) return;
+    await fetch("/api/recommenders/assign", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ recommender_id: recommenderId, application_id: applicationId }) });
+    refresh();
   }
 
   return (
@@ -45,8 +53,10 @@ export default function RecommendationsPanel(){
             <div className="text-[11px] text-muted-foreground">{r.email ?? "—"}</div>
             <div className="mt-1 text-[12px] text-muted-foreground">Assigned: {r.assigned ?? 0} • Completed: {r.completed ?? 0}</div>
             <div className="mt-2 flex gap-2">
-              <button className="btn btn-outline text-xs">Prep pack</button>
-              <button className="btn btn-outline text-xs">Manage</button>
+              <select className="w-full rounded-md border px-2 py-1 text-xs" onChange={(e)=> assign(r.id, e.target.value)} defaultValue="">
+                <option value="" disabled>Assign to application…</option>
+                {apps.map(a=> <option key={a.id} value={a.id}>{a.label}</option>)}
+              </select>
             </div>
           </div>
         ))}
