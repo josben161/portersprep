@@ -18,7 +18,12 @@ const poppins = Poppins({
 export const metadata = {
   title: "PortersPrep — MBA Admissions Copilot",
   description: "Assess • Edit • Coach",
-  icons: { icon: "/favicon.png" }
+  icons: { 
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.png", type: "image/png" }
+    ]
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
