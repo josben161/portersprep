@@ -8,7 +8,8 @@
     "lint": "next lint",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "seed": "tsx src/scripts/seed-schools.ts",
-    "health:env": "tsx scripts/health/check-env.ts"
+    "health:env": "tsx scripts/health/check-env.ts",
+    "s3:cors": "tsx scripts/configure-s3-cors.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.569.0",

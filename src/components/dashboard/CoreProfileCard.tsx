@@ -49,63 +49,29 @@ export default function CoreProfileCard(){
     try {
       console.log("Starting CV upload for file:", file.name);
       
-      // Get presigned URL
-      const r = await apiFetch(`/api/s3-presign?ext=${encodeURIComponent(file.name.split(".").pop()||"pdf")}`);
-      if (!r.ok) { 
-        const errorText = await r.text();
-        console.error("S3 presign failed:", errorText);
-        alert(`Failed to get upload URL: ${errorText}`); 
-        return; 
-      }
+      // Use server-side upload to avoid CORS issues
+      const formData = new FormData();
+      formData.append('file', file);
       
-      const { url, key } = await r.json();
-      console.log("Got presigned URL:", url);
-      
-      // Upload to S3
-      console.log("Uploading to S3 with URL:", url);
-      console.log("File type:", file.type, "File size:", file.size);
-      
-      let put;
-      try {
-        put = await fetch(url, { 
-          method:"PUT", 
-          headers: { "Content-Type": file.type || "application/octet-stream" }, 
-          body: file 
-        });
-      } catch (fetchError) {
-        console.error("Fetch error during S3 upload:", fetchError);
-        alert(`Network error during upload: ${fetchError instanceof Error ? fetchError.message : 'Unknown network error'}`);
-        return;
-      }
-      
-      if (!put.ok) { 
-        const errorText = await put.text().catch(() => "Unknown error");
-        console.error("S3 upload failed:", put.status, put.statusText, errorText);
-        alert(`Upload failed: ${put.status} ${put.statusText} - ${errorText}`); 
-        return; 
-      }
-      
-      console.log("File uploaded successfully, saving to profile...");
-      
-      // Save resume_key on profile
-      const profileUpdate = await apiFetch("/api/profile", { 
-        method:"PUT", 
-        headers:{ "Content-Type":"application/json" }, 
-        body: JSON.stringify({ resume_key: key }) 
+      const r = await apiFetch("/api/upload-cv", {
+        method: "POST",
+        body: formData
       });
       
-      if (!profileUpdate.ok) {
-        const errorText = await profileUpdate.text();
-        console.error("Profile update failed:", errorText);
-        alert(`Failed to save CV reference: ${errorText}`);
+      if (!r.ok) {
+        const errorText = await r.text();
+        console.error("CV upload failed:", errorText);
+        alert(`Upload failed: ${errorText}`);
         return;
       }
+      
+      const result = await r.json();
+      console.log("CV upload completed successfully:", result);
       
       // Refresh profile data
       const rr = await fetch("/api/profile"); 
       setP(rr.ok? await rr.json(): p);
       
-      console.log("CV upload completed successfully");
       alert("CV uploaded successfully!");
       
     } catch (error) {
