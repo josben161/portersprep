@@ -1,8 +1,8 @@
-import { requireAuthedProfile } from "@/lib/authz";
+import { requireAuth } from "@/lib/authz";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 
 export async function GET() {
-  await requireAuthedProfile(); // RLS on view does scoping
+  await requireAuth(); // RLS on view does scoping
   const sb = getAdminSupabase();
   const { data, error } = await sb
     .from("v_application_progress_secure")

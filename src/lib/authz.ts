@@ -9,14 +9,27 @@ export async function requireAuthedProfile() {
   const name = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || user?.firstName || "";
 
   const sb = getAdminSupabase();
-  // Ensure profile exists
-  const { data: existing } = await sb.from("profiles").select("*").eq("clerk_user_id", userId).maybeSingle();
-  if (!existing) {
-    const { data: created, error } = await sb.from("profiles").insert({
-      clerk_user_id: userId, email, name, subscription_tier: "free"
-    }).select("*").single();
-    if (error) throw new Error(error.message);
-    return { clerkUserId: userId, profile: created, email, name };
+  // Ensure profile exists - use upsert to avoid RLS issues
+  const { data: profile, error } = await sb.from("profiles").upsert({
+    clerk_user_id: userId, 
+    email, 
+    name, 
+    subscription_tier: "free"
+  }, {
+    onConflict: "clerk_user_id",
+    ignoreDuplicates: false
+  }).select("*").single();
+  
+  if (error) {
+    console.error("Profile upsert error:", error);
+    throw new Error(`Profile error: ${error.message}`);
   }
-  return { clerkUserId: userId, profile: existing, email, name };
+  
+  return { clerkUserId: userId, profile, email, name };
+}
+
+export async function requireAuth() {
+  const { userId } = auth();
+  if (!userId) throw new Response("Unauthorized", { status: 401 });
+  return { userId };
 } 
