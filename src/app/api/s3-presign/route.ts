@@ -8,9 +8,7 @@ const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 export async function GET(req: NextRequest) {
   try {
-    await requireAuthedProfile(); // auth gate
-    
-    // Check required environment variables
+    // Check required environment variables first
     if (!process.env.AWS_REGION) {
       return new Response("AWS_REGION not configured", { status: 500 });
     }
@@ -18,16 +16,32 @@ export async function GET(req: NextRequest) {
       return new Response("S3_BUCKET not configured", { status: 500 });
     }
     
+    // Get user info without requiring profile to exist
+    const { userId } = await import("@clerk/nextjs/server").then(m => m.auth());
+    if (!userId) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+    
     const { searchParams } = new URL(req.url);
     const ext = searchParams.get("ext") || "pdf";
-    const key = `resumes/${crypto.randomUUID()}.${ext}`;
+    
+    // Validate file extension
+    const allowedExtensions = ['pdf', 'doc', 'docx', 'txt'];
+    if (!allowedExtensions.includes(ext.toLowerCase())) {
+      return new Response(`File type .${ext} not allowed. Please use: ${allowedExtensions.join(', ')}`, { status: 400 });
+    }
+    
+    const key = `resumes/${userId}/${crypto.randomUUID()}.${ext}`;
     
     console.log("Generating presigned URL for:", key);
     
     const url = await getSignedUrl(s3, new PutObjectCommand({
       Bucket: process.env.S3_BUCKET!,
       Key: key,
-      ContentType: "application/octet-stream"
+      ContentType: ext === 'pdf' ? 'application/pdf' : 
+                   ext === 'doc' ? 'application/msword' :
+                   ext === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
+                   'text/plain'
     }), { expiresIn: 60 });
     
     console.log("Presigned URL generated successfully");

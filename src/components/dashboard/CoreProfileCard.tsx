@@ -129,7 +129,23 @@ export default function CoreProfileCard(){
       <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
         <label className="btn btn-outline text-xs">
           Upload CV
-          <input type="file" className="hidden" accept=".pdf,.doc,.docx,.txt" onChange={e=> { const f = e.target.files?.[0]; if (f) uploadCV(f); }} />
+          <input 
+            type="file" 
+            className="hidden" 
+            accept=".pdf,.doc,.docx,.txt" 
+            onChange={e=> { 
+              const f = e.target.files?.[0]; 
+              if (f) {
+                const ext = f.name.split('.').pop()?.toLowerCase();
+                const allowedExtensions = ['pdf', 'doc', 'docx', 'txt'];
+                if (!allowedExtensions.includes(ext || '')) {
+                  alert(`Please select a PDF, Word document, or text file. Got: .${ext}`);
+                  return;
+                }
+                uploadCV(f); 
+              }
+            }} 
+          />
         </label>
         <button className="btn btn-primary text-xs" onClick={saveProfile} disabled={saving}>{saving? "Saving…" : "Save profile"}</button>
         {p.resume_key && <span className="text-xs text-muted-foreground">CV on file</span>}
