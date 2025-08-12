@@ -2,13 +2,14 @@ import { Poppins } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import TopNav from "@/components/layout/TopNav";
 import SiteFooter from "@/components/layout/SiteFooter";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
-const poppins = Poppins({ 
-  subsets: ["latin"], 
-  weight: ["300", "400", "500", "600", "700"], 
-  variable: "--font-poppins", 
-  display: "swap" 
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap"
 });
 
 export const metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
             <SiteFooter />
           </div>
+          <Toaster position="top-center" />
         </body>
       </html>
     </ClerkProvider>

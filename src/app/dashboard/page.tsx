@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, FileText, MessageSquare, CreditCard, Plus, ArrowRight } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function DashboardPage() {
   const [isLoadingBilling, setIsLoadingBilling] = useState(false);
@@ -22,11 +23,11 @@ export default function DashboardPage() {
         window.location.href = data.url;
       } else {
         console.error('Failed to access billing portal');
-        alert('Failed to access billing portal. Please try again.');
+        toast.error('Failed to access billing portal. Please try again.');
       }
     } catch (error) {
       console.error('Error accessing billing portal:', error);
-      alert('An error occurred. Please try again.');
+      toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoadingBilling(false);
     }

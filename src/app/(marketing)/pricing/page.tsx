@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { toast } from "react-hot-toast";
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
@@ -20,14 +21,15 @@ export default function PricingPage() {
 
       if (response.ok) {
         const data = await response.json();
+        toast.success(`Redirecting to checkout...`);
         window.location.href = data.url;
       } else {
         console.error('Checkout failed');
-        alert('Failed to start checkout. Please try again.');
+        toast.error('Failed to start checkout. Please try again.');
       }
     } catch (error) {
       console.error('Error during checkout:', error);
-      alert('An error occurred. Please try again.');
+      toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(null);
     }
@@ -175,7 +177,7 @@ export default function PricingPage() {
                     : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {plan.loading ? 'Loading...' : plan.cta}
+                {plan.loading ? "Loading..." : plan.cta}
               </button>
             ) : (
               <a

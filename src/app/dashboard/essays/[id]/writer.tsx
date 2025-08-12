@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function Editor({ id, initialTitle, onMetaSave }:{
   id: string; initialTitle: string; onMetaSave: (title: string, wc: number) => Promise<void>;
@@ -15,19 +16,32 @@ export default function Editor({ id, initialTitle, onMetaSave }:{
   }
 
   useEffect(() => {
-    // TODO: Load content from S3 or another store if you add one later.
-    // For now, keep content in memory; we still persist title + word_count + version for history.
-  }, []);
+    fetch(`/api/essays/${id}/content`)
+      .then(r => r.text())
+      .then(setText)
+      .catch(() => toast.error("Failed to load content"));
+  }, [id]);
 
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
       setSaving(true);
-      await onMetaSave(title, countWords(text));
-      setSaving(false);
-    }, 800);
+      try {
+        await fetch(`/api/essays/${id}/content`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+        await onMetaSave(title, countWords(text));
+        toast.success("Saved");
+      } catch {
+        toast.error("Save failed");
+      } finally {
+        setSaving(false);
+      }
+    }, 1000);
     return () => clearTimeout(timer.current);
-  }, [title, text, onMetaSave]);
+  }, [title, text, id, onMetaSave]);
 
   return (
     <div>
@@ -47,8 +61,9 @@ export default function Editor({ id, initialTitle, onMetaSave }:{
         <button
           onClick={async ()=> {
             const res = await fetch("/api/redline", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ text }) });
-            if (!res.ok) { alert("Redline failed"); return; }
+            if (!res.ok) { toast.error("Redline failed"); return; }
             const data = await res.json();
+            toast.success(`Got ${data.suggestions.length} suggestions`);
             alert(`Suggestions: \n- ${data.suggestions.join("\n- ")}`);
           }}
           className="rounded-md bg-primary px-3 py-2 text-primary-foreground"

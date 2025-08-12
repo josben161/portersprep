@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function CoachPage() {
   const [messages, setMessages] = useState<{id:number; sender:string; text:string; created_at:string}[]>([]);
@@ -7,8 +8,16 @@ export default function CoachPage() {
   const [loading, setLoading] = useState(false);
 
   async function load() {
-    const res = await fetch("/api/coach/messages");
-    if (res.ok) setMessages(await res.json());
+    try {
+      const res = await fetch("/api/coach/messages");
+      if (res.ok) {
+        setMessages(await res.json());
+      } else {
+        toast.error("Failed to load messages");
+      }
+    } catch (error) {
+      toast.error("Failed to load messages");
+    }
   }
 
   useEffect(() => {
@@ -20,9 +29,25 @@ export default function CoachPage() {
   async function send() {
     if (!text.trim()) return;
     setLoading(true);
-    const res = await fetch("/api/coach/messages", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
-    setLoading(false);
-    if (res.ok) { setText(""); load(); } else { alert("Failed to send"); }
+    try {
+      const res = await fetch("/api/coach/messages", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ text }) 
+      });
+      
+      if (res.ok) { 
+        setText(""); 
+        load();
+        toast.success("Message sent");
+      } else { 
+        toast.error("Failed to send message");
+      }
+    } catch (error) {
+      toast.error("Failed to send message");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -38,8 +63,20 @@ export default function CoachPage() {
           ))}
         </div>
         <div className="mt-4 flex gap-2">
-          <textarea className="min-h-[44px] flex-1 rounded-md border p-2" value={text} onChange={e=>setText(e.target.value)} placeholder="Type a message..." />
-          <button disabled={loading} onClick={send} className="rounded-md bg-primary px-4 py-2 text-primary-foreground">{loading ? "Sending..." : "Send"}</button>
+          <textarea 
+            className="min-h-[44px] flex-1 rounded-md border p-2" 
+            value={text} 
+            onChange={e=>setText(e.target.value)} 
+            placeholder="Type a message..." 
+            disabled={loading}
+          />
+          <button 
+            disabled={loading || !text.trim()} 
+            onClick={send} 
+            className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Sending..." : "Send"}
+          </button>
         </div>
       </div>
     </div>

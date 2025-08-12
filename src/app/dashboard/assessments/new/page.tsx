@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 export default function NewAssessment() {
   const r = useRouter();
@@ -13,18 +14,29 @@ export default function NewAssessment() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const res = await fetch("/api/assessment/run", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        targets: targets.split(",").map(s => s.trim()).filter(Boolean),
-        resumeText, goals, constraints
-      })
-    });
-    setLoading(false);
-    if (!res.ok) { alert("Failed to run assessment"); return; }
-    const json = await res.json();
-    r.push(`/dashboard/assessments/${json.assessmentId}`);
+    try {
+      const res = await fetch("/api/assessment/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targets: targets.split(",").map(s => s.trim()).filter(Boolean),
+          resumeText, goals, constraints
+        })
+      });
+      
+      if (!res.ok) {
+        toast.error("Failed to run assessment");
+        return;
+      }
+      
+      const json = await res.json();
+      toast.success("Assessment complete");
+      r.push(`/dashboard/assessments/${json.assessmentId}`);
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -47,7 +59,12 @@ export default function NewAssessment() {
           <label className="text-sm font-medium">Constraints (optional)</label>
           <textarea className="mt-1 w-full rounded-md border px-3 py-2" rows={3} value={constraints} onChange={e=>setConstraints(e.target.value)} />
         </div>
-        <button disabled={loading} className="rounded-md bg-primary px-4 py-2 text-primary-foreground">{loading ? "Running..." : "Run assessment"}</button>
+        <button 
+          disabled={loading} 
+          className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Running..." : "Run assessment"}
+        </button>
       </form>
     </div>
   );
