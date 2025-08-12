@@ -32,6 +32,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const { school_id, round, deadline } = body || {};
     
+    console.log("Creating application with data:", { school_id, round, deadline, user_id: profile.id });
+    
     if (!school_id) return new Response("school_id required", { status: 400 });
 
     const sb = getAdminSupabase();
@@ -49,12 +51,23 @@ export async function POST(req: NextRequest) {
       
     if (error) {
       console.error("Application create error:", error);
-      return new Response("Failed to create application", { status: 500 });
+      
+      // Provide more specific error messages
+      if (error.code === '42501') {
+        return new Response("Database permission error. Please contact support.", { status: 500 });
+      } else if (error.code === '42P01') {
+        return new Response("Applications table not found. Please contact support.", { status: 500 });
+      } else if (error.code === '23503') {
+        return new Response("Invalid school_id. Please select a valid school.", { status: 400 });
+      } else {
+        return new Response(`Failed to create application: ${error.message}`, { status: 500 });
+      }
     }
     
+    console.log("Application created successfully:", data);
     return Response.json(data);
   } catch (error) {
     console.error("Applications POST error:", error);
-    return new Response("Application error", { status: 500 });
+    return new Response(`Application error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
   }
 } 
