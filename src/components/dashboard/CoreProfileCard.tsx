@@ -22,7 +22,9 @@ export default function CoreProfileCard(){
     try {
       const r = await fetch("/api/profile");
       if (r.ok) {
-        setP(await r.json());
+        const profileData = await r.json();
+        console.log("Initial profile load:", profileData);
+        setP(profileData);
       } else {
         // If profile doesn't exist or API fails, create a default one
         setP({
@@ -85,6 +87,7 @@ export default function CoreProfileCard(){
       // Refresh profile data
       const rr = await fetch("/api/profile"); 
       const updatedProfile = rr.ok ? await rr.json() : p;
+      console.log("Profile after CV upload:", updatedProfile);
       setP(updatedProfile);
       
       setMessage({ type: 'success', text: `CV uploaded successfully!` });
@@ -177,6 +180,11 @@ export default function CoreProfileCard(){
           {message.text}
         </div>
       )}
+      
+      {/* Debug info - remove this later */}
+      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        Debug: resume_key = {p.resume_key ? `"${p.resume_key}"` : 'null'}
+      </div>
       
       <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
         <input className="rounded-md border px-3 py-2" placeholder="Name" value={p.name ?? ""} onChange={e=> setP((v:any)=>({...v, name: e.target.value}))} />
