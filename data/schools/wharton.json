@@ -3,6 +3,11 @@
   "name": "The Wharton School",
   "country": "USA",
   "cycle": "2025-2026",
+  "deadlines": {
+    "round1": "2025-09-04",
+    "round2": "2026-01-07",
+    "round3": "2026-04-01"
+  },
   "essays": [
     {
       "type": "long",
@@ -25,5 +30,13 @@
     "format": "GMAC Common LOR"
   },
   "verify_in_portal": false,
-  "last_checked": "2024-12-19"
+  "last_checked": "2024-12-19",
+  "website": "https://mba.wharton.upenn.edu",
+  "location": "Philadelphia, PA",
+  "class_size": 877,
+  "acceptance_rate": "23.1%",
+  "avg_gmat": 728,
+  "avg_gpa": 3.6,
+  "tuition": "$84,874/year",
+  "application_fee": "$275"
 } 

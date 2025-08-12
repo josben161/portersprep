@@ -3,6 +3,11 @@
   "name": "Stanford Graduate School of Business",
   "country": "USA",
   "cycle": "2025-2026",
+  "deadlines": {
+    "round1": "2025-09-12",
+    "round2": "2026-01-09",
+    "round3": "2026-04-09"
+  },
   "essays": [
     {
       "type": "long",
@@ -25,5 +30,13 @@
     "format": "School form"
   },
   "verify_in_portal": false,
-  "last_checked": "2024-12-19"
+  "last_checked": "2024-12-19",
+  "website": "https://www.gsb.stanford.edu/programs/mba",
+  "location": "Stanford, CA",
+  "class_size": 417,
+  "acceptance_rate": "6.2%",
+  "avg_gmat": 738,
+  "avg_gpa": 3.8,
+  "tuition": "$76,950/year",
+  "application_fee": "$275"
 } 

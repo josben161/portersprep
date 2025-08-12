@@ -3,6 +3,11 @@
   "name": "Chicago Booth School of Business",
   "country": "USA",
   "cycle": "2025-2026",
+  "deadlines": {
+    "round1": "2025-09-26",
+    "round2": "2026-01-09",
+    "round3": "2026-04-04"
+  },
   "essays": [
     {
       "type": "long",
@@ -25,5 +30,13 @@
     "format": "GMAC Common LOR"
   },
   "verify_in_portal": false,
-  "last_checked": "2024-12-19"
+  "last_checked": "2024-12-19",
+  "website": "https://www.chicagobooth.edu/mba",
+  "location": "Chicago, IL",
+  "class_size": 621,
+  "acceptance_rate": "23.5%",
+  "avg_gmat": 730,
+  "avg_gpa": 3.6,
+  "tuition": "$77,841/year",
+  "application_fee": "$250"
 } 
