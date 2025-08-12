@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import AppShell from "@/components/appshell/AppShell";
 import LeftNav from "@/components/appshell/LeftNav";
 import TopBar from "@/components/appshell/TopBar";
@@ -26,9 +27,10 @@ export default function IDE({ params }: { params: { id: string } }) {
   const [content, setContent] = useState("");
   const [analysis, setAnalysis] = useState<any | null>(null);
   const [saving, setSaving] = useState(false);
+  const [stories, setStories] = useState<any[]>([]);
   const saveTimer = useRef<any>(null);
 
-  // Load nav + questions
+  // Load nav + questions + stories
   useEffect(()=>{
     (async()=>{
       // schools list for left nav
@@ -46,6 +48,10 @@ export default function IDE({ params }: { params: { id: string } }) {
         const sb = await fetch(`/api/schools/${app.school_id}`).then(r=>r.json()); // if you mapped id->slug route differently, update
         setSchoolJson(sb);
       } catch {}
+
+      // Load stories for sidebar
+      const storiesData = await fetch("/api/stories").then(r=>r.json()).catch(()=>[]);
+      setStories(storiesData);
     })();
   },[appId]);
 
@@ -97,29 +103,66 @@ export default function IDE({ params }: { params: { id: string } }) {
     { label: "Coverage", node: <CoveragePanel applicationId={appId} /> },
   ], [analysis, schoolJson]);
 
-  // Left: show questions list + button to open Requirements if available
+  // Left: 3-zone Command Center layout (compact for IDE)
   const leftNavNode = (
-    <div className="flex h-full flex-col">
-      <div className="px-3 py-2 text-sm font-semibold">Questions</div>
-      <div className="flex-1 divide-y">
-        {questions.map(q=>(
-          <button key={q.id} onClick={()=>openQuestion(q)} className={`block w-full px-3 py-2 text-left text-sm hover:bg-accent ${selected?.id===q.id ? "bg-secondary" : ""}`}>
-            <div className="font-medium">{q.archetype.replace("_"," ")}</div>
-            <div className="text-xs text-muted-foreground line-clamp-2">{q.prompt}</div>
-            {q.word_limit ? <div className="mt-1 text-[10px] text-muted-foreground">≤ {q.word_limit} words</div> : null}
-          </button>
-        ))}
+    <div className="flex h-full flex-col space-y-4 p-4">
+      {/* Zone 1: Core Profile (Compact) */}
+      <div className="space-y-2">
+        <div className="text-xs text-muted-foreground font-medium">Core Profile</div>
+        <div className="rounded-md border p-3 text-xs">
+          <div className="flex items-center justify-between mb-2">
+            <div className="font-medium">Story Bank</div>
+            <Link href="/dashboard/stories" className="text-brand-500 hover:underline">Manage</Link>
+          </div>
+          <div className="space-y-1">
+            {stories.length > 0 ? (
+              stories.slice(0, 3).map((s: any) => (
+                <div key={s.id} className="rounded border p-1.5">
+                  <div className="font-medium text-[10px]">{s.title}</div>
+                  <div className="text-[9px] text-muted-foreground line-clamp-1">{s.summary}</div>
+                </div>
+              ))
+            ) : (
+              <div className="text-muted-foreground">No stories loaded</div>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="border-t p-3 text-xs">
-        <div className="text-muted-foreground mb-1">Requirements</div>
-        <div className="rounded-md border p-2">
-          <RequirementsPanel 
-            school={schoolJson ?? { id:"", name:"", essays:[], verify_in_portal:true, lor:null, video_assessment:null, country:"", cycle:"", last_checked:"" }} 
-            onStart={(essayId) => {
-              // TODO: Implement draft creation logic
-              console.log("Start draft for essay:", essayId);
-            }}
-          />
+
+      {/* Zone 2: Current Application */}
+      <div className="space-y-2">
+        <div className="text-xs text-muted-foreground font-medium">Current Application</div>
+        <div className="rounded-md border p-3 text-xs">
+          <div className="font-medium mb-2">{schoolJson?.name ?? "School"}</div>
+          <div className="space-y-1">
+            {questions.map(q => (
+              <button 
+                key={q.id} 
+                onClick={() => openQuestion(q)} 
+                className={`block w-full text-left p-1.5 rounded hover:bg-accent ${selected?.id === q.id ? "bg-secondary" : ""}`}
+              >
+                <div className="font-medium text-[10px]">{q.archetype.replace("_", " ")}</div>
+                <div className="text-[9px] text-muted-foreground line-clamp-1">{q.prompt}</div>
+                {q.word_limit && <div className="text-[8px] text-muted-foreground">≤ {q.word_limit} words</div>}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Zone 3: Quick Actions */}
+      <div className="space-y-2">
+        <div className="text-xs text-muted-foreground font-medium">Quick Actions</div>
+        <div className="rounded-md border p-3 text-xs space-y-2">
+          <Link href="/dashboard/applications" className="block text-center btn btn-outline text-[10px] py-1">
+            All Applications
+          </Link>
+          <Link href="/dashboard/stories" className="block text-center btn btn-outline text-[10px] py-1">
+            Story Bank
+          </Link>
+          <Link href="/dashboard/assessments" className="block text-center btn btn-outline text-[10px] py-1">
+            Run Prediction
+          </Link>
         </div>
       </div>
     </div>
