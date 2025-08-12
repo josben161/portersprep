@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import EssayEditor from "./EssayEditor";
 import ApplicationProgress from "@/components/ApplicationProgress";
+import DesignTab from "./DesignTab";
 
 interface Question {
   id: string;
@@ -40,7 +41,7 @@ export default function ApplicationWorkspace() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'workspace' | 'progress'>('workspace');
+  const [activeTab, setActiveTab] = useState<'workspace' | 'progress' | 'design'>('workspace');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -146,6 +147,16 @@ export default function ApplicationWorkspace() {
             Workspace
           </button>
           <button
+            onClick={() => setActiveTab('design')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+              activeTab === 'design'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Design
+          </button>
+          <button
             onClick={() => setActiveTab('progress')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
               activeTab === 'progress'
@@ -225,9 +236,18 @@ export default function ApplicationWorkspace() {
             )}
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'progress' ? (
         <div className="max-w-4xl">
           <ApplicationProgress
+            questions={questions}
+            answers={answers}
+            application={application}
+          />
+        </div>
+      ) : (
+        <div className="max-w-4xl">
+          <DesignTab
+            appId={appId}
             questions={questions}
             answers={answers}
             application={application}
