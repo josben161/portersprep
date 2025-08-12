@@ -317,21 +317,40 @@ export default function CoreProfileCard(){
           <input 
             className="w-full rounded-md border px-2 py-1 text-sm mb-2" 
             placeholder="Story title" 
+            id="story-title"
             onKeyDown={async (e) => {
-              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                const title = e.currentTarget.value.trim();
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                const titleInput = document.getElementById('story-title') as HTMLInputElement;
+                const descInput = document.getElementById('story-description') as HTMLTextAreaElement;
+                const title = titleInput?.value?.trim();
+                const description = descInput?.value?.trim();
+                
+                if (!title) {
+                  setMessage({ type: 'error', text: 'Story title is required' });
+                  return;
+                }
+                
                 try {
                   const r = await apiFetch("/api/stories", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ title, summary: "", tags: [] })
+                    body: JSON.stringify({ 
+                      title, 
+                      summary: description || "", 
+                      tags: [] 
+                    })
                   });
                   if (r.ok) {
                     const newStory = await r.json();
                     setStories(prev => [newStory, ...prev]);
-                    e.currentTarget.value = "";
+                    titleInput.value = "";
+                    descInput.value = "";
                     setMessage({ type: 'success', text: 'Story added successfully!' });
                     setTimeout(() => setMessage(null), 3000);
+                  } else {
+                    const errorText = await r.text();
+                    setMessage({ type: 'error', text: `Failed to add story: ${errorText}` });
                   }
                 } catch (error) {
                   console.error("Failed to add story:", error);
@@ -340,8 +359,58 @@ export default function CoreProfileCard(){
               }
             }}
           />
-          <div className="text-xs text-muted-foreground">
-            Press Enter to save
+          <textarea 
+            className="w-full rounded-md border px-2 py-1 text-sm mb-2 resize-none" 
+            placeholder="Story description (optional)"
+            rows={2}
+            id="story-description"
+          />
+          <div className="flex justify-between items-center">
+            <div className="text-xs text-muted-foreground">
+              Press Enter in title field to save
+            </div>
+            <button 
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-3 py-1 text-xs transition-colors"
+              onClick={async () => {
+                const titleInput = document.getElementById('story-title') as HTMLInputElement;
+                const descInput = document.getElementById('story-description') as HTMLTextAreaElement;
+                const title = titleInput?.value?.trim();
+                const description = descInput?.value?.trim();
+                
+                if (!title) {
+                  setMessage({ type: 'error', text: 'Story title is required' });
+                  return;
+                }
+                
+                try {
+                  const r = await apiFetch("/api/stories", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                      title, 
+                      summary: description || "", 
+                      tags: [] 
+                    })
+                  });
+                  if (r.ok) {
+                    const newStory = await r.json();
+                    setStories(prev => [newStory, ...prev]);
+                    titleInput.value = "";
+                    descInput.value = "";
+                    setMessage({ type: 'success', text: 'Story added successfully!' });
+                    setTimeout(() => setMessage(null), 3000);
+                  } else {
+                    const errorText = await r.text();
+                    setMessage({ type: 'error', text: `Failed to add story: ${errorText}` });
+                  }
+                } catch (error) {
+                  console.error("Failed to add story:", error);
+                  setMessage({ type: 'error', text: 'Failed to add story' });
+                }
+              }}
+            >
+              Add Story
+            </button>
           </div>
         </div>
         
