@@ -7,10 +7,10 @@ export async function GET() {
     const { profile } = await requireAuthedProfile();
     const sb = getAdminSupabase();
     
-    // Simple query that works regardless of column existence
+    // Query with resume_key if it exists
     const { data, error } = await sb
       .from("profiles")
-      .select("id, name, email, subscription_tier")
+      .select("id, name, email, subscription_tier, resume_key")
       .eq("id", profile.id)
       .single();
       
@@ -37,7 +37,7 @@ export async function GET() {
       name: data.name || "",
       email: data.email || "",
       subscription_tier: data.subscription_tier || "free",
-      resume_key: null, // Will be added by migration
+      resume_key: data.resume_key || null,
       goals: "",
       industry: "",
       years_exp: null,
@@ -55,9 +55,9 @@ export async function PUT(req: NextRequest) {
     const { profile } = await requireAuthedProfile();
     const body = await req.json().catch(() => ({}));
     
-    // Only update basic fields for now
+    // Allow updating more fields now
     const updates: any = {};
-    for (const k of ["name"]) {
+    for (const k of ["name", "goals", "industry", "years_exp", "gpa", "gmat", "resume_key"]) {
       if (k in body) updates[k] = body[k];
     }
     

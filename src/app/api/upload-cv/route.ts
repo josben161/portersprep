@@ -56,23 +56,28 @@ export async function POST(req: NextRequest) {
 
     await s3.send(command);
 
-    // Update profile with resume_key
+    // Update profile with resume_key - simplified approach
     const { getAdminSupabase } = await import("@/lib/supabaseAdmin");
     const sb = getAdminSupabase();
     
-    // Use upsert to handle case where profile doesn't exist yet
-    const { error: profileError } = await sb.from("profiles")
-      .upsert({ 
-        clerk_user_id: userId,
-        resume_key: key,
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: "clerk_user_id"
-      });
+    // Try to update existing profile first
+    const { error: updateError } = await sb.from("profiles")
+      .update({ resume_key: key })
+      .eq("clerk_user_id", userId);
     
-    if (profileError) {
-      console.error("Profile update error:", profileError);
-      // Continue anyway since S3 upload succeeded
+    if (updateError) {
+      console.error("Profile update error:", updateError);
+      // Try to create profile if update fails
+      const { error: insertError } = await sb.from("profiles")
+        .insert({ 
+          clerk_user_id: userId,
+          resume_key: key
+        });
+      
+      if (insertError) {
+        console.error("Profile insert error:", insertError);
+        // Continue anyway since S3 upload succeeded
+      }
     }
 
     return Response.json({ 
