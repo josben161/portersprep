@@ -11,12 +11,21 @@ function DocumentIcon({ className = "" }: { className?: string }) {
   );
 }
 
+type Story = {
+  id: string;
+  title: string;
+  summary?: string;
+  tags?: string[];
+};
+
 export default function CoreProfileCard(){
   const [p, setP] = useState<any|null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+  const [stories, setStories] = useState<Story[]>([]);
+  const [originalFileName, setOriginalFileName] = useState<string>("");
 
   useEffect(()=>{ (async()=>{
     try {
@@ -58,9 +67,26 @@ export default function CoreProfileCard(){
     }
   })(); },[]);
 
+  // Load stories
+  useEffect(() => {
+    async function loadStories() {
+      try {
+        const r = await fetch("/api/stories");
+        if (r.ok) {
+          const storiesData = await r.json();
+          setStories(storiesData);
+        }
+      } catch (error) {
+        console.error("Failed to load stories:", error);
+      }
+    }
+    loadStories();
+  }, []);
+
   async function uploadCV(file: File){
     setUploading(true);
     setMessage(null);
+    setOriginalFileName(file.name); // Store original filename
     
     try {
       console.log("Starting CV upload for file:", file.name);
@@ -139,6 +165,7 @@ export default function CoreProfileCard(){
       });
       
       setP((prev: any) => ({ ...prev, resume_key: null }));
+      setOriginalFileName(""); // Clear original filename
       setMessage({ type: 'success', text: 'CV removed successfully' });
       setTimeout(() => setMessage(null), 3000);
       
@@ -148,8 +175,9 @@ export default function CoreProfileCard(){
     }
   }
 
-  // Extract filename from S3 key
+  // Get filename - use original filename if available, otherwise extract from S3 key
   function getFileName(key: string) {
+    if (originalFileName) return originalFileName;
     const parts = key.split('/');
     return parts[parts.length - 1] || 'CV';
   }
@@ -189,7 +217,7 @@ export default function CoreProfileCard(){
       
       <div className="mt-3 flex gap-2">
         <button 
-          className="btn btn-primary text-xs" 
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-3 py-2 text-xs transition-colors" 
           onClick={saveProfile} 
           disabled={saving}
         >
@@ -277,6 +305,70 @@ export default function CoreProfileCard(){
             </label>
           </div>
         )}
+      </div>
+
+      {/* Story Bank Section */}
+      <div className="mt-6">
+        <div className="text-xs text-muted-foreground mb-3">Story Bank</div>
+        
+        {/* Quick Add Story */}
+        <div className="mb-3 rounded-md border p-3">
+          <div className="text-xs text-muted-foreground mb-2">Quick Add Story</div>
+          <input 
+            className="w-full rounded-md border px-2 py-1 text-sm mb-2" 
+            placeholder="Story title" 
+            onKeyDown={async (e) => {
+              if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                const title = e.currentTarget.value.trim();
+                try {
+                  const r = await apiFetch("/api/stories", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title, summary: "", tags: [] })
+                  });
+                  if (r.ok) {
+                    const newStory = await r.json();
+                    setStories(prev => [newStory, ...prev]);
+                    e.currentTarget.value = "";
+                    setMessage({ type: 'success', text: 'Story added successfully!' });
+                    setTimeout(() => setMessage(null), 3000);
+                  }
+                } catch (error) {
+                  console.error("Failed to add story:", error);
+                  setMessage({ type: 'error', text: 'Failed to add story' });
+                }
+              }
+            }}
+          />
+          <div className="text-xs text-muted-foreground">
+            Press Enter to save
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          {stories.map((story) => (
+            <div key={story.id} className="rounded-md border p-3">
+              <div className="text-sm font-medium">{story.title}</div>
+              {story.summary && (
+                <div className="text-xs text-muted-foreground mt-1">{story.summary}</div>
+              )}
+              {story.tags && story.tags.length > 0 && (
+                <div className="flex gap-1 mt-2">
+                  {story.tags.map((tag, index) => (
+                    <span key={index} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+          {stories.length === 0 && (
+            <div className="text-sm text-muted-foreground text-center py-4">
+              No stories yet. Add your first story above!
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

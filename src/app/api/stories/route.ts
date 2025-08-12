@@ -1,27 +1,60 @@
 import { NextRequest } from "next/server";
 import { requireAuthedProfile } from "@/lib/authz";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
-import { getQuotaSnapshot, assertWithinLimit } from "@/lib/quota";
 
 export async function GET() {
-  const { profile } = await requireAuthedProfile();
-  const sb = getAdminSupabase();
-  const { data, error } = await sb.from("anchor_stories").select("id,title,tags").eq("user_id", profile.id).order("created_at",{ascending:false});
-  if (error) return Response.json([]);
-  return Response.json(data ?? []);
+  try {
+    const { profile } = await requireAuthedProfile();
+    const sb = getAdminSupabase();
+    
+    const { data, error } = await sb
+      .from("anchor_stories")
+      .select("id, title, summary, tags")
+      .eq("user_id", profile.id)
+      .order("created_at", { ascending: false });
+      
+    if (error) {
+      console.error("Stories fetch error:", error);
+      return Response.json([]);
+    }
+    
+    return Response.json(data ?? []);
+  } catch (error) {
+    console.error("Stories API error:", error);
+    return Response.json([]);
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const { profile } = await requireAuthedProfile();
-  const body = await req.json().catch(()=> ({}));
-  const { title, summary, tags } = body || {};
-  if (!title) return new Response("Title required", { status: 400 });
-  const sb = getAdminSupabase();
-  const { data, error } = await sb.from("anchor_stories")
-    .insert({ user_id: profile.id, title, summary: summary ?? null, tags: tags ?? [] })
-    .select("id").single();
-  if (error) return new Response(error.message, { status: 400 });
-  return Response.json(data);
+  try {
+    const { profile } = await requireAuthedProfile();
+    const body = await req.json().catch(() => ({}));
+    const { title, summary, tags } = body || {};
+    
+    if (!title) return new Response("Title required", { status: 400 });
+    
+    const sb = getAdminSupabase();
+    const { data, error } = await sb
+      .from("anchor_stories")
+      .insert({ 
+        user_id: profile.id, 
+        title, 
+        summary: summary ?? null, 
+        tags: tags ?? [] 
+      })
+      .select("id, title, summary, tags")
+      .single();
+      
+    if (error) {
+      console.error("Story create error:", error);
+      return new Response("Failed to create story", { status: 500 });
+    }
+    
+    return Response.json(data);
+  } catch (error) {
+    console.error("Stories POST error:", error);
+    return new Response("Story error", { status: 500 });
+  }
 }
 
 export async function PUT(req: NextRequest) {
