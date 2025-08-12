@@ -119,10 +119,10 @@ function EssayEditorInner({ userId }: EssayEditorProps) {
               {redlineSuggestions.map((suggestion, index) => (
                 <div key={index} className="bg-white rounded-lg border p-3">
                   <div className="text-sm text-gray-600 mb-2">
-                    <span className="font-medium">Original:</span> "{suggestion.text}"
+                    <span className="font-medium">Original:</span> &quot;{suggestion.text}&quot;
                   </div>
                   <div className="text-sm text-gray-900 mb-2">
-                    <span className="font-medium">Suggestion:</span> "{suggestion.suggestion}"
+                    <span className="font-medium">Suggestion:</span> &quot;{suggestion.suggestion}&quot;
                   </div>
                   <div className="text-xs text-gray-500">
                     {suggestion.reason}

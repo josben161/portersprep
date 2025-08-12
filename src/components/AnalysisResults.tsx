@@ -96,7 +96,7 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
               <div>
                 <div className="font-medium">School Focus</div>
                 <div className="text-sm text-muted-foreground">
-                  How well your essay aligns with the school's values
+                  How well your essay aligns with the school&apos;s values
                 </div>
               </div>
             </div>
@@ -296,7 +296,7 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
                     </div>
                   </div>
                   <div className="text-sm italic text-muted-foreground mb-2">
-                    "{sentence.text}"
+                    &quot;{sentence.text}&quot;
                   </div>
                   {sentence.suggestions?.length > 0 && (
                     <div>

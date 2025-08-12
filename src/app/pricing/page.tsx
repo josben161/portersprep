@@ -14,7 +14,7 @@ export default function PricingPage(){
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="text-3xl font-semibold md:text-4xl">Pricing</h1>
-          <p className="mt-2 text-muted-foreground">Start free. Upgrade when you're in flow.</p>
+          <p className="mt-2 text-muted-foreground">Start free. Upgrade when you&apos;re in flow.</p>
         </div>
       </section>
       <PricingTable />

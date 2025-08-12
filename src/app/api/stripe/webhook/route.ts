@@ -17,6 +17,17 @@ export async function POST(req: NextRequest) {
   }
 
   const sb = getAdminSupabase();
+  
+  // Check idempotency
+  const { data: existing } = await sb
+    .from("stripe_event_log")
+    .select("id")
+    .eq("event_id", event.id)
+    .single();
+  
+  if (existing) {
+    return new Response("Event already processed", { status: 200 });
+  }
 
   if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated") {
     const sub = event.data.object as Stripe.Subscription;
@@ -38,5 +49,12 @@ export async function POST(req: NextRequest) {
     if (profiles?.[0]) await sb.from("profiles").update({ subscription_tier: "free" }).eq("id", profiles[0].id);
   }
 
-    return new Response("ok");
+  // Log the processed event
+  await sb.from("stripe_event_log").insert({
+    event_id: event.id,
+    event_type: event.type,
+    data: event.data
+  });
+
+  return new Response("ok");
 } 

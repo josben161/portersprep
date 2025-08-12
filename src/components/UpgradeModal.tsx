@@ -32,7 +32,7 @@ export default function UpgradeModal(){
       <div className="w-full max-w-md rounded-lg border bg-card p-5 shadow-xl" onClick={(e)=>e.stopPropagation()}>
         <div className="text-lg font-semibold">Unlock {featureLabel}</div>
         <p className="mt-2 text-sm text-muted-foreground">
-          You've hit the limit for your current plan. Upgrade to <span className="font-medium">Plus</span> or <span className="font-medium">Pro</span> to keep going.
+          You&apos;ve hit the limit for your current plan. Upgrade to <span className="font-medium">Plus</span> or <span className="font-medium">Pro</span> to keep going.
         </p>
         <ul className="mt-3 list-disc pl-5 text-sm text-muted-foreground">
           <li>Plus — $89/mo: up to 3 schools, 10 essays, advanced analysis, per‑school adaptation.</li>

@@ -150,7 +150,7 @@ export default function FAQPage() {
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h2 className="text-3xl font-semibold mb-4">Still have questions?</h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Can't find what you're looking for? Our support team is here to help.
+            Can&apos;t find what you&apos;re looking for? Our support team is here to help.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/contact" className="rounded-md bg-blue-600 px-6 py-3 text-white font-medium shadow-sm hover:bg-blue-700 transition-colors">

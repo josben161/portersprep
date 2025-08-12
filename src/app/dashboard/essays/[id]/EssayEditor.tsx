@@ -271,10 +271,10 @@ export default function EssayEditor({ essay }: { essay: Essay }) {
                   {redlineSuggestions.map((suggestion, index) => (
                     <div key={index} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="text-sm text-gray-600 mb-2">
-                        <strong>Original:</strong> "{suggestion.text}"
+                        <strong>Original:</strong> &quot;{suggestion.text}&quot;
                       </div>
                       <div className="text-sm text-gray-600 mb-2">
-                        <strong>Suggestion:</strong> "{suggestion.suggestion}"
+                        <strong>Suggestion:</strong> &quot;{suggestion.suggestion}&quot;
                       </div>
                       <div className="text-xs text-gray-500 mb-3">
                         {suggestion.reason}

@@ -6,7 +6,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "tsx src/scripts/seed-schools.ts"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "seed": "tsx src/scripts/seed-schools.ts",
+    "health:env": "tsx scripts/health/check-env.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.569.0",
