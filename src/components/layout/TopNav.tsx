@@ -109,7 +109,7 @@ export default function TopNav() {
                   Sign In
                 </button>
               </SignInButton>
-              <Link href="/sign-up" className="rounded-md bg-blue-600 px-3 py-1.5 text-white text-sm shadow-sm hover:bg-blue-700 transition-colors font-medium">
+              <Link href="/sign-up" className="rounded-md bg-slate-900 px-3 py-1.5 text-white text-sm shadow-sm hover:bg-slate-800 transition-colors font-medium">
                 Get Started
               </Link>
             </div>
@@ -159,7 +159,7 @@ export default function TopNav() {
               </>
             ) : (
               <>
-                <Link href="/dashboard" onClick={() => setOpen(false)} className="mt-1 rounded-md bg-blue-600 px-3 py-2 text-white text-center shadow-sm hover:bg-blue-700 transition-colors font-medium">Get admitted</Link>
+                <Link href="/dashboard" onClick={() => setOpen(false)} className="mt-1 rounded-md bg-slate-900 px-3 py-2 text-white text-center shadow-sm hover:bg-slate-800 transition-colors font-medium">Get admitted</Link>
                 <div className="border-t pt-2 mt-2">
                   <SignInButton>
                     <button className="block py-1 text-muted-foreground w-full text-left">Sign In</button>
