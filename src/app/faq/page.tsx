@@ -1,18 +1,8 @@
-import type { Metadata } from "next";
+"use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import { useState } from "react";
-
-export const metadata: Metadata = {
-  title: "FAQ — PortersPrep MBA Admissions CoPilot",
-  description: "Frequently asked questions about PortersPrep and MBA applications.",
-  openGraph: {
-    title: "FAQ — PortersPrep MBA Admissions CoPilot",
-    description: "Get answers to common questions about using PortersPrep for your MBA applications.",
-    type: "website"
-  }
-};
 
 const faqs = [
   {
