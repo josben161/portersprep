@@ -7,10 +7,10 @@ export async function GET() {
     const { profile } = await requireAuthedProfile();
     const sb = getAdminSupabase();
     
-    // Simple query that should work
+    // Simple query that should work - removed deadline from schools selection
     const { data, error } = await sb
       .from("applications")
-      .select("id, status, school_id, school:schools(id,name,deadline)")
+      .select("id, status, school_id, school:schools(id,name)")
       .eq("user_id", profile.id)
       .order("created_at", { ascending: false });
       
