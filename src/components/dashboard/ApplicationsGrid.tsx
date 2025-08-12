@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FitChip } from "./FitChip";
 
 interface Application {
   id: string;
@@ -10,6 +9,31 @@ interface Application {
     id: string;
     name: string;
   };
+}
+
+function StatusChip({ status }: { status: string }) {
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "planning":
+        return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200";
+      case "in_progress":
+        return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200";
+      case "submitted":
+        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-200";
+      case "accepted":
+        return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200";
+      case "rejected":
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200";
+      default:
+        return "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-200";
+    }
+  };
+
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${getStatusColor(status)}`}>
+      {status.replace('_', ' ')}
+    </span>
+  );
 }
 
 export default function ApplicationsGrid() {
@@ -91,7 +115,7 @@ export default function ApplicationsGrid() {
                 <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
                   {app.school.name}
                 </div>
-                <FitChip status={app.status} />
+                <StatusChip status={app.status} />
               </div>
               <div className="text-xs text-muted-foreground">
                 Manage recs
