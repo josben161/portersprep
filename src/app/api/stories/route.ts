@@ -1,27 +1,23 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { getOrCreateProfileByClerkId } from "@/lib/db";
+import { requireAuthedProfile } from "@/lib/authz";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 import { getQuotaSnapshot, assertWithinLimit } from "@/lib/quota";
 
 export async function GET() {
-  const { userId } = auth(); if (!userId) return new Response("Unauthorized", {status:401});
-  const u = await currentUser();
-  const p = await getOrCreateProfileByClerkId(userId, u?.emailAddresses?.[0]?.emailAddress, u?.firstName ?? undefined);
+  const { profile } = await requireAuthedProfile();
   const sb = getAdminSupabase();
-  const { data } = await sb.from("anchor_stories").select("*").eq("user_id", p.id).order("updated_at", { ascending: false });
+  const { data, error } = await sb.from("anchor_stories").select("id,title,tags").eq("user_id", profile.id).order("created_at",{ascending:false});
+  if (error) return Response.json([]);
   return Response.json(data ?? []);
 }
 
 export async function POST(req: Request) {
-  const { userId } = auth(); if (!userId) return new Response("Unauthorized", {status:401});
-  const u = await currentUser();
-  const p = await getOrCreateProfileByClerkId(userId, u?.emailAddresses?.[0]?.emailAddress, u?.firstName ?? undefined);
-  const snap = await getQuotaSnapshot(userId);
+  const { profile, clerkUserId } = await requireAuthedProfile();
+  const snap = await getQuotaSnapshot(clerkUserId);
   try { assertWithinLimit("stories", snap); } catch (e) { if (e instanceof Response) return e; throw e; }
   const body = await req.json();
   const sb = getAdminSupabase();
   const { data, error } = await sb.from("anchor_stories").insert({
-    user_id: p.id,
+    user_id: profile.id,
     title: body.title,
     summary: body.summary,
     detail: body.detail ?? null,

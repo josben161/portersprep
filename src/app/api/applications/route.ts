@@ -1,60 +1,48 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { getOrCreateProfileByClerkId } from "@/lib/db";
-import { createApplication, listApplications } from "@/lib/apps";
+import { requireAuthedProfile } from "@/lib/authz";
+import { getAdminSupabase } from "@/lib/supabaseAdmin";
 
 export async function GET() {
-  const { userId } = auth();
-  if (!userId) return new Response("Unauthorized", { status: 401 });
-  const u = await currentUser();
-  const p = await getOrCreateProfileByClerkId(userId, u?.emailAddresses?.[0]?.emailAddress, u?.firstName ?? undefined);
-  return Response.json(await listApplications(p.id));
+  const { profile } = await requireAuthedProfile();
+  const sb = getAdminSupabase();
+
+  // Try to select applications with school join if available
+  const { data, error } = await sb
+    .from("applications")
+    .select("id, status, progress, deadline, school_id, schools(name, id, deadline)")
+    .eq("user_id", profile.id)
+    .order("created_at",{ ascending:false });
+
+  if (error) {
+    // Fallback: minimal shape
+    const { data: apps } = await sb.from("applications").select("id, school_id").eq("user_id", profile.id);
+    return Response.json((apps ?? []).map(a => ({ id: a.id, school: { id: a.school_id, name: "School" }, progress:{essays:0,total:0} })));
+  }
+
+  const mapped = (data ?? []).map((a:any)=>({
+    id: a.id,
+    school: a.schools ? { id: a.schools.id, name: a.schools.name, deadline: a.schools.deadline ?? a.deadline ?? null } : { id: a.school_id, name: "School", deadline: a.deadline ?? null },
+    status: a.status ?? "active",
+    progress: a.progress ?? { essays: 0, total: 0, recs: 0, recsTotal: 0 }
+  }));
+  return Response.json(mapped);
 }
 
 export async function POST(req: Request) {
-  const { userId } = auth();
-  if (!userId) return new Response("Unauthorized", { status: 401 });
-  const u = await currentUser();
-  const p = await getOrCreateProfileByClerkId(userId, u?.emailAddresses?.[0]?.emailAddress, u?.firstName ?? undefined);
-  const { schoolId, round } = await req.json();
-  if (!schoolId) return new Response("Bad Request", { status: 400 });
-  
-  // schoolId is actually a school slug, so we need to get the actual school UUID
-  const { getAdminSupabase } = await import("@/lib/supabaseAdmin");
+  const { profile } = await requireAuthedProfile();
+  const body = await req.json();
   const sb = getAdminSupabase();
   
-  // First, try to find the school by slug
-  const { data: school } = await sb
-    .from("schools")
-    .select("id")
-    .eq("slug", schoolId)
+  const { data, error } = await sb
+    .from("applications")
+    .insert({
+      user_id: profile.id,
+      school_id: body.schoolId,
+      status: "active",
+      progress: { essays: 0, total: 0, recs: 0, recsTotal: 0 }
+    })
+    .select()
     .single();
-  
-  if (!school) {
-    // If school doesn't exist, create it using the school data
-    const { getSchoolData } = await import("@/lib/schools");
-    const schoolData = await getSchoolData(schoolId);
-    if (!schoolData) {
-      return new Response("School not found", { status: 404 });
-    }
-    
-    // Upsert the school to get its UUID
-    const { upsertSchool } = await import("@/lib/apps");
-    const schoolUUID = await upsertSchool({
-      name: schoolData.name,
-      slug: schoolData.id,
-      website: "",
-      brief: {
-        cycle: schoolData.cycle,
-        verify_in_portal: schoolData.verify_in_portal,
-        country: schoolData.country
-      }
-    });
-    
-    const id = await createApplication(p.id, schoolUUID, round);
-    return Response.json({ id });
-  }
-  
-  // School exists, use its UUID
-  const id = await createApplication(p.id, school.id, round);
-  return Response.json({ id });
+
+  if (error) return new Response(error.message, { status: 400 });
+  return Response.json(data);
 } 

@@ -1,21 +1,53 @@
 "use client";
 import { motion } from "framer-motion";
-export default function ProgressRing({ value=0, size=28, stroke=3 }:{ value?: number; size?: number; stroke?: number }) {
-  const radius = (size - stroke) / 2;
-  const c = 2 * Math.PI * radius;
-  const pct = Math.min(100, Math.max(0, value));
-  const dash = (pct / 100) * c;
+
+interface ProgressRingProps {
+  value: number;
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}
+
+export default function ProgressRing({ 
+  value, 
+  size = 32, 
+  strokeWidth = 3, 
+  className = "" 
+}: ProgressRingProps) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const progress = Math.min(Math.max(value, 0), 100);
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
   return (
-    <svg width={size} height={size} className="inline-block align-middle">
-      <circle cx={size/2} cy={size/2} r={radius} strokeWidth={stroke} className="fill-none stroke-muted-foreground/20" />
-      <motion.circle
-        cx={size/2} cy={size/2} r={radius} strokeWidth={stroke}
-        className="fill-none stroke-brand-500"
+    <svg
+      width={size}
+      height={size}
+      className={`transform -rotate-90 ${className}`}
+    >
+      {/* Background circle */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        fill="none"
+        className="text-gray-200 dark:text-gray-700"
+      />
+      {/* Progress circle */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        fill="none"
+        strokeDasharray={strokeDasharray}
+        strokeDashoffset={strokeDashoffset}
         strokeLinecap="round"
-        initial={{ strokeDasharray: `0 ${c}` }}
-        animate={{ strokeDasharray: `${dash} ${c - dash}` }}
-        transition={{ duration: .35, ease: [0.16,1,0.3,1] }}
-        transform={`rotate(-90 ${size/2} ${size/2})`}
+        className="text-brand-500 transition-all duration-300"
       />
     </svg>
   );
