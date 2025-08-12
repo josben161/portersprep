@@ -36,7 +36,7 @@ export default function UpgradeModal(){
         </p>
         <ul className="mt-3 list-disc pl-5 text-sm text-muted-foreground">
           <li>Plus — $89/mo: up to 3 schools, 10 essays, advanced analysis, per‑school adaptation.</li>
-          <li>Pro — $399/mo: up to 20 schools, unlimited essays & AI usage, coach tools.</li>
+          <li>Pro — $299/mo: up to 20 schools, unlimited essays & AI usage, coach tools.</li>
         </ul>
         <div className="mt-5 flex justify-end gap-2">
           <button className="btn btn-outline text-sm" onClick={()=>setOpen(false)}>Keep exploring</button>

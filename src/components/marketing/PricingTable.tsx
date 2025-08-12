@@ -33,7 +33,7 @@ const TIERS = [
   },
   {
     name: "Pro",
-    price: "$399/mo",
+    price: "$299/mo",
     sub: "For full cycles & pros",
     cta: { href: "/checkout/pro", label: "Choose Pro" },
     features: [

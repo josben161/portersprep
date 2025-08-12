@@ -12,7 +12,7 @@ export default function FinalCTA(){
             <p className="mt-1 text-muted-foreground">Start free, add schools when you're in flow. No long setup.</p>
           </div>
           <div className="flex gap-3">
-            <Link href="/sign-up" className="btn btn-primary">Get started</Link>
+            <Link href="/sign-up" className="rounded-md bg-blue-600 px-4 py-2 text-white text-sm font-medium shadow-sm hover:bg-blue-700 transition-colors">Get started</Link>
             <Link href="/pricing" className="btn btn-outline">See pricing</Link>
           </div>
         </div>

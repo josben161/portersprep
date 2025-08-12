@@ -1,23 +1,13 @@
-// import { auth } from "@clerk/nextjs/server";
+import { requireAuthedProfile } from "@/lib/authz";
 import { NextRequest, NextResponse } from "next/server";
-import { getProfileByClerkId, getDocument, updateDocumentMeta } from "@/lib/db";
+import { getDocument, updateDocumentMeta } from "@/lib/db";
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // const { userId } = auth();
-    const userId = "dummy-user-id"; // Temporary for build
-
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const profile = await getProfileByClerkId(userId);
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-    }
+    const { profile } = await requireAuthedProfile();
 
     const body = await request.json();
     const { title, content } = body;
