@@ -51,13 +51,30 @@ export async function GET(req: NextRequest) {
       Bucket: process.env.S3_BUCKET!,
       Key: key,
       ContentType: contentType
-    }), { expiresIn: 60 });
+    }), { expiresIn: 300 }); // Increased to 5 minutes
     
     console.log("Presigned URL generated successfully");
-    return Response.json({ url, key });
+    return Response.json({ url, key }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
+    });
     
   } catch (error) {
     console.error("S3 presign error:", error);
     return new Response(`Failed to generate upload URL: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
   }
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    }
+  });
 } 
