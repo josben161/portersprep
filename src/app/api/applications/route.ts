@@ -8,12 +8,12 @@ export async function GET() {
     const { profile } = await requireAuthedProfile();
     const sb = getAdminSupabase();
     
-    // Get applications with basic data
+    // Get applications with basic data (removed created_at since it doesn't exist)
     const { data: apps, error } = await sb
       .from("applications")
-      .select("id, status, school_id, round, created_at, updated_at")
+      .select("id, status, school_id, round")
       .eq("user_id", profile.id)
-      .order("created_at", { ascending: false });
+      .order("id", { ascending: false }); // Use id instead of created_at for ordering
       
     if (error) {
       console.error("Applications fetch error:", error);
