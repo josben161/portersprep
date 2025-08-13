@@ -1,5 +1,6 @@
 "use client";
 import { Suspense } from "react";
+import AIAssistant from "@/components/dashboard/AIAssistant";
 import CoreProfileCard from "@/components/dashboard/CoreProfileCard";
 import PredictCard from "@/components/dashboard/PredictCard";
 import ApplicationsGrid from "@/components/dashboard/ApplicationsGrid";
@@ -12,6 +13,10 @@ export default function Dashboard(){
         <h1 className="text-2xl font-semibold">Your MBA Command Center</h1>
         <p className="text-sm text-muted-foreground">Build your core profile, manage schools, and keep recommenders moving.</p>
       </div>
+
+      <Suspense fallback={<div className="card p-6">Loading AI assistant…</div>}>
+        <AIAssistant />
+      </Suspense>
 
       <Suspense fallback={<div className="card p-6">Loading core profile…</div>}>
         <CoreProfileCard />

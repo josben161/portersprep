@@ -1,14 +1,22 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { CheckCircle, Clock, AlertCircle, TrendingUp } from "lucide-react";
 
 interface Application {
   id: string;
   status: string;
+  progress?: number;
   school: {
     id: string;
     name: string;
   };
+}
+
+interface Essay {
+  id: string;
+  application_id: string;
+  status: string;
 }
 
 function StatusChip({ status }: { status: string }) {
@@ -36,8 +44,26 @@ function StatusChip({ status }: { status: string }) {
   );
 }
 
+function ProgressBar({ progress }: { progress: number }) {
+  const getProgressColor = (progress: number) => {
+    if (progress >= 80) return "bg-green-500";
+    if (progress >= 50) return "bg-yellow-500";
+    return "bg-red-500";
+  };
+
+  return (
+    <div className="w-full bg-gray-200 rounded-full h-2">
+      <div 
+        className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(progress)}`}
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+  );
+}
+
 export default function ApplicationsGrid() {
   const [apps, setApps] = useState<Application[]>([]);
+  const [essays, setEssays] = useState<Essay[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,6 +73,20 @@ export default function ApplicationsGrid() {
         if (r.ok) {
           const data = await r.json();
           setApps(data);
+          
+          // Load essays for progress calculation
+          const essaysData = [];
+          for (const app of data) {
+            const essaysRes = await fetch(`/api/applications/${app.id}/answers`);
+            if (essaysRes.ok) {
+              const appEssays = await essaysRes.json();
+              essaysData.push(...appEssays.map((e: any) => ({
+                ...e,
+                application_id: app.id
+              })));
+            }
+          }
+          setEssays(essaysData);
         }
       } catch (error) {
         console.error("Failed to load applications:", error);
@@ -56,6 +96,51 @@ export default function ApplicationsGrid() {
     }
     loadApps();
   }, []);
+
+  function getApplicationProgress(appId: string) {
+    const appEssays = essays.filter(e => e.application_id === appId);
+    if (appEssays.length === 0) return 0;
+    
+    const completed = appEssays.filter(e => e.status === 'completed').length;
+    return Math.round((completed / appEssays.length) * 100);
+  }
+
+  function getApplicationInsight(app: Application) {
+    const progress = getApplicationProgress(app.id);
+    const appEssays = essays.filter(e => e.application_id === app.id);
+    const completedEssays = appEssays.filter(e => e.status === 'completed').length;
+    const totalEssays = appEssays.length;
+
+    if (app.status === 'planning') {
+      return {
+        icon: <Clock className="w-4 h-4 text-blue-600" />,
+        text: "Ready to start",
+        color: "text-blue-600"
+      };
+    }
+
+    if (progress === 0 && totalEssays > 0) {
+      return {
+        icon: <AlertCircle className="w-4 h-4 text-yellow-600" />,
+        text: `${totalEssays} essay${totalEssays > 1 ? 's' : ''} to start`,
+        color: "text-yellow-600"
+      };
+    }
+
+    if (progress === 100) {
+      return {
+        icon: <CheckCircle className="w-4 h-4 text-green-600" />,
+        text: "All essays complete",
+        color: "text-green-600"
+      };
+    }
+
+    return {
+      icon: <TrendingUp className="w-4 h-4 text-amber-600" />,
+      text: `${completedEssays}/${totalEssays} essays done`,
+      color: "text-amber-600"
+    };
+  }
 
   if (loading) {
     return (
@@ -98,30 +183,53 @@ export default function ApplicationsGrid() {
           </div>
           <Link 
             href="/dashboard/applications/new"
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-3 py-2 text-xs transition-colors"
           >
-            Create Application →
+            Add Application
           </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {apps.map((app) => (
-            <Link
-              key={app.id}
-              href={`/dashboard/applications/${app.id}`}
-              className="block p-4 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {app.school.name}
+          {apps.map((app) => {
+            const progress = getApplicationProgress(app.id);
+            const insight = getApplicationInsight(app);
+            
+            return (
+              <Link 
+                key={app.id} 
+                href={`/dashboard/applications/${app.id}`}
+                className="block border rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all duration-200"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-900 truncate">{app.school.name}</h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <StatusChip status={app.status} />
+                    </div>
+                  </div>
                 </div>
-                <StatusChip status={app.status} />
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Manage recs
-              </div>
-            </Link>
-          ))}
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    {insight.icon}
+                    <span className={`text-sm font-medium ${insight.color}`}>
+                      {insight.text}
+                    </span>
+                  </div>
+                  
+                  {progress > 0 && (
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Progress</span>
+                        <span>{progress}%</span>
+                      </div>
+                      <ProgressBar progress={progress} />
+                    </div>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </section>
