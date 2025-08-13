@@ -33,10 +33,12 @@ export default function RecommendationsPanel() {
           const assignmentsRes = await fetch(`/api/applications/${app.id}/recommendations`);
           if (assignmentsRes.ok) {
             const data = await assignmentsRes.json();
-            allAssignments.push(...data.assignments.map((a: any) => ({
-              ...a,
-              applications: app
-            })));
+            if (data.assignments && Array.isArray(data.assignments)) {
+              allAssignments.push(...data.assignments.map((a: any) => ({
+                ...a,
+                applications: app
+              })));
+            }
           }
         }
         setAssignments(allAssignments);

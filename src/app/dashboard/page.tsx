@@ -14,6 +14,13 @@ export default function Dashboard(){
         <p className="text-sm text-muted-foreground">Build your core profile, manage schools, and keep recommenders moving.</p>
       </div>
 
+      {/* Admit Planner - Top on mobile, right side on desktop */}
+      <div className="mb-6 lg:hidden">
+        <Suspense fallback={<div className="card p-6">Loading planner…</div>}>
+          <CoachWidget />
+        </Suspense>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 space-y-6">
           <Suspense fallback={<div className="card p-6">Loading core profile…</div>}>
@@ -33,7 +40,8 @@ export default function Dashboard(){
           </Suspense>
         </div>
 
-        <div className="lg:col-span-1">
+        {/* Admit Planner - Right side on desktop only */}
+        <div className="hidden lg:block lg:col-span-1">
           <Suspense fallback={<div className="card p-6">Loading planner…</div>}>
             <CoachWidget />
           </Suspense>

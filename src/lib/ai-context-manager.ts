@@ -35,6 +35,13 @@ export interface AIMemory {
   updated_at: string;
 }
 
+// Helper function to check if Supabase is available
+function isSupabaseAvailable(): boolean {
+  return typeof window === 'undefined' && 
+         !!process.env.NEXT_PUBLIC_SUPABASE_URL && 
+         !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+}
+
 class AIContextManager {
   private static instance: AIContextManager;
   private contextCache: Map<string, UserContext> = new Map();
@@ -50,14 +57,30 @@ class AIContextManager {
   }
 
   async getUserContext(userId: string): Promise<UserContext> {
+    // Check if Supabase is available
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, returning empty context');
+      return {
+        profile: {},
+        applications: [],
+        essays: [],
+        recommendations: [],
+        resume: null,
+        schools: [],
+        progress: {},
+        memory: [],
+        conversations: []
+      };
+    }
+
     // Check cache first
     if (this.contextCache.has(userId)) {
       return this.contextCache.get(userId)!;
     }
 
-    const supabase = getAdminSupabase();
-    
     try {
+      const supabase = getAdminSupabase();
+    
       // Gather all user data in parallel
       const [
         profileResult,
@@ -181,6 +204,11 @@ class AIContextManager {
   }
 
   async storeMemory(userId: string, memory: Omit<AIMemory, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<void> {
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, skipping memory storage');
+      return;
+    }
+
     const supabase = getAdminSupabase();
     
     try {
@@ -212,6 +240,11 @@ class AIContextManager {
   }
 
   async getMemory(userId: string, type?: string): Promise<AIMemory[]> {
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, returning empty memory');
+      return [];
+    }
+
     const supabase = getAdminSupabase();
     
     try {
@@ -240,6 +273,11 @@ class AIContextManager {
   }
 
   async updateMemory(memoryId: string, updates: Partial<AIMemory>): Promise<void> {
+    if (!isSupabaseAvailable()) {
+      console.warn('Supabase not available, skipping memory update');
+      return;
+    }
+
     const supabase = getAdminSupabase();
     
     try {

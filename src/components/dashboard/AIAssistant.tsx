@@ -84,10 +84,12 @@ export default function AIAssistant() {
           const assignmentsRes = await fetch(`/api/applications/${app.id}/recommendations`);
           if (assignmentsRes.ok) {
             const data = await assignmentsRes.json();
-            assignmentsData.push(...data.assignments.map((a: any) => ({
-              ...a,
-              applications: app
-            })));
+            if (data.assignments && Array.isArray(data.assignments)) {
+              assignmentsData.push(...data.assignments.map((a: any) => ({
+                ...a,
+                applications: app
+              })));
+            }
           }
         }
       }
