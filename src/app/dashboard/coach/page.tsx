@@ -1,16 +1,18 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User } from 'lucide-react';
+import { Send, Bot, User, Search, Lightbulb, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+  functionCall?: any;
 }
 
 export default function CoachPage() {
@@ -44,7 +46,8 @@ export default function CoachPage() {
               id: `${conv.id}-assistant`,
               role: 'assistant' as const,
               content: conv.response,
-              timestamp: conv.created_at
+              timestamp: conv.created_at,
+              functionCall: conv.context?.functionCall
             }
           ]).reverse();
           setMessages(formattedMessages);
@@ -75,7 +78,7 @@ export default function CoachPage() {
         },
         body: JSON.stringify({
           message: input.trim(),
-          context: {} // TODO: Add user context
+          context: {}
         }),
       });
 
@@ -86,7 +89,8 @@ export default function CoachPage() {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
           content: data.message,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          functionCall: data.functionCall
         };
         setMessages(prev => [...prev, assistantMessage]);
       }
@@ -109,6 +113,50 @@ export default function CoachPage() {
       e.preventDefault();
       sendMessage();
     }
+  };
+
+  const renderFunctionCall = (functionCall: any) => {
+    if (!functionCall) return null;
+
+    const getFunctionIcon = (functionName: string) => {
+      switch (functionName) {
+        case 'analyze_user_progress':
+          return <Target className="h-4 w-4" />;
+        case 'generate_essay_guidance':
+          return <Lightbulb className="h-4 w-4" />;
+        case 'search_web':
+          return <Search className="h-4 w-4" />;
+        default:
+          return <Bot className="h-4 w-4" />;
+      }
+    };
+
+    const getFunctionTitle = (functionName: string) => {
+      switch (functionName) {
+        case 'analyze_user_progress':
+          return 'Progress Analysis';
+        case 'generate_essay_guidance':
+          return 'Essay Guidance';
+        case 'search_web':
+          return 'Web Search';
+        default:
+          return 'AI Insight';
+      }
+    };
+
+    return (
+      <div className="mt-2 p-3 bg-muted/50 rounded-lg border">
+        <div className="flex items-center space-x-2 mb-2">
+          {getFunctionIcon(functionCall.name)}
+          <Badge variant="secondary">{getFunctionTitle(functionCall.name)}</Badge>
+        </div>
+        {functionCall.arguments && (
+          <div className="text-sm text-muted-foreground">
+            <pre className="whitespace-pre-wrap">{JSON.stringify(JSON.parse(functionCall.arguments), null, 2)}</pre>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -151,6 +199,7 @@ export default function CoachPage() {
                       <li>Profile completion</li>
                       <li>Recommendation management</li>
                       <li>Interview preparation</li>
+                      <li>Web search for current information</li>
                     </ul>
                     <p className="text-muted-foreground">
                       What would you like to work on today?
@@ -190,6 +239,7 @@ export default function CoachPage() {
                       }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      {message.functionCall && renderFunctionCall(message.functionCall)}
                     </div>
                   </div>
                 </div>

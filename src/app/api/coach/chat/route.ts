@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSupabase } from '@/lib/supabaseAdmin';
 import { requireAuthedProfile } from '@/lib/authz';
+import { generateCoachResponse, searchWeb } from '@/lib/openai';
+import { gatherUserContext } from '@/lib/coach-context';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,19 +15,43 @@ export async function POST(request: NextRequest) {
 
     const supabase = getAdminSupabase();
 
-    // For now, return a simple response
-    // TODO: Integrate with OpenAI in the next phase
-    const response = `Thank you for your message: "${message}". I'm The Admit Coach, and I'm here to help you with your college application process. 
+    // Gather user context
+    const userContext = await gatherUserContext(profile.id);
 
-I can help you with:
-- Essay writing and brainstorming
-- Application strategy and timeline
-- School selection guidance
-- Profile completion
-- Recommendation management
-- Interview preparation
+    // Check if message contains search request
+    const isSearchRequest = message.toLowerCase().includes('search') || 
+                           message.toLowerCase().includes('find') ||
+                           message.toLowerCase().includes('look up');
 
-What would you like to work on today?`;
+    let response: string;
+    let functionCall: any = null;
+
+    if (isSearchRequest) {
+      // Handle web search
+      const searchResults = await searchWeb(message);
+      response = `Here's what I found for your search:\n\n${searchResults.join('\n\n')}`;
+    } else {
+      // Generate AI response
+      const messages = [
+        { role: 'user' as const, content: message }
+      ];
+
+      try {
+        const aiResponse = await generateCoachResponse(messages, userContext);
+        
+        if (aiResponse.message?.function_call) {
+          // Handle function call
+          functionCall = aiResponse.message.function_call;
+          response = aiResponse.message.content || 'I have some insights for you.';
+        } else {
+          response = aiResponse.message?.content || 'I apologize, but I encountered an error. Please try again.';
+        }
+      } catch (error) {
+        console.error('OpenAI error:', error);
+        // Fallback response
+        response = `I'm here to help you with your college application process. I can assist with essay writing, application strategy, school selection, and more. What specific area would you like to work on?`;
+      }
+    }
 
     // Store the conversation
     const { data: conversation, error: conversationError } = await supabase
@@ -34,7 +60,11 @@ What would you like to work on today?`;
         user_id: profile.id,
         message,
         response,
-        context: context || {}
+        context: {
+          ...context,
+          userContext: userContext,
+          functionCall: functionCall
+        }
       })
       .select()
       .single();
@@ -43,9 +73,29 @@ What would you like to work on today?`;
       console.error('Error storing conversation:', conversationError);
     }
 
+    // Store insights in memory if function was called
+    if (functionCall) {
+      try {
+        await supabase
+          .from('coach_memory')
+          .insert({
+            user_id: profile.id,
+            memory_type: 'insight',
+            content: {
+              function: functionCall.name,
+              arguments: functionCall.arguments,
+              timestamp: new Date().toISOString()
+            }
+          });
+      } catch (error) {
+        console.error('Error storing memory:', error);
+      }
+    }
+
     return NextResponse.json({
       message: response,
-      conversationId: conversation?.id
+      conversationId: conversation?.id,
+      functionCall: functionCall
     });
 
   } catch (error) {
