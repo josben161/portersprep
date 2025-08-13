@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import ApplicationWorkspace from "./ApplicationWorkspace";
 import ApplicationProgress from "@/components/ApplicationProgress";
+import RecommendationsManager from "./RecommendationsManager";
 
 interface Application {
   id: string;
@@ -22,7 +23,7 @@ export default function ApplicationPage() {
   const appId = params.id as string;
   
   const [application, setApplication] = useState<Application | null>(null);
-  const [activeTab, setActiveTab] = useState<'workspace' | 'progress'>('workspace');
+  const [activeTab, setActiveTab] = useState<'workspace' | 'progress' | 'recommendations'>('workspace');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -90,7 +91,17 @@ export default function ApplicationPage() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            Application Workspace
+            Essays
+          </button>
+          <button
+            onClick={() => setActiveTab('recommendations')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+              activeTab === 'recommendations'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Recommendations
           </button>
           <button
             onClick={() => setActiveTab('progress')}
@@ -107,6 +118,8 @@ export default function ApplicationPage() {
 
       {activeTab === 'workspace' ? (
         <ApplicationWorkspace appId={appId} />
+      ) : activeTab === 'recommendations' ? (
+        <RecommendationsManager appId={appId} />
       ) : (
         <div className="max-w-4xl">
           <ApplicationProgress
