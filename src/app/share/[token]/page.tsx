@@ -34,7 +34,7 @@ export default function SharePage({ params }: { params: { token: string } }) {
   return (
     <div className="mx-auto max-w-3xl p-6">
       <div className="mb-3 rounded-md border p-3">
-        <div className="text-xs text-muted-foreground">The Academic Architect — Shared Draft</div>
+        <div className="text-xs text-muted-foreground">The Admit Architect — Shared Draft</div>
         <div className="text-base font-semibold">{state.answer?.title ?? "Untitled"}</div>
         <div className="mt-1 text-[12px] text-muted-foreground">{state.answer?.prompt}</div>
         {state.answer?.word_limit && <div className="mt-1 text-[11px] text-muted-foreground">≤ {state.answer.word_limit} words</div>}

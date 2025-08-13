@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "How The Academic Architect Works — MBA Admissions CoPilot",
-  description: "See how The Academic Architect guides you through every step of your MBA application process.",
+  title: "How The Admit Architect Works — MBA Admissions CoPilot",
+  description: "See how The Admit Architect guides you through every step of your MBA application process.",
   openGraph: {
-    title: "How The Academic Architect Works — MBA Admissions CoPilot",
-    description: "Step-by-step guide to using The Academic Architect for your MBA applications.",
+    title: "How The Admit Architect Works — MBA Admissions CoPilot",
+    description: "Step-by-step guide to using The Admit Architect for your MBA applications.",
     type: "website"
   }
 };

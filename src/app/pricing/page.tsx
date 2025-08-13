@@ -4,7 +4,7 @@ import FAQ from "@/components/marketing/FAQ";
 import Footer from "@/components/marketing/Footer";
 
 export const metadata: Metadata = {
-  title: "Pricing — The Academic Architect",
+  title: "Pricing — The Admit Architect",
   description: "Simple plans for serious applicants."
 };
 

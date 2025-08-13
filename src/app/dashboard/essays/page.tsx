@@ -1,7 +1,7 @@
 import { requireProfile } from "../_auth";
 import { listDocuments, createDocument } from "@/lib/db";
 
-export const metadata = { title: "Essays — The Academic Architect" };
+export const metadata = { title: "Essays — The Admit Architect" };
 
 export default async function Essays() {
   const profile = await requireProfile();

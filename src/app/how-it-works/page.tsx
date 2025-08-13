@@ -76,7 +76,7 @@ export default function HowItWorksPage() {
               <span className="h-1.5 w-1.5 rounded-full bg-brand-500" /> Step-by-step process
             </span>
             <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
-              How <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">The Academic Architect Works</span>
+              How <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">The Admit Architect Works</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
               From initial assessment to final submission, we guide you through every step of your MBA application journey with AI-powered tools and expert insights.
@@ -154,7 +154,7 @@ export default function HowItWorksPage() {
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h2 className="text-3xl font-semibold mb-4">Ready to start your MBA journey?</h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join thousands of applicants who have used The Academic Architect to get into their dream MBA programs.
+            Join thousands of applicants who have used The Admit Architect to get into their dream MBA programs.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/sign-up" className="rounded-md bg-blue-600 px-6 py-3 text-white font-medium shadow-sm hover:bg-blue-700 transition-colors">

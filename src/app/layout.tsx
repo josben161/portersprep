@@ -16,7 +16,7 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "The Academic Architect — MBA Admissions Copilot",
+  title: "The Admit Architect — MBA Admissions Copilot",
   description: "Assess • Edit • Coach",
   icons: { 
     icon: [

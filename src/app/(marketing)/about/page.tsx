@@ -1,8 +1,8 @@
 import { Users, Target, Shield, Zap } from "lucide-react";
 
 export const metadata = {
-  title: "About — The Academic Architect",
-  description: "Learn about The Academic Architect's mission to democratize MBA admissions coaching through ethical, technology-driven solutions."
+  title: "About — The Admit Architect",
+  description: "Learn about The Admit Architect's mission to democratize MBA admissions coaching through ethical, technology-driven solutions."
 };
 
 export default function About() {
@@ -10,7 +10,7 @@ export default function About() {
     <main className="mx-auto max-w-4xl px-6 py-16">
       {/* Header */}
       <div className="text-center mb-16">
-        <h1 className="text-4xl font-bold mb-6">About The Academic Architect</h1>
+        <h1 className="text-4xl font-bold mb-6">About The Admit Architect</h1>
         <p className="text-xl text-muted-foreground">
           Empowering MBA applicants through ethical, technology-driven coaching
         </p>
@@ -135,7 +135,7 @@ export default function About() {
         <section>
           <h2 className="text-3xl font-bold mb-6">Our Story</h2>
           <p className="text-lg text-muted-foreground mb-6">
-            The Academic Architect was founded with a simple belief: MBA admissions consulting should be 
+            The Admit Architect was founded with a simple belief: MBA admissions consulting should be 
             accessible, ethical, and effective. We recognized that traditional consulting was 
             often expensive, opaque, and sometimes crossed ethical boundaries.
           </p>
