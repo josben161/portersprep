@@ -66,7 +66,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         .from("application_answers")
         .update({
           content,
-          word_count: content.trim().split(/\s+/).filter(word => word.length > 0).length,
+          word_count: content.trim().split(/\s+/).filter((word: string) => word.length > 0).length,
           updated_at: new Date().toISOString()
         })
         .eq("id", existing.id)
@@ -83,7 +83,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
           application_id: params.id,
           question_id,
           content,
-          word_count: content.trim().split(/\s+/).filter(word => word.length > 0).length
+          word_count: content.trim().split(/\s+/).filter((word: string) => word.length > 0).length
         })
         .select("id, question_id, content, word_count")
         .single();
