@@ -7,8 +7,8 @@ const corsRules = [
     AllowedHeaders: ["*"],
     AllowedMethods: ["GET", "PUT", "POST", "DELETE", "HEAD"],
     AllowedOrigins: [
-      "https://portersprep.vercel.app",
-      "https://portersprep.com", 
+      "https://The Academic Architect.vercel.app",
+      "https://The Academic Architect.com", 
       "http://localhost:3000"
     ],
     ExposeHeaders: ["ETag"],

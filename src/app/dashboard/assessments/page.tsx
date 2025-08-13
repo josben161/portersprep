@@ -1,7 +1,7 @@
 import { requireProfile } from "../_auth";
 import { listAssessments } from "@/lib/db";
 
-export const metadata = { title: "Assessments — PortersPrep" };
+export const metadata = { title: "Assessments — The Academic Architect" };
 
 export default async function Assessments() {
   const profile = await requireProfile();

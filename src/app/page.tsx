@@ -8,10 +8,10 @@ import FAQ from "@/components/marketing/FAQ";
 import FinalCTA from "@/components/marketing/FinalCTA";
 
 export const metadata: Metadata = {
-  title: "PortersPrep — The CoPilot for MBA Applicants",
+  title: "The Academic Architect — The CoPilot for MBA Applicants",
   description: "Design your narrative, draft faster, and tailor every essay to each school's DNA.",
   openGraph: {
-    title: "PortersPrep — The CoPilot for MBA Applicants",
+    title: "The Academic Architect — The CoPilot for MBA Applicants",
     description: "Narrative-aware, school-specific coaching for your MBA applications.",
     type: "website"
   },
@@ -29,7 +29,7 @@ export default function Home() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            name: "PortersPrep",
+            name: "The Academic Architect",
             applicationCategory: "Productivity",
             offers: [{ "@type": "Offer", price: "0", priceCurrency: "USD" }]
           })

@@ -6,19 +6,19 @@ import { useState } from "react";
 
 const faqs = [
   {
-    question: "How does PortersPrep help with MBA applications?",
-    answer: "PortersPrep is a comprehensive platform that guides you through every step of your MBA application process. We provide admission assessments, AI-powered essay writing tools, story management, and expert coaching to help you craft compelling applications that stand out to admissions committees."
+    question: "How does The Academic Architect help with MBA applications?",
+    answer: "The Academic Architect is a comprehensive platform that guides you through every step of your MBA application process. We provide admission assessments, AI-powered essay writing tools, story management, and expert coaching to help you craft compelling applications that stand out to admissions committees."
   },
   {
-    question: "Is PortersPrep suitable for all MBA programs?",
-    answer: "Yes! PortersPrep is designed to work with all MBA programs, from top-tier schools like Harvard and Stanford to regional programs. Our tools adapt to each school's specific requirements and essay prompts."
+    question: "Is The Academic Architect suitable for all MBA programs?",
+    answer: "Yes! The Academic Architect is designed to work with all MBA programs, from top-tier schools like Harvard and Stanford to regional programs. Our tools adapt to each school's specific requirements and essay prompts."
   },
   {
     question: "How accurate are the admission assessments?",
     answer: "Our admission assessments use data from thousands of successful applications and are based on current admissions trends. While no assessment can guarantee admission, we provide realistic likelihood bands and specific recommendations to improve your chances."
   },
   {
-    question: "Can I use PortersPrep for multiple schools?",
+    question: "Can I use The Academic Architect for multiple schools?",
     answer: "Absolutely! You can create separate application workspaces for each school you're applying to. Our platform helps you organize your applications, track deadlines, and adapt your stories for different essay prompts."
   },
   {
@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     question: "What's included in the free plan?",
-    answer: "The free plan includes 1 school workspace, 2 essays total, basic analysis, Story Bank up to 3 stories, and 5 AI actions per month. It's perfect for getting started and understanding how PortersPrep works."
+    answer: "The free plan includes 1 school workspace, 2 essays total, basic analysis, Story Bank up to 3 stories, and 5 AI actions per month. It's perfect for getting started and understanding how The Academic Architect works."
   },
   {
     question: "How do I get expert coaching?",
@@ -43,15 +43,15 @@ const faqs = [
   },
   {
     question: "Do you offer refunds?",
-    answer: "We offer a 30-day money-back guarantee for all paid plans. If you're not satisfied with PortersPrep within the first 30 days, we'll provide a full refund."
+    answer: "We offer a 30-day money-back guarantee for all paid plans. If you're not satisfied with The Academic Architect within the first 30 days, we'll provide a full refund."
   },
   {
     question: "How do I get started?",
     answer: "Getting started is easy! Simply sign up for a free account, complete your profile, and start with an admission assessment. Our platform will guide you through each step of the process."
   },
   {
-    question: "What makes PortersPrep different from other services?",
-    answer: "PortersPrep combines AI-powered tools with human expertise in a unified platform. Unlike traditional consulting, you get instant feedback and can work at your own pace. Unlike generic writing tools, our AI is specifically trained on MBA applications and understands what admissions committees look for."
+    question: "What makes The Academic Architect different from other services?",
+    answer: "The Academic Architect combines AI-powered tools with human expertise in a unified platform. Unlike traditional consulting, you get instant feedback and can work at your own pace. Unlike generic writing tools, our AI is specifically trained on MBA applications and understands what admissions committees look for."
   }
 ];
 
@@ -122,7 +122,7 @@ export default function FAQPage() {
               Frequently Asked <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">Questions</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
-              Get answers to the most common questions about PortersPrep and how we can help with your MBA applications.
+              Get answers to the most common questions about The Academic Architect and how we can help with your MBA applications.
             </p>
           </motion.div>
         </div>

@@ -1,7 +1,7 @@
 import AppShell from "@/components/layout/AppShell";
 import { auth } from "@clerk/nextjs/server";
 
-export const metadata = { title: "Dashboard — PortersPrep" };
+export const metadata = { title: "Dashboard — The Academic Architect" };
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { userId } = auth();

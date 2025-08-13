@@ -8,7 +8,7 @@ export default function MarketingHeader(){
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2">
           <div className="h-6 w-6 rounded-md bg-gradient-to-b from-brand-400 to-brand-600 shadow" />
-          <span className="text-sm font-semibold">PortersPrep</span>
+          <span className="text-sm font-semibold">The Academic Architect</span>
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link>

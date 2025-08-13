@@ -17,11 +17,11 @@ export default function SideNav() {
     <aside className="hidden w-60 shrink-0 border-r bg-background md:block">
       <div className="p-4 flex items-center">
         <Image
-          src="/brand/the-admit-architect-square.svg"
+          src="/brand/portersprep.png"
           alt="The Admit Architect"
-          width={40}
-          height={40}
-          className="h-8 w-8"
+          width={120}
+          height={30}
+          className="h-8 w-auto"
         />
       </div>
       <div className="px-2 pb-3 pt-1 text-xs uppercase tracking-wide text-muted-foreground">Command Center</div>

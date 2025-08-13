@@ -112,7 +112,7 @@ export default function FeaturesPage() {
               Everything you need for <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">MBA Success</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
-              From initial assessment to final submission, PortersPrep provides the tools, insights, and guidance you need to craft compelling MBA applications.
+              From initial assessment to final submission, The Academic Architect provides the tools, insights, and guidance you need to craft compelling MBA applications.
             </p>
 
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -208,7 +208,7 @@ export default function FeaturesPage() {
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h2 className="text-3xl font-semibold mb-4">Ready to transform your MBA application?</h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join thousands of applicants who have used PortersPrep to get into their dream MBA programs.
+            Join thousands of applicants who have used The Academic Architect to get into their dream MBA programs.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/sign-up" className="rounded-md bg-blue-600 px-6 py-3 text-white font-medium shadow-sm hover:bg-blue-700 transition-colors">

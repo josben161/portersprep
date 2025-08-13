@@ -1,1 +1,12 @@
- 
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 32 32" fill="none">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+  
+  <!-- P letter (for The Academic Architect) -->
+  <path d="M10 8h8c2.2 0 4 1.8 4 4s-1.8 4-4 4h-4v6h-4V8z" fill="white"/>
+  <path d="M14 14h4c1.1 0 2-0.9 2-2s-0.9-2-2-2h-4v4z" fill="#2563eb"/>
+  
+  <!-- Small graduation cap accent -->
+  <path d="M20 18l-4 2-4-2v-1l4 2 4-2v1z" fill="white" opacity="0.8"/>
+  <path d="M16 20l-2-1v-1l2 1 2-1v1l-2 1z" fill="white" opacity="0.6"/>
+</svg> 

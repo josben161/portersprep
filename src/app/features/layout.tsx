@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Features — PortersPrep MBA Admissions CoPilot",
-  description: "Discover the powerful features that make PortersPrep the ultimate MBA application workspace.",
+  title: "Features — The Academic Architect MBA Admissions CoPilot",
+  description: "Discover the powerful features that make The Academic Architect the ultimate MBA application workspace.",
   openGraph: {
-    title: "Features — PortersPrep MBA Admissions CoPilot",
+    title: "Features — The Academic Architect MBA Admissions CoPilot",
     description: "AI-powered essay analysis, story management, and school-specific guidance.",
     type: "website"
   }
