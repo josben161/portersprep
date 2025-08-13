@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSupabase } from '@/lib/supabaseAdmin';
 import { requireAuthedProfile } from '@/lib/authz';
-import { generateCoachResponse, searchWeb } from '@/lib/openai';
+import { generateCoachResponse, handleFunctionCall } from '@/lib/openai';
 import { gatherUserContext } from '@/lib/coach-context';
 
 export async function POST(request: NextRequest) {
@@ -18,39 +18,28 @@ export async function POST(request: NextRequest) {
     // Gather user context
     const userContext = await gatherUserContext(profile.id);
 
-    // Check if message contains search request
-    const isSearchRequest = message.toLowerCase().includes('search') || 
-                           message.toLowerCase().includes('find') ||
-                           message.toLowerCase().includes('look up');
-
     let response: string;
     let functionCall: any = null;
 
-    if (isSearchRequest) {
-      // Handle web search
-      const searchResults = await searchWeb(message);
-      response = `Here's what I found for your search:\n\n${searchResults.join('\n\n')}`;
-    } else {
-      // Generate AI response
-      const messages = [
-        { role: 'user' as const, content: message }
-      ];
+    // Generate AI response
+    const messages = [
+      { role: 'user' as const, content: message }
+    ];
 
-      try {
-        const aiResponse = await generateCoachResponse(messages, userContext);
-        
-        if (aiResponse.message?.function_call) {
-          // Handle function call
-          functionCall = aiResponse.message.function_call;
-          response = aiResponse.message.content || 'I have some insights for you.';
-        } else {
-          response = aiResponse.message?.content || 'I apologize, but I encountered an error. Please try again.';
-        }
-      } catch (error) {
-        console.error('OpenAI error:', error);
-        // Fallback response
-        response = `I'm here to help you with your college application process. I can assist with essay writing, application strategy, school selection, and more. What specific area would you like to work on?`;
+    try {
+      const aiResponse = await generateCoachResponse(messages, userContext);
+      
+      if (aiResponse.message?.function_call) {
+        // Handle function call
+        functionCall = aiResponse.message.function_call;
+        response = await handleFunctionCall(functionCall);
+      } else {
+        response = aiResponse.message?.content || 'I apologize, but I encountered an error. Please try again.';
       }
+    } catch (error) {
+      console.error('OpenAI error:', error);
+      // Fallback response
+      response = `I'm here to help you with your college application process. I can assist with essay writing, application strategy, school selection, and more. What specific area would you like to work on?`;
     }
 
     // Store the conversation

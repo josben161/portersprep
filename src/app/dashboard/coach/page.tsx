@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { getPersonalizedGreeting } from '@/lib/coach-personalization';
 
 interface Message {
   id: string;
@@ -19,6 +20,7 @@ export default function CoachPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [personalizedGreeting, setPersonalizedGreeting] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -28,6 +30,25 @@ export default function CoachPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    // Load personalized greeting
+    const loadGreeting = async () => {
+      try {
+        const response = await fetch('/api/me');
+        const data = await response.json();
+        if (data.profile?.id) {
+          const greeting = await getPersonalizedGreeting(data.profile.id);
+          setPersonalizedGreeting(greeting);
+        }
+      } catch (error) {
+        console.error('Error loading greeting:', error);
+        setPersonalizedGreeting("Hello! I'm The Admit Coach, and I'm here to help you with your college application process.");
+      }
+    };
+
+    loadGreeting();
+  }, []);
 
   useEffect(() => {
     // Load recent conversations
@@ -190,7 +211,7 @@ export default function CoachPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-muted-foreground">
-                      I'm here to help you with your college application process. I can assist with:
+                      {personalizedGreeting || "I'm here to help you with your college application process. I can assist with:"}
                     </p>
                     <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
                       <li>Essay writing and brainstorming</li>

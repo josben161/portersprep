@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { searchWeb, searchCollegeInfo, searchCurrentEvents } from './web-search';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -65,13 +66,13 @@ export const coachFunctions = [
           type: "string",
           description: "The search query to execute"
         },
-        search_results: {
-          type: "array",
-          items: { type: "string" },
-          description: "Summarized search results"
+        search_type: {
+          type: "string",
+          enum: ["general", "college", "current_events"],
+          description: "Type of search to perform"
         }
       },
-      required: ["search_query", "search_results"]
+      required: ["search_query", "search_type"]
     }
   }
 ];
@@ -93,6 +94,7 @@ Your role is to:
 3. Offer reassurance and motivation throughout the process
 4. Direct users to relevant parts of their application they need to complete
 5. Provide actionable next steps
+6. Use web search when needed for current information
 
 User Context:
 - Profile: ${JSON.stringify(userContext.profile || {})}
@@ -119,11 +121,73 @@ Be helpful, encouraging, and specific. Always provide actionable advice.`
   }
 }
 
-// Simple web search simulation (placeholder for real search integration)
-export async function searchWeb(query: string): Promise<string[]> {
-  // TODO: Integrate with real search API in Phase 3
-  return [
-    `Search results for "${query}": This is a placeholder for real web search integration.`,
-    `In a real implementation, this would search the internet for current information about ${query}.`
-  ];
+// Handle function calls
+export async function handleFunctionCall(functionCall: any): Promise<string> {
+  const { name, arguments: args } = functionCall;
+  const parsedArgs = JSON.parse(args);
+
+  switch (name) {
+    case 'search_web':
+      return await handleWebSearch(parsedArgs);
+    case 'analyze_user_progress':
+      return await handleProgressAnalysis(parsedArgs);
+    case 'generate_essay_guidance':
+      return await handleEssayGuidance(parsedArgs);
+    default:
+      return 'I processed your request but encountered an unknown function.';
+  }
+}
+
+async function handleWebSearch(args: any): Promise<string> {
+  const { search_query, search_type } = args;
+  
+  let results;
+  switch (search_type) {
+    case 'college':
+      results = await searchCollegeInfo(search_query);
+      break;
+    case 'current_events':
+      results = await searchCurrentEvents(search_query);
+      break;
+    default:
+      results = await searchWeb(search_query);
+  }
+
+  if (results.length === 0) {
+    return `I searched for "${search_query}" but couldn't find specific results. You might want to try a more specific search term.`;
+  }
+
+  const formattedResults = results.map((result, index) => 
+    `${index + 1}. **${result.title}**\n${result.snippet}\nSource: ${result.url}`
+  ).join('\n\n');
+
+  return `Here's what I found for "${search_query}":\n\n${formattedResults}`;
+}
+
+async function handleProgressAnalysis(args: any): Promise<string> {
+  const { progress_summary, next_steps, insights } = args;
+  
+  const formattedSteps = next_steps.map((step: string, index: number) => 
+    `${index + 1}. ${step}`
+  ).join('\n');
+
+  const formattedInsights = insights.map((insight: string) => 
+    `• ${insight}`
+  ).join('\n');
+
+  return `## Progress Analysis\n\n**Summary:** ${progress_summary}\n\n**Next Steps:**\n${formattedSteps}\n\n**Key Insights:**\n${formattedInsights}`;
+}
+
+async function handleEssayGuidance(args: any): Promise<string> {
+  const { suggestions, structure_advice, content_ideas } = args;
+  
+  const formattedSuggestions = suggestions.map((suggestion: string, index: number) => 
+    `${index + 1}. ${suggestion}`
+  ).join('\n');
+
+  const formattedIdeas = content_ideas.map((idea: string) => 
+    `• ${idea}`
+  ).join('\n');
+
+  return `## Essay Guidance\n\n**Writing Suggestions:**\n${formattedSuggestions}\n\n**Structure Advice:**\n${structure_advice}\n\n**Content Ideas:**\n${formattedIdeas}`;
 } 
