@@ -29,12 +29,16 @@ export async function POST(request: NextRequest) {
     try {
       const aiResponse = await generateCoachResponse(messages, userContext);
       
-      if (aiResponse.message?.function_call) {
+      // Check if response has function_call (OpenAI Choice type)
+      if (aiResponse && 'message' in aiResponse && aiResponse.message && 'function_call' in aiResponse.message && aiResponse.message.function_call) {
         // Handle function call with user ID for memory storage
         functionCall = aiResponse.message.function_call;
         response = await handleFunctionCall(functionCall, profile.id);
+      } else if (aiResponse && 'content' in aiResponse) {
+        // Handle regular response
+        response = aiResponse.content || 'I apologize, but I encountered an error processing your request.';
       } else {
-        response = aiResponse.message?.content || 'I apologize, but I encountered an error. Please try again.';
+        response = 'I apologize, but I encountered an error processing your request.';
       }
     } catch (error) {
       console.error('OpenAI error:', error);

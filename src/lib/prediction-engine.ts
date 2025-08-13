@@ -2,9 +2,23 @@ import OpenAI from 'openai';
 import { aiContextManager } from './ai-context-manager';
 import { ResumeAnalysis } from './resume-analyzer';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client only on server side with proper error handling
+let openai: OpenAI | null = null;
+
+if (typeof window === 'undefined' && process.env.OPENAI_API_KEY) {
+  try {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  } catch (error) {
+    console.error('Failed to initialize OpenAI client:', error);
+  }
+}
+
+// Helper function to check if OpenAI is available
+function isOpenAIAvailable(): boolean {
+  return openai !== null && process.env.OPENAI_API_KEY !== undefined;
+}
 
 export interface SchoolPrediction {
   school_id: string;
@@ -34,6 +48,11 @@ export interface ImprovementPlan {
 }
 
 export async function generateSchoolPredictions(userId: string, schoolIds: string[]): Promise<SchoolPrediction[]> {
+  if (!isOpenAIAvailable()) {
+    console.warn('OpenAI not available, returning empty predictions');
+    return [];
+  }
+
   try {
     const context = await aiContextManager.getUserContext(userId);
     const resumeAnalysis = context.resume?.resume_analysis;
@@ -56,6 +75,27 @@ export async function generateSchoolPredictions(userId: string, schoolIds: strin
 }
 
 async function analyzeSchoolFit(context: any, school: any, resumeAnalysis?: ResumeAnalysis): Promise<SchoolPrediction> {
+  if (!isOpenAIAvailable()) {
+    // Return a default prediction when OpenAI is not available
+    return {
+      school_id: school.id,
+      school_name: school.name,
+      admission_probability: 50,
+      confidence_level: 'low',
+      strengths: ['Profile data available'],
+      weaknesses: ['AI analysis unavailable'],
+      fit_analysis: 'AI analysis is currently unavailable. Please complete your profile for better insights.',
+      recommendations: ['Complete your profile with more details'],
+      data_points: {
+        gpa_match: false,
+        gmat_match: false,
+        experience_match: false,
+        industry_match: false,
+        leadership_match: false,
+      }
+    };
+  }
+
   try {
     const systemPrompt = `You are an expert MBA admissions consultant analyzing a candidate's fit for a specific business school. 
 
@@ -96,7 +136,7 @@ ${JSON.stringify(school, null, 2)}
 
 Provide a detailed prediction in JSON format.`;
 
-    const response = await openai.chat.completions.create({
+    const response = await openai!.chat.completions.create({
       model: "gpt-4",
       messages: [
         { role: 'system', content: systemPrompt },
@@ -154,6 +194,18 @@ Provide a detailed prediction in JSON format.`;
 }
 
 export async function generateImprovementPlan(userId: string, predictions: SchoolPrediction[]): Promise<ImprovementPlan> {
+  if (!isOpenAIAvailable()) {
+    console.warn('OpenAI not available, returning default improvement plan');
+    return {
+      short_term: ['Complete your profile with more details'],
+      medium_term: ['Focus on essay development and school research'],
+      long_term: ['Build leadership experience and strengthen application'],
+      priority_actions: ['AI analysis unavailable - complete profile for personalized plan'],
+      timeline: 'Timeline unavailable',
+      estimated_impact: 'Impact assessment unavailable'
+    };
+  }
+
   try {
     const context = await aiContextManager.getUserContext(userId);
     
@@ -182,7 +234,7 @@ ${context.resume?.resume_analysis ? JSON.stringify(context.resume.resume_analysi
 
 Provide a comprehensive improvement plan in JSON format.`;
 
-    const response = await openai.chat.completions.create({
+    const response = await openai!.chat.completions.create({
       model: "gpt-4",
       messages: [
         { role: 'system', content: systemPrompt },

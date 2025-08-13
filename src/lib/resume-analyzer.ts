@@ -1,8 +1,22 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client only on server side with proper error handling
+let openai: OpenAI | null = null;
+
+if (typeof window === 'undefined' && process.env.OPENAI_API_KEY) {
+  try {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  } catch (error) {
+    console.error('Failed to initialize OpenAI client:', error);
+  }
+}
+
+// Helper function to check if OpenAI is available
+function isOpenAIAvailable(): boolean {
+  return openai !== null && process.env.OPENAI_API_KEY !== undefined;
+}
 
 export interface ResumeAnalysis {
   summary: string;
@@ -47,6 +61,47 @@ export interface ResumeAnalysis {
 }
 
 export async function analyzeResume(resumeText: string): Promise<ResumeAnalysis> {
+  if (!isOpenAIAvailable()) {
+    console.error('OpenAI API key not configured or client not initialized.');
+    return {
+      summary: 'OpenAI API key not configured or client not initialized.',
+      experience: {
+        years: 0,
+        industries: [],
+        roles: [],
+        leadership: false,
+        international: false
+      },
+      education: {
+        major: '',
+        institution: '',
+        graduation_year: 0,
+        honors: []
+      },
+      skills: {
+        technical: [],
+        leadership: [],
+        analytical: [],
+        communication: []
+      },
+      achievements: {
+        quantifiable: [],
+        leadership: [],
+        awards: []
+      },
+      mbaReadiness: {
+        strengths: ['Resume analysis unavailable'],
+        weaknesses: ['Unable to assess'],
+        recommendations: ['Please ensure resume is properly formatted'],
+        fit_score: 50
+      },
+      extractedData: {
+        name: '',
+        email: ''
+      }
+    };
+  }
+
   try {
     const systemPrompt = `You are an expert MBA admissions consultant analyzing a resume for MBA application readiness. 
 
@@ -75,7 +130,7 @@ ${resumeText}
 
 Provide a comprehensive analysis in JSON format.`;
 
-    const response = await openai.chat.completions.create({
+    const response = await openai!.chat.completions.create({
       model: "gpt-4",
       messages: [
         { role: 'system', content: systemPrompt },
@@ -139,6 +194,11 @@ Provide a comprehensive analysis in JSON format.`;
 }
 
 export async function generateResumeInsights(analysis: ResumeAnalysis, targetSchools: string[]): Promise<string[]> {
+  if (!isOpenAIAvailable()) {
+    console.error('OpenAI API key not configured or client not initialized.');
+    return ['Unable to generate insights at this time.'];
+  }
+
   try {
     const systemPrompt = `You are an MBA admissions expert providing specific insights based on resume analysis and target schools.`;
 
@@ -157,7 +217,7 @@ Provide 5-7 specific, actionable insights for improving MBA application chances.
 
 Format as a numbered list.`;
 
-    const response = await openai.chat.completions.create({
+    const response = await openai!.chat.completions.create({
       model: "gpt-4",
       messages: [
         { role: 'system', content: systemPrompt },
@@ -187,6 +247,11 @@ Format as a numbered list.`;
 }
 
 export function calculateMBAFitScore(analysis: ResumeAnalysis): number {
+  if (!isOpenAIAvailable()) {
+    console.error('OpenAI API key not configured or client not initialized.');
+    return 50; // Return a default score if OpenAI is not available
+  }
+
   let score = 50; // Base score
 
   // Experience factors

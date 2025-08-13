@@ -2,10 +2,23 @@ import OpenAI from 'openai';
 import { searchWeb, searchCollegeInfo, searchCurrentEvents } from './web-search';
 import { aiContextManager } from './ai-context-manager';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client only on server side with proper error handling
+let openai: OpenAI | null = null;
+
+if (typeof window === 'undefined' && process.env.OPENAI_API_KEY) {
+  try {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  } catch (error) {
+    console.error('Failed to initialize OpenAI client:', error);
+  }
+}
+
+// Helper function to check if OpenAI is available
+function isOpenAIAvailable(): boolean {
+  return openai !== null && process.env.OPENAI_API_KEY !== undefined;
+}
 
 // Coach system function definitions
 export const coachFunctions = [
@@ -133,6 +146,13 @@ export async function generateCoachResponse(
   userContext: any,
   functions?: any[]
 ) {
+  if (!isOpenAIAvailable()) {
+    return {
+      role: 'assistant',
+      content: 'I apologize, but I am currently unable to process your request due to missing API key or OpenAI client initialization issues. Please try again later or contact support.'
+    };
+  }
+
   try {
     const systemMessage = {
       role: 'system' as const,
@@ -173,7 +193,7 @@ Guidelines:
 Be encouraging, specific, and always provide actionable advice that moves them toward their MBA goals.`
     };
 
-    const response = await openai.chat.completions.create({
+    const response = await openai!.chat.completions.create({
       model: "gpt-4",
       messages: [systemMessage, ...messages],
       functions: functions || coachFunctions,
@@ -191,6 +211,10 @@ Be encouraging, specific, and always provide actionable advice that moves them t
 
 // Handle function calls
 export async function handleFunctionCall(functionCall: any, userId?: string): Promise<string> {
+  if (!isOpenAIAvailable()) {
+    return 'I apologize, but I am currently unable to process your request due to missing API key or OpenAI client initialization issues. Please try again later or contact support.';
+  }
+
   const { name, arguments: args } = functionCall;
   const parsedArgs = JSON.parse(args);
 

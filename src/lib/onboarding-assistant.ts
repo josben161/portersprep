@@ -1,9 +1,23 @@
 import { aiContextManager } from './ai-context-manager';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client only on server side with proper error handling
+let openai: OpenAI | null = null;
+
+if (typeof window === 'undefined' && process.env.OPENAI_API_KEY) {
+  try {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  } catch (error) {
+    console.error('Failed to initialize OpenAI client:', error);
+  }
+}
+
+// Helper function to check if OpenAI is available
+function isOpenAIAvailable(): boolean {
+  return openai !== null && process.env.OPENAI_API_KEY !== undefined;
+}
 
 export interface OnboardingStep {
   id: string;
