@@ -71,12 +71,9 @@ export default function RecommendationsPage() {
       if (appsRes.ok) {
         const appsData = await appsRes.json();
         setApplications(appsData);
-      }
 
-      // Load all assignments across applications
-      const assignmentsData = [];
-      if (appsRes.ok) {
-        const appsData = await appsRes.json();
+        // Load all assignments across applications
+        const assignmentsData = [];
         for (const app of appsData) {
           const assignmentsRes = await fetch(`/api/applications/${app.id}/recommendations`);
           if (assignmentsRes.ok) {
@@ -87,8 +84,8 @@ export default function RecommendationsPage() {
             })));
           }
         }
+        setAssignments(assignmentsData);
       }
-      setAssignments(assignmentsData);
     } catch (error) {
       console.error("Failed to load recommendations data:", error);
       toast.error("Failed to load recommendations data");
