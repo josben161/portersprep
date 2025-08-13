@@ -8,7 +8,7 @@ const items = [
   { href: "/dashboard/predict", label: "Predict", desc: "Fit by school" },
   { href: "/dashboard/applications", label: "Applications", desc: "Essays & tasks" },
   { href: "/dashboard/recommendations", label: "Recommendations", desc: "School-specific" },
-  { href: "/dashboard/coach", label: "Coach", desc: "Ask anything" },
+  { href: "/dashboard/coach", label: "Planner", desc: "AI assistant" },
 ];
 
 export default function SideNav() {

@@ -1,6 +1,5 @@
 "use client";
 import { Suspense } from "react";
-import AIAssistant from "@/components/dashboard/AIAssistant";
 import CoreProfileCard from "@/components/dashboard/CoreProfileCard";
 import PredictCard from "@/components/dashboard/PredictCard";
 import ApplicationsGrid from "@/components/dashboard/ApplicationsGrid";
@@ -9,18 +8,14 @@ import CoachWidget from "@/components/dashboard/CoachWidget";
 
 export default function Dashboard(){
   return (
-    <div className="mx-auto max-w-6xl p-6 space-y-6">
-      <div>
+    <div className="mx-auto max-w-7xl p-6">
+      <div className="mb-6">
         <h1 className="text-2xl font-semibold">Your MBA Command Center</h1>
         <p className="text-sm text-muted-foreground">Build your core profile, manage schools, and keep recommenders moving.</p>
       </div>
 
-      <Suspense fallback={<div className="card p-6">Loading AI assistant…</div>}>
-        <AIAssistant />
-      </Suspense>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3 space-y-6">
           <Suspense fallback={<div className="card p-6">Loading core profile…</div>}>
             <CoreProfileCard />
           </Suspense>
@@ -38,8 +33,8 @@ export default function Dashboard(){
           </Suspense>
         </div>
 
-        <div className="space-y-6">
-          <Suspense fallback={<div className="card p-6">Loading coach…</div>}>
+        <div className="lg:col-span-1">
+          <Suspense fallback={<div className="card p-6">Loading planner…</div>}>
             <CoachWidget />
           </Suspense>
         </div>

@@ -61,7 +61,7 @@ export default function CoachWidget() {
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      setLastResponse('Sorry, I encountered an error. Please try the full coach interface.');
+      setLastResponse('Sorry, I encountered an error. Please try the full planner interface.');
     } finally {
       setIsLoading(false);
     }
@@ -75,12 +75,12 @@ export default function CoachWidget() {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full h-full">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2 text-lg">
             <Bot className="h-5 w-5 text-primary" />
-            <span>The Admit Coach</span>
+            <span>The Admit Planner</span>
           </CardTitle>
           <Link href="/dashboard/coach">
             <Button variant="outline" size="sm">

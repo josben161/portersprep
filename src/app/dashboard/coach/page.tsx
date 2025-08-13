@@ -43,7 +43,7 @@ export default function CoachPage() {
         }
       } catch (error) {
         console.error('Error loading greeting:', error);
-        setPersonalizedGreeting("Hello! I'm The Admit Coach, and I'm here to help you with your college application process.");
+        setPersonalizedGreeting("Hello! I'm The Admit Planner, and I'm here to help you with your college application process.");
       }
     };
 
@@ -187,7 +187,7 @@ export default function CoachPage() {
         <div className="container flex h-16 items-center">
           <div className="flex items-center space-x-2">
             <Bot className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-semibold">The Admit Coach</h1>
+            <h1 className="text-xl font-semibold">The Admit Planner</h1>
           </div>
           <div className="ml-4 text-sm text-muted-foreground">
             Your AI assistant for college applications
@@ -206,7 +206,7 @@ export default function CoachPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Bot className="h-5 w-5" />
-                      <span>Welcome to The Admit Coach!</span>
+                      <span>Welcome to The Admit Planner!</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
