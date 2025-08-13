@@ -43,9 +43,9 @@ export default function TopNav() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center">
           <Image
-            src="/brand/portersprep.png"
+            src="/brand/long_logo.png"
             alt="The Admit Architect"
-            width={160}
+            width={200}
             height={40}
             className="h-10 w-auto"
             priority
