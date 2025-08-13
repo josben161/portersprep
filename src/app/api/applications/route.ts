@@ -1,16 +1,17 @@
 import { NextRequest } from "next/server";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 import { requireAuthedProfile } from "@/lib/authz";
+import { getSchoolData } from "@/lib/schools";
 
 export async function GET() {
   try {
     const { profile } = await requireAuthedProfile();
     const sb = getAdminSupabase();
     
-    // Simple query that should work - removed deadline from schools selection
-    const { data, error } = await sb
+    // Get applications with basic data
+    const { data: apps, error } = await sb
       .from("applications")
-      .select("id, status, school_id, school:schools(id,name)")
+      .select("id, status, school_id, round, created_at, updated_at")
       .eq("user_id", profile.id)
       .order("created_at", { ascending: false });
       
@@ -18,8 +19,30 @@ export async function GET() {
       console.error("Applications fetch error:", error);
       return Response.json([]);
     }
+
+    // Enrich with school data from JSON files
+    const enrichedApps = await Promise.all(
+      (apps || []).map(async (app) => {
+        try {
+          const schoolData = await getSchoolData(app.school_id);
+          return {
+            ...app,
+            school: schoolData ? {
+              name: schoolData.name,
+              id: schoolData.id
+            } : null
+          };
+        } catch (error) {
+          console.error(`Failed to load school data for ${app.school_id}:`, error);
+          return {
+            ...app,
+            school: null
+          };
+        }
+      })
+    );
     
-    return Response.json(data ?? []);
+    return Response.json(enrichedApps);
   } catch (error) {
     console.error("Applications API error:", error);
     return Response.json([]);
