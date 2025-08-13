@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { searchWeb, searchCollegeInfo, searchCurrentEvents } from './web-search';
+import { aiContextManager } from './ai-context-manager';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -74,10 +75,59 @@ export const coachFunctions = [
       },
       required: ["search_query", "search_type"]
     }
+  },
+  {
+    name: "analyze_resume",
+    description: "Analyze user's resume and provide MBA-specific insights",
+    parameters: {
+      type: "object",
+      properties: {
+        strengths: {
+          type: "array",
+          items: { type: "string" },
+          description: "Resume strengths for MBA applications"
+        },
+        weaknesses: {
+          type: "array",
+          items: { type: "string" },
+          description: "Areas for improvement"
+        },
+        recommendations: {
+          type: "array",
+          items: { type: "string" },
+          description: "Specific recommendations for resume improvement"
+        }
+      },
+      required: ["strengths", "weaknesses", "recommendations"]
+    }
+  },
+  {
+    name: "generate_school_predictions",
+    description: "Generate admission predictions for target schools",
+    parameters: {
+      type: "object",
+      properties: {
+        school_analysis: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              school_name: { type: "string" },
+              admission_probability: { type: "number" },
+              strengths: { type: "array", items: { type: "string" } },
+              weaknesses: { type: "array", items: { type: "string" } },
+              recommendations: { type: "array", items: { type: "string" } }
+            }
+          },
+          description: "Analysis for each target school"
+        }
+      },
+      required: ["school_analysis"]
+    }
   }
 ];
 
-// Generate coach response with context
+// Generate coach response with comprehensive context
 export async function generateCoachResponse(
   messages: any[],
   userContext: any,
@@ -86,23 +136,41 @@ export async function generateCoachResponse(
   try {
     const systemMessage = {
       role: 'system' as const,
-      content: `You are The Admit Coach, an AI assistant specializing in college applications. You have access to the user's profile, applications, essays, and recommendations.
+      content: `You are The Admit Planner, an expert AI assistant specializing in MBA applications. You have comprehensive access to the user's profile, applications, essays, recommendations, resume analysis, and school data.
 
 Your role is to:
-1. Provide personalized guidance based on the user's specific situation
+1. Provide personalized, actionable guidance based on the user's specific situation
 2. Help with essay writing, application strategy, and school selection
 3. Offer reassurance and motivation throughout the process
 4. Direct users to relevant parts of their application they need to complete
-5. Provide actionable next steps
+5. Provide specific, actionable next steps with timelines
 6. Use web search when needed for current information
+7. Analyze resume and provide MBA-specific insights
+8. Generate realistic school predictions and improvement plans
+9. Act as an onboarding assistant for new users
 
-User Context:
-- Profile: ${JSON.stringify(userContext.profile || {})}
+You have access to:
+- User Profile: ${JSON.stringify(userContext.profile || {})}
 - Applications: ${JSON.stringify(userContext.applications || [])}
 - Essays: ${JSON.stringify(userContext.essays || [])}
 - Recommendations: ${JSON.stringify(userContext.recommendations || [])}
+- Resume Analysis: ${JSON.stringify(userContext.resume || {})}
+- Schools Data: ${JSON.stringify(userContext.schools || [])}
+- Progress Metrics: ${JSON.stringify(userContext.progress || {})}
+- AI Memory: ${JSON.stringify(userContext.memory || [])}
+- Conversation History: ${JSON.stringify(userContext.conversations || [])}
 
-Be helpful, encouraging, and specific. Always provide actionable advice.`
+Guidelines:
+- Be specific and actionable in all recommendations
+- Reference specific data points from their profile
+- Provide realistic timelines and expectations
+- Consider their target schools and industry background
+- Use their resume analysis to inform advice
+- Remember previous conversations and preferences
+- For new users, focus on onboarding and profile completion
+- Always provide next steps and clear action items
+
+Be encouraging, specific, and always provide actionable advice that moves them toward their MBA goals.`
     };
 
     const response = await openai.chat.completions.create({
@@ -111,7 +179,7 @@ Be helpful, encouraging, and specific. Always provide actionable advice.`
       functions: functions || coachFunctions,
       function_call: functions ? "auto" : undefined,
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 1500,
     });
 
     return response.choices[0];
@@ -122,7 +190,7 @@ Be helpful, encouraging, and specific. Always provide actionable advice.`
 }
 
 // Handle function calls
-export async function handleFunctionCall(functionCall: any): Promise<string> {
+export async function handleFunctionCall(functionCall: any, userId?: string): Promise<string> {
   const { name, arguments: args } = functionCall;
   const parsedArgs = JSON.parse(args);
 
@@ -133,6 +201,10 @@ export async function handleFunctionCall(functionCall: any): Promise<string> {
       return await handleProgressAnalysis(parsedArgs);
     case 'generate_essay_guidance':
       return await handleEssayGuidance(parsedArgs);
+    case 'analyze_resume':
+      return await handleResumeAnalysis(parsedArgs, userId);
+    case 'generate_school_predictions':
+      return await handleSchoolPredictions(parsedArgs, userId);
     default:
       return 'I processed your request but encountered an unknown function.';
   }
@@ -190,4 +262,82 @@ async function handleEssayGuidance(args: any): Promise<string> {
   ).join('\n');
 
   return `## Essay Guidance\n\n**Writing Suggestions:**\n${formattedSuggestions}\n\n**Structure Advice:**\n${structure_advice}\n\n**Content Ideas:**\n${formattedIdeas}`;
+}
+
+async function handleResumeAnalysis(args: any, userId?: string): Promise<string> {
+  const { strengths, weaknesses, recommendations } = args;
+  
+  const formattedStrengths = strengths.map((strength: string) => 
+    `• ${strength}`
+  ).join('\n');
+
+  const formattedWeaknesses = weaknesses.map((weakness: string) => 
+    `• ${weakness}`
+  ).join('\n');
+
+  const formattedRecommendations = recommendations.map((rec: string, index: number) => 
+    `${index + 1}. ${rec}`
+  ).join('\n');
+
+  let message = `## Resume Analysis\n\n**Strengths:**\n${formattedStrengths}\n\n**Areas for Improvement:**\n${formattedWeaknesses}\n\n**Recommendations:**\n${formattedRecommendations}`;
+
+  // Store this analysis in memory for future reference
+  if (userId) {
+    await aiContextManager.storeMemory(userId, {
+      memory_type: 'analysis',
+      content: {
+        type: 'resume_analysis',
+        strengths,
+        weaknesses,
+        recommendations,
+        timestamp: new Date().toISOString()
+      },
+      context: { source: 'planner_function_call' }
+    });
+  }
+
+  return message;
+}
+
+async function handleSchoolPredictions(args: any, userId?: string): Promise<string> {
+  const { school_analysis } = args;
+  
+  let message = `## School Predictions\n\n`;
+  
+  school_analysis.forEach((school: any, index: number) => {
+    message += `### ${school.school_name}\n`;
+    message += `**Admission Probability:** ${school.admission_probability}%\n\n`;
+    
+    message += `**Strengths:**\n`;
+    school.strengths.forEach((strength: string) => {
+      message += `• ${strength}\n`;
+    });
+    
+    message += `\n**Areas for Improvement:**\n`;
+    school.weaknesses.forEach((weakness: string) => {
+      message += `• ${weakness}\n`;
+    });
+    
+    message += `\n**Recommendations:**\n`;
+    school.recommendations.forEach((rec: string, recIndex: number) => {
+      message += `${recIndex + 1}. ${rec}\n`;
+    });
+    
+    message += `\n---\n\n`;
+  });
+
+  // Store predictions in memory
+  if (userId) {
+    await aiContextManager.storeMemory(userId, {
+      memory_type: 'prediction',
+      content: {
+        type: 'school_predictions',
+        predictions: school_analysis,
+        timestamp: new Date().toISOString()
+      },
+      context: { source: 'planner_function_call' }
+    });
+  }
+
+  return message;
 } 

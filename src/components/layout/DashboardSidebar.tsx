@@ -14,7 +14,7 @@ export default function DashboardSidebar(){
   const pathname = usePathname();
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-card/30 p-3 lg:block">
-      <div className="px-2 pb-3 pt-1 text-xs uppercase tracking-wide text-muted-foreground">Command Center</div>
+      <div className="px-2 pb-3 pt-1 text-xs uppercase tracking-wide text-muted-foreground">Dashboard</div>
       <nav className="space-y-1">
         {items.map(it => {
           const active = pathname === it.href || pathname?.startsWith(it.href + "/");

@@ -24,7 +24,7 @@ export default function SideNav() {
           className="h-8 w-auto"
         />
       </div>
-      <div className="px-2 pb-3 pt-1 text-xs uppercase tracking-wide text-muted-foreground">Command Center</div>
+      <div className="px-2 pb-3 pt-1 text-xs uppercase tracking-wide text-muted-foreground">Dashboard</div>
       <nav className="px-2 pb-4 space-y-1">
         {items.map(it => {
           const active = pathname === it.href || pathname?.startsWith(it.href + "/");

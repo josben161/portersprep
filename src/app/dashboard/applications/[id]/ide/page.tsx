@@ -103,7 +103,7 @@ export default function IDE({ params }: { params: { id: string } }) {
     { label: "Coverage", node: <CoveragePanel applicationId={appId} /> },
   ], [analysis, schoolJson]);
 
-  // Left: 3-zone Command Center layout (compact for IDE)
+  // Left: 3-zone Dashboard layout (compact for IDE)
   const leftNavNode = (
     <div className="flex h-full flex-col space-y-4 p-4">
       {/* Zone 1: Core Profile (Compact) */}

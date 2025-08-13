@@ -20,7 +20,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
       return new Response("Application not found", { status: 404 });
     }
     
-    // Get recommender assignments with recommender details
+    // Get recommender assignments with recommender details using proper join
     const { data: assignments, error } = await sb
       .from("recommender_assignments")
       .select(`
@@ -30,7 +30,8 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
         due_date,
         notes,
         school_requirements,
-        recommenders (
+        recommender_id,
+        recommenders!recommender_assignments_recommender_id_fkey (
           id,
           name,
           title,
@@ -120,7 +121,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         due_date,
         notes,
         school_requirements,
-        recommenders (
+        recommender_id,
+        recommenders!recommender_assignments_recommender_id_fkey (
           id,
           name,
           title,
@@ -138,7 +140,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     
     return Response.json(data);
   } catch (error) {
-    console.error("Assignment creation error:", error);
-    return new Response("Failed to create assignment", { status: 500 });
+    console.error("Recommendations API error:", error);
+    return new Response("Internal server error", { status: 500 });
   }
 } 

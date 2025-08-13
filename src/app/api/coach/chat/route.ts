@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSupabase } from '@/lib/supabaseAdmin';
 import { requireAuthedProfile } from '@/lib/authz';
 import { generateCoachResponse, handleFunctionCall } from '@/lib/openai';
-import { gatherUserContext } from '@/lib/coach-context';
+import { aiContextManager } from '@/lib/ai-context-manager';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
 
     const supabase = getAdminSupabase();
 
-    // Gather user context
-    const userContext = await gatherUserContext(profile.id);
+    // Gather user context using the central AI context manager
+    const userContext = await aiContextManager.getUserContext(profile.id);
 
     let response: string;
     let functionCall: any = null;
@@ -30,9 +30,9 @@ export async function POST(request: NextRequest) {
       const aiResponse = await generateCoachResponse(messages, userContext);
       
       if (aiResponse.message?.function_call) {
-        // Handle function call
+        // Handle function call with user ID for memory storage
         functionCall = aiResponse.message.function_call;
-        response = await handleFunctionCall(functionCall);
+        response = await handleFunctionCall(functionCall, profile.id);
       } else {
         response = aiResponse.message?.content || 'I apologize, but I encountered an error. Please try again.';
       }
@@ -65,17 +65,15 @@ export async function POST(request: NextRequest) {
     // Store insights in memory if function was called
     if (functionCall) {
       try {
-        await supabase
-          .from('coach_memory')
-          .insert({
-            user_id: profile.id,
-            memory_type: 'insight',
-            content: {
-              function: functionCall.name,
-              arguments: functionCall.arguments,
-              timestamp: new Date().toISOString()
-            }
-          });
+        await aiContextManager.storeMemory(profile.id, {
+          memory_type: 'insight',
+          content: {
+            function: functionCall.name,
+            arguments: functionCall.arguments,
+            timestamp: new Date().toISOString()
+          },
+          context: { source: 'planner_chat' }
+        });
       } catch (error) {
         console.error('Error storing memory:', error);
       }

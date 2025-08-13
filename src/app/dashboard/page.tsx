@@ -10,7 +10,7 @@ export default function Dashboard(){
   return (
     <div className="mx-auto max-w-7xl p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold">Your MBA Command Center</h1>
+        <h1 className="text-2xl font-semibold">Your MBA Dashboard</h1>
         <p className="text-sm text-muted-foreground">Build your core profile, manage schools, and keep recommenders moving.</p>
       </div>
 

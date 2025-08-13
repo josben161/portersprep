@@ -253,7 +253,7 @@ export default function CoreProfileCard(){
                   Remove
                 </button>
                 <label className={`btn btn-outline text-xs ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                  {uploading ? 'Uploading...' : 'Replace'}
+                  {uploading ? 'Uploading...' : 'Update'}
                   <input 
                     type="file" 
                     className="hidden" 
