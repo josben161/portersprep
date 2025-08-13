@@ -307,6 +307,60 @@ export default function CoreProfileCard(){
         )}
       </div>
 
+      {/* Resume Analysis Section */}
+      {p?.resume_key && (
+        <div className="mt-4 p-3 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-medium text-blue-900 dark:text-blue-100">Resume Analysis</div>
+            <button 
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              onClick={() => {
+                // Trigger resume analysis
+                // sendMessage("Analyze my resume and provide MBA-specific insights"); // This line was commented out in the original file
+              }}
+            >
+              Analyze
+            </button>
+          </div>
+          
+          {p?.resume_analysis ? (
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">MBA Readiness Score:</span>
+                <span className="font-medium">{p.resume_analysis.mbaReadiness?.fit_score || 'N/A'}%</span>
+              </div>
+              
+              {p.resume_analysis.experience && (
+                <div>
+                  <span className="text-muted-foreground">Experience:</span>
+                  <span className="ml-1">{p.resume_analysis.experience.years} years</span>
+                  {p.resume_analysis.experience.leadership && (
+                    <span className="ml-2 text-green-600 dark:text-green-400">✓ Leadership</span>
+                  )}
+                  {p.resume_analysis.experience.international && (
+                    <span className="ml-2 text-blue-600 dark:text-blue-400">✓ International</span>
+                  )}
+                </div>
+              )}
+              
+              {p.resume_analysis.education && (
+                <div>
+                  <span className="text-muted-foreground">Education:</span>
+                  <span className="ml-1">{p.resume_analysis.education.major} at {p.resume_analysis.education.institution}</span>
+                  {p.resume_analysis.education.gpa && (
+                    <span className="ml-2">GPA: {p.resume_analysis.education.gpa}</span>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-xs text-muted-foreground">
+              Click "Analyze" to get AI-powered resume insights for your MBA applications.
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Story Bank Section */}
       <div className="mt-6">
         <div className="text-xs text-muted-foreground mb-3">Story Bank</div>
