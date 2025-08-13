@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { getSchoolData } from "@/lib/schools";
 
 interface School {
   id: string;
@@ -56,10 +55,13 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
       const appData = await appRes.json();
       setApplication(appData);
 
-      // Load school data
+      // Load school data through API
       if (appData.schools?.slug) {
-        const schoolData = await getSchoolData(appData.schools.slug);
-        setSchool(schoolData);
+        const schoolRes = await fetch(`/api/schools/${appData.schools.slug}`);
+        if (schoolRes.ok) {
+          const schoolData = await schoolRes.json();
+          setSchool(schoolData);
+        }
       }
 
       // Load existing answers
