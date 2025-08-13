@@ -20,7 +20,7 @@ export const metadata = {
   description: "Assess • Edit • Coach",
   icons: { 
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/square_logo.png", type: "image/png" },
       { url: "/favicon.png", type: "image/png" }
     ]
   }
