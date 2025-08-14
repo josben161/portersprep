@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { SchoolPrediction, ImprovementPlan, generateSchoolPredictions, generateImprovementPlan, calculateOverallAdmissionProbability, getConfidenceLevel } from "@/lib/prediction-engine";
 
 function BandBadge({ probability }: { probability: number }) {
   let band = "safety";
@@ -62,7 +61,7 @@ function ProfileSummary({ profile }: { profile: any }) {
   );
 }
 
-function SchoolPredictionCard({ prediction }: { prediction: SchoolPrediction }) {
+function SchoolPredictionCard({ prediction }: { prediction: any }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -94,7 +93,7 @@ function SchoolPredictionCard({ prediction }: { prediction: SchoolPrediction }) 
           <div>
             <div className="font-medium text-green-700 dark:text-green-400 mb-1">Strengths:</div>
             <ul className="list-disc list-inside space-y-1">
-              {prediction.strengths.map((strength, index) => (
+              {prediction.strengths.map((strength: string, index: number) => (
                 <li key={index} className="text-muted-foreground">{strength}</li>
               ))}
             </ul>
@@ -103,7 +102,7 @@ function SchoolPredictionCard({ prediction }: { prediction: SchoolPrediction }) 
           <div>
             <div className="font-medium text-red-700 dark:text-red-400 mb-1">Areas for Improvement:</div>
             <ul className="list-disc list-inside space-y-1">
-              {prediction.weaknesses.map((weakness, index) => (
+              {prediction.weaknesses.map((weakness: string, index: number) => (
                 <li key={index} className="text-muted-foreground">{weakness}</li>
               ))}
             </ul>
@@ -112,7 +111,7 @@ function SchoolPredictionCard({ prediction }: { prediction: SchoolPrediction }) 
           <div>
             <div className="font-medium text-blue-700 dark:text-blue-400 mb-1">Recommendations:</div>
             <ul className="list-disc list-inside space-y-1">
-              {prediction.recommendations.slice(0, 3).map((rec, index) => (
+              {prediction.recommendations.slice(0, 3).map((rec: string, index: number) => (
                 <li key={index} className="text-muted-foreground">{rec}</li>
               ))}
             </ul>
@@ -123,7 +122,7 @@ function SchoolPredictionCard({ prediction }: { prediction: SchoolPrediction }) 
   );
 }
 
-function ImprovementPlanWidget({ plan }: { plan: ImprovementPlan }) {
+function ImprovementPlanWidget({ plan }: { plan: any }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -146,7 +145,7 @@ function ImprovementPlanWidget({ plan }: { plan: ImprovementPlan }) {
           <div>
             <div className="font-medium text-green-700 dark:text-green-400 mb-1">Short-term (0-3 months):</div>
             <ul className="list-disc list-inside space-y-1">
-              {plan.short_term.map((action, index) => (
+              {plan.short_term.map((action: string, index: number) => (
                 <li key={index} className="text-muted-foreground">{action}</li>
               ))}
             </ul>
@@ -155,7 +154,7 @@ function ImprovementPlanWidget({ plan }: { plan: ImprovementPlan }) {
           <div>
             <div className="font-medium text-amber-700 dark:text-amber-400 mb-1">Medium-term (3-6 months):</div>
             <ul className="list-disc list-inside space-y-1">
-              {plan.medium_term.map((action, index) => (
+              {plan.medium_term.map((action: string, index: number) => (
                 <li key={index} className="text-muted-foreground">{action}</li>
               ))}
             </ul>
@@ -164,7 +163,7 @@ function ImprovementPlanWidget({ plan }: { plan: ImprovementPlan }) {
           <div>
             <div className="font-medium text-blue-700 dark:text-blue-400 mb-1">Long-term (6+ months):</div>
             <ul className="list-disc list-inside space-y-1">
-              {plan.long_term.map((action, index) => (
+              {plan.long_term.map((action: string, index: number) => (
                 <li key={index} className="text-muted-foreground">{action}</li>
               ))}
             </ul>
@@ -173,7 +172,7 @@ function ImprovementPlanWidget({ plan }: { plan: ImprovementPlan }) {
           <div className="pt-2 border-t border-blue-200 dark:border-blue-800">
             <div className="font-medium text-purple-700 dark:text-purple-400 mb-1">Priority Actions:</div>
             <ul className="list-disc list-inside space-y-1">
-              {plan.priority_actions.slice(0, 3).map((action, index) => (
+              {plan.priority_actions.slice(0, 3).map((action: string, index: number) => (
                 <li key={index} className="text-muted-foreground">{action}</li>
               ))}
             </ul>
@@ -185,8 +184,8 @@ function ImprovementPlanWidget({ plan }: { plan: ImprovementPlan }) {
 }
 
 export default function PredictCard() {
-  const [predictions, setPredictions] = useState<SchoolPrediction[]>([]);
-  const [improvementPlan, setImprovementPlan] = useState<ImprovementPlan | null>(null);
+  const [predictions, setPredictions] = useState<any[]>([]);
+  const [improvementPlan, setImprovementPlan] = useState<any | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
@@ -208,49 +207,29 @@ export default function PredictCard() {
   async function runPredictions() {
     setRunning(true);
     try {
-      // Get user ID for predictions
-      const meRes = await fetch("/api/me");
-      if (!meRes.ok) {
-        throw new Error("Failed to load user profile");
+      // Call the prediction API endpoint
+      const response = await fetch("/api/predict/run", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate predictions");
       }
-      const meData = await meRes.json();
+
+      const result = await response.json();
       
-      // Get target schools from applications
-      const appsRes = await fetch("/api/applications");
-      if (!appsRes.ok) {
-        throw new Error("Failed to load applications");
-      }
-      const appsData = await appsRes.json();
-      
-      const schoolIds = appsData
-        .filter((app: any) => app.school_id)
-        .map((app: any) => app.school_id);
-      
-      if (schoolIds.length === 0) {
-        // Use default schools if no applications
-        const schoolsRes = await fetch("/api/schools");
-        if (schoolsRes.ok) {
-          const schoolsData = await schoolsRes.json();
-          schoolIds.push(...schoolsData.slice(0, 5).map((s: any) => s.id));
-        }
-      }
-      
-      // Generate predictions
-      const predictions = await generateSchoolPredictions(meData.profile.id, schoolIds);
-      setPredictions(predictions);
-      
-      // Calculate overall probability
-      const overall = calculateOverallAdmissionProbability(predictions);
-      setOverallProbability(overall);
-      
-      // Get confidence level
-      const confidence = getConfidenceLevel(predictions);
-      setConfidenceLevel(confidence);
-      
-      // Generate improvement plan
-      if (predictions.length > 0) {
-        const plan = await generateImprovementPlan(meData.profile.id, predictions);
-        setImprovementPlan(plan);
+      if (result.ok) {
+        // For now, we'll show a success message since the API returns mock data
+        // In the future, this could be enhanced to return actual predictions
+        alert("Predictions generated successfully! Check the Predict page for detailed results.");
+        
+        // Optionally refresh the page or redirect to predictions history
+        window.location.href = "/dashboard/predict";
+      } else {
+        throw new Error(result.message || "Failed to generate predictions");
       }
       
     } catch (error) {
