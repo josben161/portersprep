@@ -1,54 +1,36 @@
 "use client";
 import { useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
+import Link from "next/link";
 
 export default function RunPredictModal({ onDone }: { onDone?: () => void }) {
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    resumeText: "",
-    gmat: "",
-    gpa: "",
-    yearsExp: "",
-    industry: "",
-    roles: "",
-    goals: "",
-    targetSchools: "",
-  });
+  const [insufficientContext, setInsufficientContext] = useState<any>(null);
 
-  async function submit() {
-    const payload = {
-      resumeText: form.resumeText.trim(),
-      gmat: form.gmat ? Number(form.gmat) : undefined,
-      gpa: form.gpa ? Number(form.gpa) : undefined,
-      yearsExp: form.yearsExp ? Number(form.yearsExp) : undefined,
-      industry: form.industry || undefined,
-      roles: form.roles
-        ? form.roles
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-        : [],
-      goals: form.goals.trim(),
-      targetSchools: form.targetSchools
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-    };
+  async function runPrediction() {
     setLoading(true);
+    setInsufficientContext(null);
+    
     try {
-      const r = await apiFetch("/api/assessment/run", {
+      const r = await apiFetch("/api/predict/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({}),
       });
+      
       if (r.ok) {
         onDone?.();
-        setOpen(false);
       } else {
-        const msg = await r.text();
-        alert(msg || "Prediction failed");
+        const data = await r.json();
+        if (data.error === "insufficient_context") {
+          setInsufficientContext(data);
+        } else {
+          alert(data.message || "Prediction failed");
+        }
       }
+    } catch (error) {
+      console.error("Prediction error:", error);
+      alert("Failed to run prediction. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -58,108 +40,77 @@ export default function RunPredictModal({ onDone }: { onDone?: () => void }) {
     <>
       <button
         className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-3 py-2 text-xs transition-colors"
-        onClick={() => setOpen(true)}
+        onClick={runPrediction}
+        disabled={loading}
       >
-        Run Prediction
+        {loading ? "Running..." : "Run Prediction"}
       </button>
-      {open && (
+      
+      {insufficientContext && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onClick={() => setOpen(false)}
+          onClick={() => setInsufficientContext(null)}
         >
           <div
-            className="w-full max-w-2xl rounded-lg border bg-card p-4"
+            className="w-full max-w-2xl rounded-lg border bg-card p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between">
-              <div className="text-base font-semibold">Run Prediction</div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-lg font-semibold">Complete Your Profile</div>
               <button
-                className="text-sm text-muted-foreground"
-                onClick={() => setOpen(false)}
+                className="text-sm text-muted-foreground hover:text-foreground"
+                onClick={() => setInsufficientContext(null)}
               >
                 ✕
               </button>
             </div>
-            <div className="mt-3 grid gap-2 text-sm">
-              <textarea
-                className="h-28 w-full rounded-md border px-3 py-2"
-                placeholder="Paste your resume / CV summary"
-                value={form.resumeText}
-                onChange={(e) =>
-                  setForm((v) => ({ ...v, resumeText: e.target.value }))
-                }
-              />
-              <input
-                className="rounded-md border px-3 py-2"
-                placeholder="Target schools (comma‑separated)"
-                value={form.targetSchools}
-                onChange={(e) =>
-                  setForm((v) => ({ ...v, targetSchools: e.target.value }))
-                }
-              />
-              <input
-                className="rounded-md border px-3 py-2"
-                placeholder="Career goals (1–2 lines)"
-                value={form.goals}
-                onChange={(e) =>
-                  setForm((v) => ({ ...v, goals: e.target.value }))
-                }
-              />
-              <div className="grid gap-2 sm:grid-cols-3">
-                <input
-                  className="rounded-md border px-3 py-2"
-                  placeholder="GMAT (opt.)"
-                  value={form.gmat}
-                  onChange={(e) =>
-                    setForm((v) => ({ ...v, gmat: e.target.value }))
-                  }
-                />
-                <input
-                  className="rounded-md border px-3 py-2"
-                  placeholder="GPA (opt.)"
-                  value={form.gpa}
-                  onChange={(e) =>
-                    setForm((v) => ({ ...v, gpa: e.target.value }))
-                  }
-                />
-                <input
-                  className="rounded-md border px-3 py-2"
-                  placeholder="Years exp (opt.)"
-                  value={form.yearsExp}
-                  onChange={(e) =>
-                    setForm((v) => ({ ...v, yearsExp: e.target.value }))
-                  }
-                />
+            
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                {insufficientContext.message}
+              </p>
+              
+              <div className="bg-muted/50 rounded-lg p-4">
+                <div className="text-sm font-medium mb-2">Profile Completeness: {insufficientContext.profileCompleteness}%</div>
+                <div className="space-y-2 text-sm">
+                  {insufficientContext.missing.resume && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                      <span>Upload your resume/CV</span>
+                    </div>
+                  )}
+                  {insufficientContext.missing.profile && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                      <span>Complete your profile information</span>
+                    </div>
+                  )}
+                  {insufficientContext.missing.applications && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                      <span>Add target schools to your applications</span>
+                    </div>
+                  )}
+                  {insufficientContext.missing.essays && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                      <span>Start working on your essays</span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="grid gap-2 sm:grid-cols-3">
-                <input
-                  className="rounded-md border px-3 py-2"
-                  placeholder="Industry (opt.)"
-                  value={form.industry}
-                  onChange={(e) =>
-                    setForm((v) => ({ ...v, industry: e.target.value }))
-                  }
-                />
-                <input
-                  className="rounded-md border px-3 py-2 sm:col-span-2"
-                  placeholder="Roles (comma‑separated; opt.)"
-                  value={form.roles}
-                  onChange={(e) =>
-                    setForm((v) => ({ ...v, roles: e.target.value }))
-                  }
-                />
-              </div>
+              
               <div className="flex gap-2">
-                <button
+                <Link
+                  href="/dashboard"
                   className="btn btn-primary text-xs"
-                  onClick={submit}
-                  disabled={loading}
+                  onClick={() => setInsufficientContext(null)}
                 >
-                  {loading ? "Running…" : "Run"}
-                </button>
+                  Complete Profile
+                </Link>
                 <button
                   className="btn btn-outline text-xs"
-                  onClick={() => setOpen(false)}
+                  onClick={() => setInsufficientContext(null)}
                 >
                   Cancel
                 </button>
