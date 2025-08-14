@@ -327,7 +327,7 @@ export default function CoreProfileCard() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {p.resume_filename || getFileName(p.resume_key)}
+                  {p.resume_filename || getFileName(p.resume_key) || "CV"}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
                   {getFileExtension(p.resume_key)} • Available for applications
