@@ -124,7 +124,7 @@ Focus on factors that impact MBA admissions:
 - Technical and analytical skills
 - Communication and teamwork abilities
 
-Return only valid JSON.`;
+IMPORTANT: Return ONLY valid JSON. Do not include any markdown formatting, explanations, or text outside the JSON object. The response must be parseable by JSON.parse().`;
 
     const userPrompt = `Please analyze this resume for MBA application readiness:
 
@@ -147,8 +147,29 @@ Provide a comprehensive analysis in JSON format.`;
       throw new Error("No analysis generated");
     }
 
-    // Parse the JSON response
-    const analysis: ResumeAnalysis = JSON.parse(analysisText);
+    console.log("Raw AI response:", analysisText);
+
+    // Try to parse the JSON response
+    let analysis: ResumeAnalysis;
+    try {
+      analysis = JSON.parse(analysisText);
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      console.error("Raw response that failed to parse:", analysisText);
+      
+      // Try to extract JSON from the response if it's wrapped in markdown
+      const jsonMatch = analysisText.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        try {
+          analysis = JSON.parse(jsonMatch[1]);
+        } catch (secondParseError) {
+          console.error("Second JSON parse error:", secondParseError);
+          throw new Error("Failed to parse AI response as JSON");
+        }
+      } else {
+        throw new Error("Failed to parse AI response as JSON");
+      }
+    }
 
     return analysis;
   } catch (error) {
