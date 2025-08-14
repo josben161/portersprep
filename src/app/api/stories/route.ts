@@ -33,6 +33,8 @@ export async function POST(req: NextRequest) {
     
     if (!title) return new Response("Title required", { status: 400 });
     
+    console.log("Creating story for profile:", { profileId: profile.id, title });
+    
     const sb = getAdminSupabase();
     const { data, error } = await sb
       .from("anchor_stories")

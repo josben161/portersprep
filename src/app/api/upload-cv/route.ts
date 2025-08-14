@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
     // Generate S3 key
     const ext = fileName.split('.').pop() || 'pdf';
     const key = `resumes/${userId}/${crypto.randomUUID()}.${ext}`;
+    const originalFileName = file.name; // Store original filename
 
     // Determine content type
     const contentType = ext === 'pdf' ? 'application/pdf' : 
@@ -52,17 +53,23 @@ export async function POST(req: NextRequest) {
       Key: key,
       Body: buffer,
       ContentType: contentType,
+      Metadata: {
+        'original-filename': originalFileName // Store original filename in S3 metadata
+      }
     });
 
     await s3.send(command);
 
-    // Update profile with resume_key - simplified approach
+    // Update profile with resume_key and original filename
     const { getAdminSupabase } = await import("@/lib/supabaseAdmin");
     const sb = getAdminSupabase();
     
     // Try to update existing profile first
     const { error: updateError } = await sb.from("profiles")
-      .update({ resume_key: key })
+      .update({ 
+        resume_key: key,
+        resume_filename: originalFileName // Store original filename in database
+      })
       .eq("clerk_user_id", userId);
     
     if (updateError) {

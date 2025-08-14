@@ -175,9 +175,9 @@ export default function CoreProfileCard(){
     }
   }
 
-  // Get filename - use original filename if available, otherwise extract from S3 key
+  // Get filename - use stored filename from database, otherwise extract from S3 key
   function getFileName(key: string) {
-    if (originalFileName) return originalFileName;
+    if (p?.resume_filename) return p.resume_filename;
     const parts = key.split('/');
     return parts[parts.length - 1] || 'CV';
   }
