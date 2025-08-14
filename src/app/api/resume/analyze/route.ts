@@ -47,24 +47,11 @@ export async function POST(req: NextRequest) {
       // Extract text from PDF
       let resumeText: string;
       try {
-        const pdfjsLib = await import('pdfjs-dist');
+        const pdfParse = await import('pdf-parse');
         
-        // Load the PDF document
-        const loadingTask = pdfjsLib.getDocument({ data: buffer });
-        const pdf = await loadingTask.promise;
-        
-        // Extract text from all pages
-        const textChunks: string[] = [];
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          const pageText = textContent.items
-            .map((item: any) => item.str)
-            .join(' ');
-          textChunks.push(pageText);
-        }
-        
-        resumeText = textChunks.join('\n');
+        // Parse the PDF buffer
+        const data = await pdfParse.default(buffer);
+        resumeText = data.text;
         
         if (!resumeText || resumeText.trim().length === 0) {
           return NextResponse.json({ error: "Could not extract text from PDF" }, { status: 500 });
