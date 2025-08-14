@@ -32,10 +32,46 @@ export async function POST(req: NextRequest) {
       });
 
       const response = await s3.send(command);
-      const resumeText = await response.Body?.transformToString();
-
-      if (!resumeText) {
+      
+      if (!response.Body) {
         return NextResponse.json({ error: "Could not read resume content" }, { status: 500 });
+      }
+
+      // Get the file as a buffer
+      const chunks: Uint8Array[] = [];
+      for await (const chunk of response.Body as any) {
+        chunks.push(chunk);
+      }
+      const buffer = Buffer.concat(chunks);
+
+      // Extract text from PDF
+      let resumeText: string;
+      try {
+        const { pdfjsLib } = await import('pdfjs-dist');
+        
+        // Load the PDF document
+        const loadingTask = pdfjsLib.getDocument({ data: buffer });
+        const pdf = await loadingTask.promise;
+        
+        // Extract text from all pages
+        const textChunks: string[] = [];
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items
+            .map((item: any) => item.str)
+            .join(' ');
+          textChunks.push(pageText);
+        }
+        
+        resumeText = textChunks.join('\n');
+        
+        if (!resumeText || resumeText.trim().length === 0) {
+          return NextResponse.json({ error: "Could not extract text from PDF" }, { status: 500 });
+        }
+      } catch (pdfError) {
+        console.error("PDF extraction error:", pdfError);
+        return NextResponse.json({ error: "Could not extract text from PDF file" }, { status: 500 });
       }
 
       // Analyze the resume

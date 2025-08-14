@@ -152,23 +152,18 @@ Provide a comprehensive analysis in JSON format.`;
     // Try to parse the JSON response
     let analysis: ResumeAnalysis;
     try {
-      analysis = JSON.parse(analysisText);
+      // First try to extract JSON from markdown code blocks
+      const jsonMatch = analysisText.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        analysis = JSON.parse(jsonMatch[1]);
+      } else {
+        // If no markdown, try direct JSON parsing
+        analysis = JSON.parse(analysisText);
+      }
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
       console.error("Raw response that failed to parse:", analysisText);
-      
-      // Try to extract JSON from the response if it's wrapped in markdown
-      const jsonMatch = analysisText.match(/```json\s*([\s\S]*?)\s*```/);
-      if (jsonMatch) {
-        try {
-          analysis = JSON.parse(jsonMatch[1]);
-        } catch (secondParseError) {
-          console.error("Second JSON parse error:", secondParseError);
-          throw new Error("Failed to parse AI response as JSON");
-        }
-      } else {
-        throw new Error("Failed to parse AI response as JSON");
-      }
+      throw new Error("Failed to parse AI response as JSON");
     }
 
     return analysis;
