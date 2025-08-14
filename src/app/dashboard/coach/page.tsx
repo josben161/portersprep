@@ -70,7 +70,7 @@ export default function CoachPage() {
                 functionCall: conv.context?.functionCall,
               },
             ])
-            .reverse();
+            .sort((a: Message, b: Message) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
           setMessages(formattedMessages);
         }
       })
