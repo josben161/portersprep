@@ -17,7 +17,7 @@ export async function requireAuthedProfile() {
     return { clerkUserId: userId, profile: existing, email, name };
   }
   
-  // If no profile exists, try to create one with RLS bypass
+  // If no profile exists, create one with proper UUID
   try {
     const { data: profile, error } = await sb.from("profiles").insert({
       clerk_user_id: userId, 
@@ -28,25 +28,13 @@ export async function requireAuthedProfile() {
     
     if (error) {
       console.error("Profile creation error:", error);
-      // If RLS blocks creation, return a minimal profile object
-      return { 
-        clerkUserId: userId, 
-        profile: { id: userId, clerk_user_id: userId, email, name, subscription_tier: "free" }, 
-        email, 
-        name 
-      };
+      throw new Error(`Failed to create profile: ${error.message}`);
     }
     
     return { clerkUserId: userId, profile, email, name };
   } catch (err) {
     console.error("Profile creation exception:", err);
-    // Return minimal profile object as fallback
-    return { 
-      clerkUserId: userId, 
-      profile: { id: userId, clerk_user_id: userId, email, name, subscription_tier: "free" }, 
-      email, 
-      name 
-    };
+    throw new Response("Failed to create user profile", { status: 500 });
   }
 }
 
