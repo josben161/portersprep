@@ -41,7 +41,9 @@ export async function POST(request: NextRequest) {
     const messages = [{ role: "user" as const, content: message }];
 
     try {
+      console.log("Generating coach response...");
       const aiResponse = await generateCoachResponse(messages, userContext);
+      console.log("AI Response received:", aiResponse);
 
       // Check if response has function_call (OpenAI Choice type)
       if (
@@ -60,6 +62,7 @@ export async function POST(request: NextRequest) {
           aiResponse.content ||
           "I apologize, but I encountered an error processing your request.";
       } else {
+        console.error("Unexpected AI response format:", aiResponse);
         response =
           "I apologize, but I encountered an error processing your request.";
       }

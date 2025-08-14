@@ -150,7 +150,12 @@ export async function generateCoachResponse(
   userContext: any,
   functions?: any[],
 ) {
+  console.log("Checking OpenAI availability...");
+  console.log("OpenAI client:", openai ? "initialized" : "not initialized");
+  console.log("API key exists:", !!process.env.OPENAI_API_KEY);
+  
   if (!isOpenAIAvailable()) {
+    console.error("OpenAI not available - missing API key or client initialization");
     return {
       role: "assistant",
       content:
