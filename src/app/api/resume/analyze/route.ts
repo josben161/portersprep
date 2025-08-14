@@ -47,15 +47,18 @@ export async function POST(req: NextRequest) {
       // Extract text from PDF
       let resumeText: string;
       try {
-        const pdfParse = await import('pdf-parse');
+        // Import pdf-parse and use it directly
+        const pdfParse = (await import('pdf-parse')).default;
         
         // Parse the PDF buffer
-        const data = await pdfParse.default(buffer);
+        const data = await pdfParse(buffer);
         resumeText = data.text;
         
         if (!resumeText || resumeText.trim().length === 0) {
           return NextResponse.json({ error: "Could not extract text from PDF" }, { status: 500 });
         }
+        
+        console.log("Extracted text length:", resumeText.length);
       } catch (pdfError) {
         console.error("PDF extraction error:", pdfError);
         return NextResponse.json({ error: "Could not extract text from PDF file" }, { status: 500 });
