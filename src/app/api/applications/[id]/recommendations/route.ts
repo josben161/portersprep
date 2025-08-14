@@ -24,21 +24,9 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     const { data: assignments, error } = await sb
       .from("recommender_assignments")
       .select(`
-        id,
-        status,
-        request_date,
-        due_date,
-        notes,
-        school_requirements,
-        recommender_id,
-        recommenders!recommender_assignments_recommender_id_fkey (
-          id,
-          name,
-          title,
-          organization,
-          email,
-          relationship
-        )
+        *,
+        recommenders (*),
+        applications (*)
       `)
       .eq("application_id", params.id)
       .order("created_at");
@@ -115,21 +103,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         school_requirements: schoolRequirements
       })
       .select(`
-        id,
-        status,
-        request_date,
-        due_date,
-        notes,
-        school_requirements,
-        recommender_id,
-        recommenders!recommender_assignments_recommender_id_fkey (
-          id,
-          name,
-          title,
-          organization,
-          email,
-          relationship
-        )
+        *,
+        recommenders (*),
+        applications (*)
       `)
       .single();
       
