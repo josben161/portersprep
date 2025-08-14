@@ -7,12 +7,33 @@ export async function GET() {
     const { profile } = await requireAuthedProfile();
     const sb = getAdminSupabase();
 
-    // Query with basic fields first
-    const { data, error } = await sb
-      .from("profiles")
-      .select("id, name, email, subscription_tier")
-      .eq("id", profile.id)
-      .single();
+    // Try to get all fields in one query, with fallback for missing columns
+    let data: any = {};
+    let error: any = null;
+
+    try {
+      // Try with all fields first
+      const result = await sb
+        .from("profiles")
+        .select("id, name, email, subscription_tier, resume_key, resume_filename, resume_analysis, goals, industry, years_exp, gpa, gmat")
+        .eq("id", profile.id)
+        .single();
+      
+      data = result.data;
+      error = result.error;
+    } catch (queryError) {
+      console.log("Full query failed, trying basic fields:", queryError);
+      
+      // Fallback to basic fields only
+      const result = await sb
+        .from("profiles")
+        .select("id, name, email, subscription_tier")
+        .eq("id", profile.id)
+        .single();
+      
+      data = result.data;
+      error = result.error;
+    }
 
     if (error) {
       console.error("Profile fetch error:", error);
@@ -33,37 +54,20 @@ export async function GET() {
       });
     }
 
-    // Try to get additional fields if they exist
-    let additionalFields: any = {};
-    try {
-      const { data: extendedData } = await sb
-        .from("profiles")
-        .select("resume_key, resume_filename, resume_analysis, goals, industry, years_exp, gpa, gmat")
-        .eq("id", profile.id)
-        .single();
-
-      if (extendedData) {
-        additionalFields = extendedData;
-      }
-    } catch (extendedError) {
-      console.log("Extended fields not available yet:", extendedError);
-      // Continue with basic fields only
-    }
-
     // Return with defaults for missing fields
     return Response.json({
       id: data.id,
       name: data.name || "",
       email: data.email || "",
       subscription_tier: data.subscription_tier || "free",
-      resume_key: additionalFields.resume_key || null,
-      resume_filename: additionalFields.resume_filename || null,
-      resume_analysis: additionalFields.resume_analysis || null,
-      goals: additionalFields.goals || "",
-      industry: additionalFields.industry || "",
-      years_exp: additionalFields.years_exp || null,
-      gpa: additionalFields.gpa || null,
-      gmat: additionalFields.gmat || null,
+      resume_key: data.resume_key || null,
+      resume_filename: data.resume_filename || null,
+      resume_analysis: data.resume_analysis || null,
+      goals: data.goals || "",
+      industry: data.industry || "",
+      years_exp: data.years_exp || null,
+      gpa: data.gpa || null,
+      gmat: data.gmat || null,
     });
   } catch (error) {
     console.error("Profile API error:", error);
@@ -76,20 +80,7 @@ export async function PUT(req: NextRequest) {
     const { profile } = await requireAuthedProfile();
     const body = await req.json().catch(() => ({}));
 
-    // Only update fields that we know exist
-    const updates: any = {};
-    const safeFields = ["name", "resume_key"]; // Start with fields we know exist
-
-    // Try to include additional fields if they exist
-    const additionalFields = ["goals", "industry", "years_exp", "gpa", "gmat", "resume_filename"];
-
-    for (const k of [...safeFields, ...additionalFields]) {
-      if (k in body) {
-        updates[k] = body[k];
-      }
-    }
-
-    if (Object.keys(updates).length === 0) {
+    if (Object.keys(body).length === 0) {
       return Response.json({ ok: true });
     }
 
@@ -98,15 +89,19 @@ export async function PUT(req: NextRequest) {
     // Try to update with all fields first
     let { error } = await sb
       .from("profiles")
-      .update(updates)
+      .update(body)
       .eq("id", profile.id);
 
     // If that fails, try updating only safe fields
     if (error) {
       console.log("Full update failed, trying safe fields only:", error);
+      const safeFields = ["name", "resume_key", "resume_filename"];
       const safeUpdates: any = {};
+      
       for (const k of safeFields) {
-        if (k in body) safeUpdates[k] = body[k];
+        if (k in body) {
+          safeUpdates[k] = body[k];
+        }
       }
 
       if (Object.keys(safeUpdates).length > 0) {
@@ -117,7 +112,7 @@ export async function PUT(req: NextRequest) {
 
         if (safeError) {
           console.error("Safe update also failed:", safeError);
-          return new Response("Update failed", { status: 500 });
+          return new Response(safeError.message, { status: 400 });
         }
       }
     }
