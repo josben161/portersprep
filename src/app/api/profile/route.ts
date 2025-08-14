@@ -24,6 +24,7 @@ export async function GET() {
         subscription_tier: "free",
         resume_key: null,
         resume_filename: null,
+        resume_analysis: null,
         goals: "",
         industry: "",
         years_exp: null,
@@ -37,7 +38,7 @@ export async function GET() {
     try {
       const { data: extendedData } = await sb
         .from("profiles")
-        .select("resume_key, resume_filename, goals, industry, years_exp, gpa, gmat")
+        .select("resume_key, resume_filename, resume_analysis, goals, industry, years_exp, gpa, gmat")
         .eq("id", profile.id)
         .single();
 
@@ -57,6 +58,7 @@ export async function GET() {
       subscription_tier: data.subscription_tier || "free",
       resume_key: additionalFields.resume_key || null,
       resume_filename: additionalFields.resume_filename || null,
+      resume_analysis: additionalFields.resume_analysis || null,
       goals: additionalFields.goals || "",
       industry: additionalFields.industry || "",
       years_exp: additionalFields.years_exp || null,

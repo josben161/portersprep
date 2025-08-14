@@ -35,13 +35,34 @@ export async function POST(req: NextRequest) {
 
     const sb = getAdminSupabase();
 
-    // Use direct SQL to bypass RLS
-    const { data, error } = await sb.rpc("create_story", {
-      p_user_id: profile.id,
-      p_title: title,
-      p_summary: summary || null,
-      p_tags: tags || [],
-    });
+    // Try to use the function first, fallback to direct insert if function doesn't exist
+    let data, error;
+    
+    try {
+      const result = await sb.rpc("create_story", {
+        p_user_id: profile.id,
+        p_title: title,
+        p_summary: summary || null,
+        p_tags: tags || [],
+      });
+      data = result.data;
+      error = result.error;
+    } catch (functionError) {
+      console.log("Function not available, using direct insert:", functionError);
+      // Fallback to direct insert
+      const result = await sb
+        .from("anchor_stories")
+        .insert({
+          user_id: profile.id,
+          title,
+          summary: summary || null,
+          tags: tags || [],
+        })
+        .select("id, title, summary, tags")
+        .single();
+      data = result.data;
+      error = result.error;
+    }
 
     if (error) {
       console.error("Story create error:", error);

@@ -33,6 +33,7 @@ export default function CoreProfileCard() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -219,6 +220,40 @@ export default function CoreProfileCard() {
     } catch (error) {
       console.error("Error viewing CV:", error);
       setMessage({ type: "error", text: "Failed to open CV" });
+    }
+  }
+
+  // Function to analyze resume
+  async function analyzeResume() {
+    if (!p?.resume_key) {
+      setMessage({ type: "error", text: "No resume uploaded to analyze" });
+      return;
+    }
+
+    setAnalyzing(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch("/api/resume/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update local state with the analysis
+        setP((prev: any) => ({ ...prev, resume_analysis: data.analysis }));
+        setMessage({ type: "success", text: "Resume analysis completed!" });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        const errorData = await response.json();
+        setMessage({ type: "error", text: errorData.error || "Failed to analyze resume" });
+      }
+    } catch (error) {
+      console.error("Resume analysis error:", error);
+      setMessage({ type: "error", text: "Failed to analyze resume" });
+    } finally {
+      setAnalyzing(false);
     }
   }
 
@@ -422,13 +457,11 @@ export default function CoreProfileCard() {
               Resume Analysis
             </div>
             <button
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-              onClick={() => {
-                // Trigger resume analysis
-                // sendMessage("Analyze my resume and provide MBA-specific insights"); // This line was commented out in the original file
-              }}
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50"
+              onClick={analyzeResume}
+              disabled={analyzing}
             >
-              Analyze
+              {analyzing ? "Analyzing..." : "Analyze"}
             </button>
           </div>
 
