@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       // Extract text from PDF
       let resumeText: string;
       try {
-        const { pdfjsLib } = await import('pdfjs-dist');
+        const pdfjsLib = await import('pdfjs-dist');
         
         // Load the PDF document
         const loadingTask = pdfjsLib.getDocument({ data: buffer });
