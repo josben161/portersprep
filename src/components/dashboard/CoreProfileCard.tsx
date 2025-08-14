@@ -38,7 +38,7 @@ export default function CoreProfileCard() {
     text: string;
   } | null>(null);
   const [stories, setStories] = useState<Story[]>([]);
-  const [originalFileName, setOriginalFileName] = useState<string>("");
+
 
   useEffect(() => {
     (async () => {
@@ -101,7 +101,6 @@ export default function CoreProfileCard() {
   async function uploadCV(file: File) {
     setUploading(true);
     setMessage(null);
-    setOriginalFileName(file.name); // Store original filename
 
     try {
       console.log("Starting CV upload for file:", file.name);
@@ -125,8 +124,12 @@ export default function CoreProfileCard() {
       const result = await r.json();
       console.log("CV upload completed successfully:", result);
 
-      // Update local state with new resume_key
-      setP((prev: any) => ({ ...prev, resume_key: result.key }));
+      // Update local state with new resume_key and filename
+      setP((prev: any) => ({ 
+        ...prev, 
+        resume_key: result.key,
+        resume_filename: file.name // Store the original filename
+      }));
 
       setMessage({ type: "success", text: `CV uploaded successfully!` });
 
@@ -184,11 +187,10 @@ export default function CoreProfileCard() {
       await apiFetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...p, resume_key: null }),
+        body: JSON.stringify({ ...p, resume_key: null, resume_filename: null }),
       });
 
-      setP((prev: any) => ({ ...prev, resume_key: null }));
-      setOriginalFileName(""); // Clear original filename
+      setP((prev: any) => ({ ...prev, resume_key: null, resume_filename: null }));
       setMessage({ type: "success", text: "CV removed successfully" });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
@@ -202,6 +204,22 @@ export default function CoreProfileCard() {
     if (p?.resume_filename) return p.resume_filename;
     const parts = key.split("/");
     return parts[parts.length - 1] || "CV";
+  }
+
+  // Function to view CV in new window
+  async function viewCV() {
+    try {
+      const response = await fetch("/api/cv/view");
+      if (response.ok) {
+        const data = await response.json();
+        window.open(data.url, '_blank');
+      } else {
+        setMessage({ type: "error", text: "Failed to open CV" });
+      }
+    } catch (error) {
+      console.error("Error viewing CV:", error);
+      setMessage({ type: "error", text: "Failed to open CV" });
+    }
   }
 
   // Get file extension for icon
@@ -309,13 +327,20 @@ export default function CoreProfileCard() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {getFileName(p.resume_key)}
+                  {p.resume_filename || getFileName(p.resume_key)}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
                   {getFileExtension(p.resume_key)} • Available for applications
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-2 py-1 text-xs transition-colors"
+                  onClick={viewCV}
+                  title="View CV"
+                >
+                  View
+                </button>
                 <button
                   className="btn btn-outline text-xs"
                   onClick={removeCV}

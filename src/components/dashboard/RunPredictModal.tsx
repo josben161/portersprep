@@ -103,7 +103,7 @@ export default function RunPredictModal({ onDone }: { onDone?: () => void }) {
               <div className="flex gap-2">
                 <Link
                   href="/dashboard"
-                  className="btn btn-primary text-xs"
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-3 py-2 text-xs transition-colors"
                   onClick={() => setInsufficientContext(null)}
                 >
                   Complete Profile
