@@ -6,8 +6,8 @@ export default async function NewEssayPage() {
   const { profile } = await requireAuthedProfile();
 
   // Create a new document with default values
-  const id = await createDocument(profile.id, 'Untitled Essay');
+  const id = await createDocument(profile.id, "Untitled Essay");
 
   // Redirect to the new document
   redirect(`/dashboard/essays/${id}`);
-} 
+}

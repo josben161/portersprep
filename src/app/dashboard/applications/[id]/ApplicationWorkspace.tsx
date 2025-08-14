@@ -87,9 +87,9 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
 
     const essay = school.essays[essayIndex];
     const questionId = `essay_${essayIndex}`;
-    
-    setSaving(prev => ({ ...prev, [questionId]: true }));
-    
+
+    setSaving((prev) => ({ ...prev, [questionId]: true }));
+
     try {
       const response = await fetch(`/api/applications/${appId}/answers`, {
         method: "POST",
@@ -97,15 +97,15 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
         body: JSON.stringify({
           question_id: questionId,
           content,
-          word_limit: essay.word_limit
-        })
+          word_limit: essay.word_limit,
+        }),
       });
 
       if (response.ok) {
         const savedAnswer = await response.json();
-        setAnswers(prev => ({
+        setAnswers((prev) => ({
           ...prev,
-          [questionId]: savedAnswer
+          [questionId]: savedAnswer,
         }));
         toast.success("Saved");
       } else {
@@ -115,7 +115,7 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
       console.error("Failed to save answer:", error);
       toast.error("Failed to save");
     } finally {
-      setSaving(prev => ({ ...prev, [questionId]: false }));
+      setSaving((prev) => ({ ...prev, [questionId]: false }));
     }
   }
 
@@ -125,14 +125,14 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
     const essay = school.essays[essayIndex];
     const questionId = `essay_${essayIndex}`;
     const answer = answers[questionId];
-    
+
     if (!answer?.content) {
       toast.error("No content to analyze");
       return;
     }
 
-    setAnalyzing(prev => ({ ...prev, [questionId]: true }));
-    
+    setAnalyzing((prev) => ({ ...prev, [questionId]: true }));
+
     try {
       const response = await fetch(`/api/analysis/essay`, {
         method: "POST",
@@ -142,15 +142,15 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
           school_name: school.name,
           essay_title: essay.title,
           essay_prompt: essay.prompt,
-          word_limit: essay.word_limit
-        })
+          word_limit: essay.word_limit,
+        }),
       });
 
       if (response.ok) {
         const analysis = await response.json();
-        setAnswers(prev => ({
+        setAnswers((prev) => ({
           ...prev,
-          [questionId]: { ...prev[questionId], analysis }
+          [questionId]: { ...prev[questionId], analysis },
         }));
         toast.success("Analysis complete");
       } else {
@@ -160,12 +160,15 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
       console.error("Failed to analyze answer:", error);
       toast.error("Failed to analyze");
     } finally {
-      setAnalyzing(prev => ({ ...prev, [questionId]: false }));
+      setAnalyzing((prev) => ({ ...prev, [questionId]: false }));
     }
   }
 
   function countWords(text: string): number {
-    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    return text
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length;
   }
 
   if (loading) {
@@ -174,7 +177,7 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
           <div className="space-y-4">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-32 bg-gray-200 rounded"></div>
             ))}
           </div>
@@ -221,21 +224,30 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
             <div key={index} className="border rounded-lg p-6">
               <div className="mb-4">
                 <h3 className="text-lg font-medium mb-2">{essay.title}</h3>
-                <p className="text-sm text-muted-foreground mb-3">{essay.prompt}</p>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {essay.prompt}
+                </p>
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-muted-foreground">
-                    {essay.word_limit ? `${wordCount}/${essay.word_limit} words` : `${wordCount} words`}
+                    {essay.word_limit
+                      ? `${wordCount}/${essay.word_limit} words`
+                      : `${wordCount} words`}
                   </span>
                   {essay.word_limit && (
-                    <div className={`px-2 py-1 rounded text-xs ${
-                      wordCount > essay.word_limit 
-                        ? 'bg-red-100 text-red-800' 
-                        : wordCount >= essay.word_limit * 0.8 
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {wordCount > essay.word_limit ? 'Over limit' : 
-                       wordCount >= essay.word_limit * 0.8 ? 'Good length' : 'Too short'}
+                    <div
+                      className={`px-2 py-1 rounded text-xs ${
+                        wordCount > essay.word_limit
+                          ? "bg-red-100 text-red-800"
+                          : wordCount >= essay.word_limit * 0.8
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {wordCount > essay.word_limit
+                        ? "Over limit"
+                        : wordCount >= essay.word_limit * 0.8
+                          ? "Good length"
+                          : "Too short"}
                     </div>
                   )}
                 </div>
@@ -247,13 +259,13 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
                   value={content}
                   onChange={(e) => {
                     const newContent = e.target.value;
-                    setAnswers(prev => ({
+                    setAnswers((prev) => ({
                       ...prev,
-                      [questionId]: { 
-                        ...prev[questionId], 
+                      [questionId]: {
+                        ...prev[questionId],
                         content: newContent,
-                        word_count: countWords(newContent)
-                      }
+                        word_count: countWords(newContent),
+                      },
                     }));
                   }}
                   onBlur={() => saveAnswer(index, content)}
@@ -271,7 +283,7 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
                 >
                   {isSaving ? "Saving..." : "Save"}
                 </button>
-                
+
                 <button
                   onClick={() => analyzeAnswer(index)}
                   disabled={isAnalyzing || !content.trim()}
@@ -310,7 +322,10 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
           {school.lor && (
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span>Letters of Recommendation: {school.lor.count} required ({school.lor.format})</span>
+              <span>
+                Letters of Recommendation: {school.lor.count} required (
+                {school.lor.format})
+              </span>
             </div>
           )}
           {school.video_assessment && (
@@ -323,4 +338,4 @@ export default function ApplicationWorkspace({ appId }: { appId: string }) {
       </div>
     </div>
   );
-} 
+}

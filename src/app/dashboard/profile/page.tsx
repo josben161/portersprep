@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { toast } from "react-hot-toast";
 import { User, Mail, Calendar, CreditCard, Settings, Save } from "lucide-react";
 
@@ -25,7 +31,7 @@ export default function ProfilePage() {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    email: ""
+    email: "",
   });
 
   useEffect(() => {
@@ -36,13 +42,13 @@ export default function ProfilePage() {
 
   const loadProfile = async () => {
     try {
-      const response = await fetch('/api/profile');
+      const response = await fetch("/api/profile");
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
         setFormData({
           name: data.name || "",
-          email: data.email || ""
+          email: data.email || "",
         });
       } else {
         toast.error("Failed to load profile");
@@ -57,10 +63,10 @@ export default function ProfilePage() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch('/api/profile', {
-        method: 'PATCH',
+      const response = await fetch("/api/profile", {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -83,10 +89,10 @@ export default function ProfilePage() {
   const handleManageBilling = async () => {
     setIsLoadingBilling(true);
     try {
-      const response = await fetch('/api/billing/portal', {
-        method: 'POST',
+      const response = await fetch("/api/billing/portal", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
@@ -94,10 +100,10 @@ export default function ProfilePage() {
         const data = await response.json();
         window.location.href = data.url;
       } else {
-        toast.error('Failed to access billing portal');
+        toast.error("Failed to access billing portal");
       }
     } catch (error) {
-      toast.error('An error occurred');
+      toast.error("An error occurred");
     } finally {
       setIsLoadingBilling(false);
     }
@@ -122,7 +128,9 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-4xl p-6">
         <div className="text-center">
           <h1 className="text-2xl font-semibold mb-4">Profile Not Found</h1>
-          <p className="text-muted-foreground">Unable to load your profile information.</p>
+          <p className="text-muted-foreground">
+            Unable to load your profile information.
+          </p>
         </div>
       </div>
     );
@@ -163,17 +171,23 @@ export default function ProfilePage() {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     className="w-full px-3 py-2 border rounded-md"
                     placeholder="Your name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Email
+                  </label>
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     className="w-full px-3 py-2 border rounded-md"
                     placeholder="your@email.com"
                   />
@@ -192,7 +206,7 @@ export default function ProfilePage() {
                       setEditMode(false);
                       setFormData({
                         name: profile.name || "",
-                        email: profile.email || ""
+                        email: profile.email || "",
                       });
                     }}
                     className="px-4 py-2 border rounded-md hover:bg-muted"
@@ -206,15 +220,21 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-3">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <div className="font-medium">{profile.name || "Not set"}</div>
-                    <div className="text-sm text-muted-foreground">Full name</div>
+                    <div className="font-medium">
+                      {profile.name || "Not set"}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Full name
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <div className="font-medium">{profile.email}</div>
-                    <div className="text-sm text-muted-foreground">Email address</div>
+                    <div className="text-sm text-muted-foreground">
+                      Email address
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -223,7 +243,9 @@ export default function ProfilePage() {
                     <div className="font-medium">
                       {new Date(profile.created_at).toLocaleDateString()}
                     </div>
-                    <div className="text-sm text-muted-foreground">Member since</div>
+                    <div className="text-sm text-muted-foreground">
+                      Member since
+                    </div>
                   </div>
                 </div>
               </>
@@ -248,11 +270,13 @@ export default function ProfilePage() {
               <div>
                 <div className="font-medium">Active Account</div>
                 <div className="text-sm text-muted-foreground">
-                  {profile.stripe_customer_id ? "Connected to Stripe" : "No billing account"}
+                  {profile.stripe_customer_id
+                    ? "Connected to Stripe"
+                    : "No billing account"}
                 </div>
               </div>
             </div>
-            
+
             {profile.stripe_customer_id ? (
               <button
                 onClick={handleManageBilling}
@@ -283,9 +307,7 @@ export default function ProfilePage() {
       <Card className="mt-6">
         <CardHeader>
           <CardTitle>Account Statistics</CardTitle>
-          <CardDescription>
-            Your usage and activity summary
-          </CardDescription>
+          <CardDescription>Your usage and activity summary</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
@@ -299,11 +321,13 @@ export default function ProfilePage() {
             </div>
             <div className="text-center p-4 border rounded-lg">
               <div className="text-2xl font-bold text-primary">0</div>
-              <div className="text-sm text-muted-foreground">Coach Messages</div>
+              <div className="text-sm text-muted-foreground">
+                Coach Messages
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
   );
-} 
+}

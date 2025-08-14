@@ -8,7 +8,7 @@ const s3 = new S3Client({ region: process.env.AWS_REGION });
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await requireAuth();
-    
+
     // Check required environment variables
     if (!process.env.AWS_REGION) {
       return new Response("AWS_REGION not configured", { status: 500 });
@@ -18,31 +18,40 @@ export async function POST(req: NextRequest) {
     }
 
     const formData = await req.formData();
-    const file = formData.get('file') as File;
-    
+    const file = formData.get("file") as File;
+
     if (!file) {
       return new Response("No file provided", { status: 400 });
     }
 
     // Validate file type
     const fileName = file.name.toLowerCase();
-    const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt'];
-    const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
-    
+    const allowedExtensions = [".pdf", ".doc", ".docx", ".txt"];
+    const hasValidExtension = allowedExtensions.some((ext) =>
+      fileName.endsWith(ext),
+    );
+
     if (!hasValidExtension) {
-      return new Response(`File type not allowed. Please use: ${allowedExtensions.join(', ')}`, { status: 400 });
+      return new Response(
+        `File type not allowed. Please use: ${allowedExtensions.join(", ")}`,
+        { status: 400 },
+      );
     }
 
     // Generate S3 key
-    const ext = fileName.split('.').pop() || 'pdf';
+    const ext = fileName.split(".").pop() || "pdf";
     const key = `resumes/${userId}/${crypto.randomUUID()}.${ext}`;
     const originalFileName = file.name; // Store original filename
 
     // Determine content type
-    const contentType = ext === 'pdf' ? 'application/pdf' : 
-                       ext === 'doc' ? 'application/msword' :
-                       ext === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
-                       'text/plain';
+    const contentType =
+      ext === "pdf"
+        ? "application/pdf"
+        : ext === "doc"
+          ? "application/msword"
+          : ext === "docx"
+            ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            : "text/plain";
 
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -54,8 +63,8 @@ export async function POST(req: NextRequest) {
       Body: buffer,
       ContentType: contentType,
       Metadata: {
-        'original-filename': originalFileName // Store original filename in S3 metadata
-      }
+        "original-filename": originalFileName, // Store original filename in S3 metadata
+      },
     });
 
     await s3.send(command);
@@ -63,42 +72,44 @@ export async function POST(req: NextRequest) {
     // Update profile with resume_key and original filename
     const { getAdminSupabase } = await import("@/lib/supabaseAdmin");
     const sb = getAdminSupabase();
-    
+
     // Try to update existing profile first
-    const { error: updateError } = await sb.from("profiles")
-      .update({ 
+    const { error: updateError } = await sb
+      .from("profiles")
+      .update({
         resume_key: key,
-        resume_filename: originalFileName // Store original filename in database
+        resume_filename: originalFileName, // Store original filename in database
       })
       .eq("clerk_user_id", userId);
-    
+
     if (updateError) {
       console.error("Profile update error:", updateError);
       // Try to create profile if update fails
-      const { error: insertError } = await sb.from("profiles")
-        .insert({ 
-          clerk_user_id: userId,
-          resume_key: key,
-          resume_filename: originalFileName,
-          email: "user@example.com", // Provide default email to satisfy constraint
-          name: "User",
-          subscription_tier: "free"
-        });
-      
+      const { error: insertError } = await sb.from("profiles").insert({
+        clerk_user_id: userId,
+        resume_key: key,
+        resume_filename: originalFileName,
+        email: "user@example.com", // Provide default email to satisfy constraint
+        name: "User",
+        subscription_tier: "free",
+      });
+
       if (insertError) {
         console.error("Profile insert error:", insertError);
         // Continue anyway since S3 upload succeeded
       }
     }
 
-    return Response.json({ 
-      success: true, 
+    return Response.json({
+      success: true,
       key,
-      message: "CV uploaded successfully!" 
+      message: "CV uploaded successfully!",
     });
-
   } catch (error) {
     console.error("CV upload error:", error);
-    return new Response(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
+    return new Response(
+      `Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      { status: 500 },
+    );
   }
-} 
+}

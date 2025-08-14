@@ -5,8 +5,17 @@ export const metadata = { title: "Assessments — The Admit Architect" };
 
 export default async function Assessments() {
   const profile = await requireProfile();
-  if (!profile) return <div className="p-8">Please <a className="underline" href="/sign-in">sign in</a>.</div>;
-  
+  if (!profile)
+    return (
+      <div className="p-8">
+        Please{" "}
+        <a className="underline" href="/sign-in">
+          sign in
+        </a>
+        .
+      </div>
+    );
+
   let items: any[] = [];
   try {
     items = await listAssessments(profile.id);
@@ -19,7 +28,12 @@ export default async function Assessments() {
     <div className="mx-auto max-w-6xl p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Assessments</h1>
-        <a href="/dashboard/assessments/new" className="rounded-md bg-primary px-4 py-2 text-primary-foreground">New assessment</a>
+        <a
+          href="/dashboard/assessments/new"
+          className="rounded-md bg-primary px-4 py-2 text-primary-foreground"
+        >
+          New assessment
+        </a>
       </div>
       {items.length === 0 ? (
         <div className="mt-8 rounded-lg border p-6 text-sm text-muted-foreground">
@@ -38,12 +52,19 @@ export default async function Assessments() {
             <tbody>
               {items.map((a) => (
                 <tr key={a.id} className="border-t">
-                  <td className="px-4 py-2">{new Date(a.created_at).toLocaleString()}</td>
+                  <td className="px-4 py-2">
+                    {new Date(a.created_at).toLocaleString()}
+                  </td>
                   <td className="px-4 py-2 text-muted-foreground">
                     {a.result?.bands ? "Admit bands ready" : "Draft"}
                   </td>
                   <td className="px-4 py-2">
-                    <a className="underline" href={`/dashboard/assessments/${a.id}`}>Open</a>
+                    <a
+                      className="underline"
+                      href={`/dashboard/assessments/${a.id}`}
+                    >
+                      Open
+                    </a>
                   </td>
                 </tr>
               ))}
@@ -53,4 +74,4 @@ export default async function Assessments() {
       )}
     </div>
   );
-} 
+}

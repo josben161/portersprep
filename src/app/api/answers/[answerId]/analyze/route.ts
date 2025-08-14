@@ -3,13 +3,25 @@ import { getAdminSupabase } from "@/lib/supabaseAdmin";
 import { getQuotaSnapshot, assertWithinLimit, logAiUse } from "@/lib/quota";
 import { chatJson } from "@/lib/ai";
 
-export async function POST(_: Request, { params }:{ params:{ answerId:string }}) {
+export async function POST(
+  _: Request,
+  { params }: { params: { answerId: string } },
+) {
   const { profile, clerkUserId } = await requireAuthedProfile();
   const snap = await getQuotaSnapshot(clerkUserId);
-  try { assertWithinLimit("ai_calls", snap); } catch (e) { if(e instanceof Response) return e; throw e; }
+  try {
+    assertWithinLimit("ai_calls", snap);
+  } catch (e) {
+    if (e instanceof Response) return e;
+    throw e;
+  }
 
   const sb = getAdminSupabase();
-  const { data: ans } = await sb.from("application_answers").select("id, content_key, applications(schools(name))").eq("id", params.answerId).single();
+  const { data: ans } = await sb
+    .from("application_answers")
+    .select("id, content_key, applications(schools(name))")
+    .eq("id", params.answerId)
+    .single();
   // Load content text from S3 by content_key if you store bodies there (left as existing function call)
   const text = ""; // TODO: load content
 
@@ -19,4 +31,4 @@ export async function POST(_: Request, { params }:{ params:{ answerId:string }})
 
   await logAiUse(profile.id, "ai_analyze");
   return Response.json(result);
-} 
+}

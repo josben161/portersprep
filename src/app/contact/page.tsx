@@ -1,4 +1,4 @@
-export default function Contact(){ 
+export default function Contact() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="text-3xl font-semibold">Contact</h1>
@@ -6,5 +6,5 @@ export default function Contact(){
         Questions? Reach us at hello@The Admit Architect.com
       </p>
     </div>
-  ); 
-} 
+  );
+}

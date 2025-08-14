@@ -2,7 +2,7 @@
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export default function MarketingHeader(){
+export default function MarketingHeader() {
   return (
     <header className="sticky top-0 z-30 border-b bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
@@ -11,12 +11,24 @@ export default function MarketingHeader(){
           <span className="text-sm font-semibold">The Admit Architect</span>
         </Link>
         <nav className="flex items-center gap-4 text-sm">
-          <Link href="/pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link>
-          <Link href="/sign-in" className="text-muted-foreground hover:text-foreground">Sign in</Link>
-          <Link href="/sign-up" className="btn btn-primary">Get started</Link>
+          <Link
+            href="/pricing"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Pricing
+          </Link>
+          <Link
+            href="/sign-in"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Sign in
+          </Link>
+          <Link href="/sign-up" className="btn btn-primary">
+            Get started
+          </Link>
           <ThemeToggle />
         </nav>
       </div>
     </header>
   );
-} 
+}

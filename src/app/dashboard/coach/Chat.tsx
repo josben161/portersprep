@@ -6,7 +6,7 @@ import { Send, Loader2 } from "lucide-react";
 interface Message {
   id: string;
   text: string;
-  from: 'user' | 'coach';
+  from: "user" | "coach";
   created_at: string;
 }
 
@@ -33,13 +33,13 @@ export default function Chat({ profileId }: ChatProps) {
   // Fetch messages
   const fetchMessages = async () => {
     try {
-      const response = await fetch('/api/coach/messages');
+      const response = await fetch("/api/coach/messages");
       if (response.ok) {
         const data = await response.json();
         setMessages(data.messages || []);
       }
     } catch (error) {
-      console.error('Error fetching messages:', error);
+      console.error("Error fetching messages:", error);
     } finally {
       setIsInitialLoading(false);
     }
@@ -62,10 +62,10 @@ export default function Chat({ profileId }: ChatProps) {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/coach/messages', {
-        method: 'POST',
+      const response = await fetch("/api/coach/messages", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ text: newMessage.trim() }),
       });
@@ -75,12 +75,12 @@ export default function Chat({ profileId }: ChatProps) {
         // Fetch updated messages
         await fetchMessages();
       } else {
-        console.error('Failed to send message');
-        alert('Failed to send message. Please try again.');
+        console.error("Failed to send message");
+        alert("Failed to send message. Please try again.");
       }
     } catch (error) {
-      console.error('Error sending message:', error);
-      alert('An error occurred. Please try again.');
+      console.error("Error sending message:", error);
+      alert("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +88,7 @@ export default function Chat({ profileId }: ChatProps) {
 
   // Handle Enter key
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
@@ -96,7 +96,7 @@ export default function Chat({ profileId }: ChatProps) {
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   if (isInitialLoading) {
@@ -117,8 +117,18 @@ export default function Chat({ profileId }: ChatProps) {
         {messages.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-muted-foreground mb-4">
-              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              <svg
+                className="mx-auto h-12 w-12"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
               </svg>
             </div>
             <h3 className="text-lg font-medium mb-2">Start a conversation</h3>
@@ -131,19 +141,21 @@ export default function Chat({ profileId }: ChatProps) {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.from === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${message.from === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
                   className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    message.from === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-foreground'
+                    message.from === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-foreground"
                   }`}
                 >
                   <div className="text-sm">{message.text}</div>
                   <div
                     className={`text-xs mt-1 ${
-                      message.from === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                      message.from === "user"
+                        ? "text-primary-foreground/70"
+                        : "text-muted-foreground"
                     }`}
                   >
                     {formatTime(message.created_at)}
@@ -167,7 +179,7 @@ export default function Chat({ profileId }: ChatProps) {
             className="flex-1 resize-none border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             rows={1}
             disabled={isLoading}
-            style={{ minHeight: '44px', maxHeight: '120px' }}
+            style={{ minHeight: "44px", maxHeight: "120px" }}
           />
           <button
             onClick={sendMessage}
@@ -187,4 +199,4 @@ export default function Chat({ profileId }: ChatProps) {
       </div>
     </div>
   );
-} 
+}

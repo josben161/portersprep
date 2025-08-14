@@ -1,25 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "dom",
-      "es2022"
-    ],
+    "lib": ["dom", "es2022"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "preserve",
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
-    "types": [
-      "@types/node",
-      "@types/react",
-      "@types/react-dom"
-    ],
+    "types": ["@types/node", "@types/react", "@types/react-dom"],
     "allowJs": true,
     "skipLibCheck": true,
     "noEmit": true,
@@ -39,7 +30,5 @@
     "next.config.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

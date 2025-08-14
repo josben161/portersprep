@@ -6,16 +6,20 @@ import { getAdminSupabase } from "@/lib/supabaseAdmin";
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const { userId } = auth();
   if (!userId) return new Response("Unauthorized", { status: 401 });
-  
+
   const u = await currentUser();
-  const profile = await getOrCreateProfileByClerkId(userId, u?.emailAddresses?.[0]?.emailAddress, u?.firstName ?? undefined);
-  
+  const profile = await getOrCreateProfileByClerkId(
+    userId,
+    u?.emailAddresses?.[0]?.emailAddress,
+    u?.firstName ?? undefined,
+  );
+
   try {
     const app = await getApplication(params.id);
     if (app.user_id !== profile.id) {
       return new Response("Forbidden", { status: 403 });
     }
-    
+
     // Get all answers for this application
     const sb = getAdminSupabase();
     const { data: answers } = await sb
@@ -23,34 +27,41 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
       .select("id, question_id, word_count, rubric, created_at, updated_at")
       .eq("application_id", params.id)
       .order("created_at", { ascending: true });
-    
+
     return Response.json(answers || []);
   } catch (error) {
     return new Response("Not found", { status: 404 });
   }
 }
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   const { userId } = auth();
   if (!userId) return new Response("Unauthorized", { status: 401 });
-  
+
   const u = await currentUser();
-  const profile = await getOrCreateProfileByClerkId(userId, u?.emailAddresses?.[0]?.emailAddress, u?.firstName ?? undefined);
-  
+  const profile = await getOrCreateProfileByClerkId(
+    userId,
+    u?.emailAddresses?.[0]?.emailAddress,
+    u?.firstName ?? undefined,
+  );
+
   try {
     const app = await getApplication(params.id);
     if (app.user_id !== profile.id) {
       return new Response("Forbidden", { status: 403 });
     }
-    
+
     const { question_id, content, word_limit } = await req.json();
-    
+
     if (!question_id || !content) {
       return new Response("Missing question_id or content", { status: 400 });
     }
-    
+
     const sb = getAdminSupabase();
-    
+
     // Check if answer already exists
     const { data: existing } = await sb
       .from("application_answers")
@@ -58,7 +69,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       .eq("application_id", params.id)
       .eq("question_id", question_id)
       .maybeSingle();
-    
+
     let answer;
     if (existing) {
       // Update existing answer
@@ -66,13 +77,16 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         .from("application_answers")
         .update({
           content,
-          word_count: content.trim().split(/\s+/).filter((word: string) => word.length > 0).length,
-          updated_at: new Date().toISOString()
+          word_count: content
+            .trim()
+            .split(/\s+/)
+            .filter((word: string) => word.length > 0).length,
+          updated_at: new Date().toISOString(),
         })
         .eq("id", existing.id)
         .select("id, question_id, content, word_count")
         .single();
-      
+
       if (error) throw error;
       answer = data;
     } else {
@@ -83,18 +97,21 @@ export async function POST(req: Request, { params }: { params: { id: string } })
           application_id: params.id,
           question_id,
           content,
-          word_count: content.trim().split(/\s+/).filter((word: string) => word.length > 0).length
+          word_count: content
+            .trim()
+            .split(/\s+/)
+            .filter((word: string) => word.length > 0).length,
         })
         .select("id, question_id, content, word_count")
         .single();
-      
+
       if (error) throw error;
       answer = data;
     }
-    
+
     return Response.json(answer);
   } catch (error) {
     console.error("Answer save error:", error);
     return new Response("Failed to save answer", { status: 500 });
   }
-} 
+}

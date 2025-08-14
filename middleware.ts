@@ -5,7 +5,7 @@ import { checkAndIncrement } from "@/lib/usage";
 
 const FEATURE_MAP: Record<string, "assessment_runs" | "redline_runs"> = {
   "/api/assessment/run": "assessment_runs",
-  "/api/redline": "redline_runs"
+  "/api/redline": "redline_runs",
 };
 
 export async function middleware(req: NextRequest) {
@@ -18,16 +18,13 @@ export async function middleware(req: NextRequest) {
   const tier = await getTier(userId);
   const ok = await checkAndIncrement(userId, feature, tier);
   if (!ok) {
-    return new Response(
-      JSON.stringify({ error: "quota_exceeded" }), 
-      { 
-        status: 402,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    return new Response(JSON.stringify({ error: "quota_exceeded" }), {
+      status: 402,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 }
 
-export const config = { matcher: ["/api/:path*"] }; 
+export const config = { matcher: ["/api/:path*"] };

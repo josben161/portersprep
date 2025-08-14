@@ -1,7 +1,8 @@
 export function defaultOpenGraph() {
   return {
     title: "The Admit Architect — MBA Admissions Copilot",
-    description: "Assess your odds, get coaching-style essay feedback, and book time with an expert coach.",
+    description:
+      "Assess your odds, get coaching-style essay feedback, and book time with an expert coach.",
     url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
     siteName: "The Admit Architect",
     type: "website",
@@ -23,4 +24,4 @@ export function jsonLdOrganization() {
       url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
     },
   };
-} 
+}

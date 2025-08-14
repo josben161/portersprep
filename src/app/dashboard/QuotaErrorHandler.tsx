@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export function useQuotaErrorHandler() {
   const [quotaError, setQuotaError] = useState<string | null>(null);
@@ -10,14 +10,14 @@ export function useQuotaErrorHandler() {
       const response = await apiCall();
       if (response.status === 402) {
         const data = await response.json();
-        if (data.error === 'quota_exceeded') {
-          setQuotaError('You\'ve hit your monthly limit. Upgrade on Pricing.');
+        if (data.error === "quota_exceeded") {
+          setQuotaError("You've hit your monthly limit. Upgrade on Pricing.");
           return { success: false, quotaExceeded: true };
         }
       }
       return { success: response.ok, quotaExceeded: false };
     } catch (error) {
-      console.error('API call failed:', error);
+      console.error("API call failed:", error);
       return { success: false, quotaExceeded: false };
     }
   };
@@ -27,7 +27,13 @@ export function useQuotaErrorHandler() {
   return { quotaError, handleApiCall, clearQuotaError };
 }
 
-export function QuotaErrorBanner({ error, onDismiss }: { error: string | null; onDismiss: () => void }) {
+export function QuotaErrorBanner({
+  error,
+  onDismiss,
+}: {
+  error: string | null;
+  onDismiss: () => void;
+}) {
   if (!error) return null;
 
   return (
@@ -60,4 +66,4 @@ export function QuotaErrorBanner({ error, onDismiss }: { error: string | null; o
       </div>
     </div>
   );
-} 
+}

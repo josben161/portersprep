@@ -1,6 +1,14 @@
 "use client";
 
-import { CheckCircle, Circle, AlertCircle, Clock, Target, FileText, MessageSquare } from "lucide-react";
+import {
+  CheckCircle,
+  Circle,
+  AlertCircle,
+  Clock,
+  Target,
+  FileText,
+  MessageSquare,
+} from "lucide-react";
 
 interface Question {
   id: string;
@@ -29,16 +37,24 @@ interface ApplicationProgressProps {
   };
 }
 
-export default function ApplicationProgress({ questions, answers, application }: ApplicationProgressProps) {
+export default function ApplicationProgress({
+  questions,
+  answers,
+  application,
+}: ApplicationProgressProps) {
   // Calculate progress metrics
   const totalQuestions = questions.length;
-  const completedAnswers = answers.filter(a => a.word_count > 0).length;
-  const progressPercentage = totalQuestions > 0 ? (completedAnswers / totalQuestions) * 100 : 0;
-  
+  const completedAnswers = answers.filter((a) => a.word_count > 0).length;
+  const progressPercentage =
+    totalQuestions > 0 ? (completedAnswers / totalQuestions) * 100 : 0;
+
   // Calculate word count metrics
   const totalWords = answers.reduce((sum, a) => sum + a.word_count, 0);
-  const totalWordLimit = questions.reduce((sum, q) => sum + (q.word_limit || 0), 0);
-  
+  const totalWordLimit = questions.reduce(
+    (sum, q) => sum + (q.word_limit || 0),
+    0,
+  );
+
   // Determine overall status
   const getStatusColor = () => {
     if (progressPercentage >= 100) return "text-green-600";
@@ -48,9 +64,12 @@ export default function ApplicationProgress({ questions, answers, application }:
   };
 
   const getStatusIcon = () => {
-    if (progressPercentage >= 100) return <CheckCircle className="h-5 w-5 text-green-600" />;
-    if (progressPercentage >= 75) return <Target className="h-5 w-5 text-blue-600" />;
-    if (progressPercentage >= 50) return <Clock className="h-5 w-5 text-amber-600" />;
+    if (progressPercentage >= 100)
+      return <CheckCircle className="h-5 w-5 text-green-600" />;
+    if (progressPercentage >= 75)
+      return <Target className="h-5 w-5 text-blue-600" />;
+    if (progressPercentage >= 50)
+      return <Clock className="h-5 w-5 text-amber-600" />;
     return <AlertCircle className="h-5 w-5 text-red-600" />;
   };
 
@@ -83,19 +102,23 @@ export default function ApplicationProgress({ questions, answers, application }:
             {completedAnswers} of {totalQuestions} essays
           </div>
         </div>
-        
+
         {/* Progress Bar */}
         <div className="w-full bg-muted rounded-full h-3 mb-3">
-          <div 
+          <div
             className={`h-3 rounded-full transition-all ${
-              progressPercentage >= 100 ? 'bg-green-500' :
-              progressPercentage >= 75 ? 'bg-blue-500' :
-              progressPercentage >= 50 ? 'bg-amber-500' : 'bg-red-500'
+              progressPercentage >= 100
+                ? "bg-green-500"
+                : progressPercentage >= 75
+                  ? "bg-blue-500"
+                  : progressPercentage >= 50
+                    ? "bg-amber-500"
+                    : "bg-red-500"
             }`}
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
-        
+
         <div className="text-2xl font-bold text-center">
           {Math.round(progressPercentage)}%
         </div>
@@ -139,12 +162,15 @@ export default function ApplicationProgress({ questions, answers, application }:
         </div>
         <div className="p-4 space-y-3">
           {questions.map((question, index) => {
-            const answer = answers.find(a => a.question_id === question.id);
+            const answer = answers.find((a) => a.question_id === question.id);
             const isCompleted = answer && answer.word_count > 0;
             const hasAnalysis = answer && answer.rubric;
-            
+
             return (
-              <div key={question.id} className="flex items-center justify-between p-3 rounded-lg border">
+              <div
+                key={question.id}
+                className="flex items-center justify-between p-3 rounded-lg border"
+              >
                 <div className="flex items-center gap-3">
                   {isCompleted ? (
                     <CheckCircle className="h-5 w-5 text-green-600" />
@@ -156,11 +182,13 @@ export default function ApplicationProgress({ questions, answers, application }:
                       {question.metadata?.title || `Essay ${index + 1}`}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {question.word_limit ? `${question.word_limit} words` : "No limit"}
+                      {question.word_limit
+                        ? `${question.word_limit} words`
+                        : "No limit"}
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   {isCompleted && (
                     <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
@@ -184,10 +212,13 @@ export default function ApplicationProgress({ questions, answers, application }:
         <div className="rounded-lg border bg-green-50 p-4">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle className="h-5 w-5 text-green-600" />
-            <div className="font-medium text-green-900">Ready for Submission</div>
+            <div className="font-medium text-green-900">
+              Ready for Submission
+            </div>
           </div>
           <div className="text-sm text-green-800">
-            All essays are complete! Review your work one final time before submitting to {application.schools.name}.
+            All essays are complete! Review your work one final time before
+            submitting to {application.schools.name}.
           </div>
         </div>
       )}
@@ -200,7 +231,10 @@ export default function ApplicationProgress({ questions, answers, application }:
             <div className="font-medium text-blue-900">Next Steps</div>
           </div>
           <div className="text-sm text-blue-800 space-y-1">
-            <div>• {totalQuestions - completedAnswers} essay{totalQuestions - completedAnswers !== 1 ? 's' : ''} remaining</div>
+            <div>
+              • {totalQuestions - completedAnswers} essay
+              {totalQuestions - completedAnswers !== 1 ? "s" : ""} remaining
+            </div>
             <div>• Focus on completing incomplete essays first</div>
             <div>• Run AI analysis on completed essays for feedback</div>
           </div>
@@ -208,4 +242,4 @@ export default function ApplicationProgress({ questions, answers, application }:
       )}
     </div>
   );
-} 
+}

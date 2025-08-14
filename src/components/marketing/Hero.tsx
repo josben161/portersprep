@@ -7,7 +7,7 @@ export default function Hero() {
   // University logos for the carousel
   const universityLogos = [
     "/images/universities/HBS.png",
-    "/images/universities/GSB.png", 
+    "/images/universities/GSB.png",
     "/images/universities/Said.png",
     "/images/universities/judge.png",
     "/images/universities/HKU.png",
@@ -15,7 +15,7 @@ export default function Hero() {
     "/images/universities/wharton.png",
     "/images/universities/Tuck.png",
     "/images/universities/melbourne.png",
-    "/images/universities/sydney.png"
+    "/images/universities/sydney.png",
   ];
 
   return (
@@ -33,17 +33,26 @@ export default function Hero() {
           className="mx-auto max-w-3xl text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" /> Your MBA, but with a strategist in the loop
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" /> Your MBA,
+            but with a strategist in the loop
           </span>
           <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
-            The <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">CoPilot for MBA Applicants</span>
+            The{" "}
+            <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
+              CoPilot for MBA Applicants
+            </span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
-            Design your narrative, draft faster, and tailor every essay to each school's DNA. Strategy, writing, and feedback—all in one focused workspace.
+            Design your narrative, draft faster, and tailor every essay to each
+            school's DNA. Strategy, writing, and feedback—all in one focused
+            workspace.
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/sign-up" className="rounded-md bg-blue-600 px-4 py-2 text-white text-sm font-medium shadow-sm hover:bg-blue-700 transition-colors">
+            <Link
+              href="/sign-up"
+              className="rounded-md bg-blue-600 px-4 py-2 text-white text-sm font-medium shadow-sm hover:bg-blue-700 transition-colors"
+            >
               Get started free
             </Link>
             <Link href="/pricing" className="btn btn-outline">
@@ -68,27 +77,32 @@ export default function Hero() {
               Used by applicants to get accepted to world leading institutions
             </p>
           </div>
-          
+
           {/* Continuous Carousel Container */}
           <div className="relative overflow-hidden">
             <div className="flex animate-scroll-left">
-              {[...universityLogos, ...universityLogos, ...universityLogos].map((logo, index) => (
-                <div key={`logo-${index}`} className="flex items-center justify-center mx-8 md:mx-12 flex-shrink-0">
-                  <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
-                    <Image
-                      src={logo}
-                      alt="University logo"
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 768px) 80px, 96px"
-                    />
+              {[...universityLogos, ...universityLogos, ...universityLogos].map(
+                (logo, index) => (
+                  <div
+                    key={`logo-${index}`}
+                    className="flex items-center justify-center mx-8 md:mx-12 flex-shrink-0"
+                  >
+                    <div className="relative w-20 h-12 md:w-24 md:h-14 opacity-40 hover:opacity-60 transition-opacity">
+                      <Image
+                        src={logo}
+                        alt="University logo"
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 768px) 80px, 96px"
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </div>
         </motion.div>
       </div>
     </section>
   );
-} 
+}

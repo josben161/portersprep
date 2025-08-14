@@ -9,13 +9,15 @@ import FinalCTA from "@/components/marketing/FinalCTA";
 
 export const metadata: Metadata = {
   title: "The Admit Architect — The CoPilot for MBA Applicants",
-  description: "Design your narrative, draft faster, and tailor every essay to each school's DNA.",
+  description:
+    "Design your narrative, draft faster, and tailor every essay to each school's DNA.",
   openGraph: {
     title: "The Admit Architect — The CoPilot for MBA Applicants",
-    description: "Narrative-aware, school-specific coaching for your MBA applications.",
-    type: "website"
+    description:
+      "Narrative-aware, school-specific coaching for your MBA applications.",
+    type: "website",
   },
-  alternates: { canonical: "/" }
+  alternates: { canonical: "/" },
 };
 
 export default function Home() {
@@ -31,8 +33,8 @@ export default function Home() {
             "@type": "SoftwareApplication",
             name: "The Admit Architect",
             applicationCategory: "Productivity",
-            offers: [{ "@type": "Offer", price: "0", priceCurrency: "USD" }]
-          })
+            offers: [{ "@type": "Offer", price: "0", priceCurrency: "USD" }],
+          }),
         }}
       />
       <Hero />
@@ -44,4 +46,4 @@ export default function Home() {
       <FinalCTA />
     </>
   );
-} 
+}

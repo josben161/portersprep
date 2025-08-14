@@ -5,8 +5,9 @@ import { chatJson } from "@/lib/ai";
 export async function POST(req: Request) {
   try {
     const { profile } = await requireAuthedProfile();
-    const { content, school_name, essay_title, essay_prompt, word_limit } = await req.json();
-    
+    const { content, school_name, essay_title, essay_prompt, word_limit } =
+      await req.json();
+
     if (!content || !school_name || !essay_title || !essay_prompt) {
       return new Response("Missing required fields", { status: 400 });
     }
@@ -15,8 +16,13 @@ export async function POST(req: Request) {
       system: `You are an expert MBA admissions consultant evaluating an essay for ${school_name}.`,
       user: `Essay Title: ${essay_title}
 Essay Prompt: ${essay_prompt}
-Word Limit: ${word_limit || 'No limit'}
-Word Count: ${content.trim().split(/\s+/).filter((word: string) => word.length > 0).length}
+Word Limit: ${word_limit || "No limit"}
+Word Count: ${
+        content
+          .trim()
+          .split(/\s+/)
+          .filter((word: string) => word.length > 0).length
+      }
 
 Please analyze this essay and provide:
 
@@ -36,12 +42,12 @@ Provide your analysis in JSON format with the following structure:
   "suggestions": "specific actionable suggestions for improvement",
   "promptAlignment": "how well the essay addresses the prompt",
   "schoolFit": "assessment of fit with school values"
-}`
+}`,
     });
-    
+
     return Response.json(analysis);
   } catch (error) {
     console.error("Essay analysis error:", error);
     return new Response("Failed to analyze essay", { status: 500 });
   }
-} 
+}

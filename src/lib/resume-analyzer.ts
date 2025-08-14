@@ -1,15 +1,15 @@
-import OpenAI from 'openai';
+import OpenAI from "openai";
 
 // Initialize OpenAI client only on server side with proper error handling
 let openai: OpenAI | null = null;
 
-if (typeof window === 'undefined' && process.env.OPENAI_API_KEY) {
+if (typeof window === "undefined" && process.env.OPENAI_API_KEY) {
   try {
     openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
   } catch (error) {
-    console.error('Failed to initialize OpenAI client:', error);
+    console.error("Failed to initialize OpenAI client:", error);
   }
 }
 
@@ -60,45 +60,47 @@ export interface ResumeAnalysis {
   };
 }
 
-export async function analyzeResume(resumeText: string): Promise<ResumeAnalysis> {
+export async function analyzeResume(
+  resumeText: string,
+): Promise<ResumeAnalysis> {
   if (!isOpenAIAvailable()) {
-    console.error('OpenAI API key not configured or client not initialized.');
+    console.error("OpenAI API key not configured or client not initialized.");
     return {
-      summary: 'OpenAI API key not configured or client not initialized.',
+      summary: "OpenAI API key not configured or client not initialized.",
       experience: {
         years: 0,
         industries: [],
         roles: [],
         leadership: false,
-        international: false
+        international: false,
       },
       education: {
-        major: '',
-        institution: '',
+        major: "",
+        institution: "",
         graduation_year: 0,
-        honors: []
+        honors: [],
       },
       skills: {
         technical: [],
         leadership: [],
         analytical: [],
-        communication: []
+        communication: [],
       },
       achievements: {
         quantifiable: [],
         leadership: [],
-        awards: []
+        awards: [],
       },
       mbaReadiness: {
-        strengths: ['Resume analysis unavailable'],
-        weaknesses: ['Unable to assess'],
-        recommendations: ['Please ensure resume is properly formatted'],
-        fit_score: 50
+        strengths: ["Resume analysis unavailable"],
+        weaknesses: ["Unable to assess"],
+        recommendations: ["Please ensure resume is properly formatted"],
+        fit_score: 50,
       },
       extractedData: {
-        name: '',
-        email: ''
-      }
+        name: "",
+        email: "",
+      },
     };
   }
 
@@ -133,8 +135,8 @@ Provide a comprehensive analysis in JSON format.`;
     const response = await openai!.chat.completions.create({
       model: "gpt-4",
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
       ],
       temperature: 0.3,
       max_tokens: 2000,
@@ -142,61 +144,64 @@ Provide a comprehensive analysis in JSON format.`;
 
     const analysisText = response.choices[0]?.message?.content;
     if (!analysisText) {
-      throw new Error('No analysis generated');
+      throw new Error("No analysis generated");
     }
 
     // Parse the JSON response
     const analysis: ResumeAnalysis = JSON.parse(analysisText);
-    
+
     return analysis;
   } catch (error) {
-    console.error('Resume analysis error:', error);
-    
+    console.error("Resume analysis error:", error);
+
     // Return a basic analysis structure on error
     return {
-      summary: 'Unable to analyze resume at this time.',
+      summary: "Unable to analyze resume at this time.",
       experience: {
         years: 0,
         industries: [],
         roles: [],
         leadership: false,
-        international: false
+        international: false,
       },
       education: {
-        major: '',
-        institution: '',
+        major: "",
+        institution: "",
         graduation_year: 0,
-        honors: []
+        honors: [],
       },
       skills: {
         technical: [],
         leadership: [],
         analytical: [],
-        communication: []
+        communication: [],
       },
       achievements: {
         quantifiable: [],
         leadership: [],
-        awards: []
+        awards: [],
       },
       mbaReadiness: {
-        strengths: ['Resume analysis unavailable'],
-        weaknesses: ['Unable to assess'],
-        recommendations: ['Please ensure resume is properly formatted'],
-        fit_score: 50
+        strengths: ["Resume analysis unavailable"],
+        weaknesses: ["Unable to assess"],
+        recommendations: ["Please ensure resume is properly formatted"],
+        fit_score: 50,
       },
       extractedData: {
-        name: '',
-        email: ''
-      }
+        name: "",
+        email: "",
+      },
     };
   }
 }
 
-export async function generateResumeInsights(analysis: ResumeAnalysis, targetSchools: string[]): Promise<string[]> {
+export async function generateResumeInsights(
+  analysis: ResumeAnalysis,
+  targetSchools: string[],
+): Promise<string[]> {
   if (!isOpenAIAvailable()) {
-    console.error('OpenAI API key not configured or client not initialized.');
-    return ['Unable to generate insights at this time.'];
+    console.error("OpenAI API key not configured or client not initialized.");
+    return ["Unable to generate insights at this time."];
   }
 
   try {
@@ -206,7 +211,7 @@ export async function generateResumeInsights(analysis: ResumeAnalysis, targetSch
 
 ${JSON.stringify(analysis, null, 2)}
 
-And these target schools: ${targetSchools.join(', ')}
+And these target schools: ${targetSchools.join(", ")}
 
 Provide 5-7 specific, actionable insights for improving MBA application chances. Focus on:
 1. Resume improvements
@@ -220,8 +225,8 @@ Format as a numbered list.`;
     const response = await openai!.chat.completions.create({
       model: "gpt-4",
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
       ],
       temperature: 0.7,
       max_tokens: 1000,
@@ -229,26 +234,28 @@ Format as a numbered list.`;
 
     const insightsText = response.choices[0]?.message?.content;
     if (!insightsText) {
-      return ['Unable to generate insights at this time.'];
+      return ["Unable to generate insights at this time."];
     }
 
     // Parse numbered list into array
     const insights = insightsText
-      .split('\n')
-      .filter(line => line.trim().match(/^\d+\./))
-      .map(line => line.replace(/^\d+\.\s*/, '').trim())
-      .filter(insight => insight.length > 0);
+      .split("\n")
+      .filter((line) => line.trim().match(/^\d+\./))
+      .map((line) => line.replace(/^\d+\.\s*/, "").trim())
+      .filter((insight) => insight.length > 0);
 
-    return insights.length > 0 ? insights : ['Unable to generate insights at this time.'];
+    return insights.length > 0
+      ? insights
+      : ["Unable to generate insights at this time."];
   } catch (error) {
-    console.error('Resume insights generation error:', error);
-    return ['Unable to generate insights at this time.'];
+    console.error("Resume insights generation error:", error);
+    return ["Unable to generate insights at this time."];
   }
 }
 
 export function calculateMBAFitScore(analysis: ResumeAnalysis): number {
   if (!isOpenAIAvailable()) {
-    console.error('OpenAI API key not configured or client not initialized.');
+    console.error("OpenAI API key not configured or client not initialized.");
     return 50; // Return a default score if OpenAI is not available
   }
 
@@ -276,4 +283,4 @@ export function calculateMBAFitScore(analysis: ResumeAnalysis): number {
   if (analysis.achievements.awards.length > 0) score += 5;
 
   return Math.min(100, Math.max(0, score));
-} 
+}

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import CharacterCount from '@tiptap/extension-character-count';
-import { useState } from 'react';
-import { RoomProvider, useRoom, useSelf } from '@liveblocks/react';
-import { ClientSideSuspense } from '@liveblocks/react';
-import { getRoomId } from '@/lib/liveblocks';
-import { Wand2, Users } from 'lucide-react';
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import CharacterCount from "@tiptap/extension-character-count";
+import { useState } from "react";
+import { RoomProvider, useRoom, useSelf } from "@liveblocks/react";
+import { ClientSideSuspense } from "@liveblocks/react";
+import { getRoomId } from "@/lib/liveblocks";
+import { Wand2, Users } from "lucide-react";
 
 interface RedlineSuggestion {
   text: string;
@@ -20,7 +20,9 @@ interface EssayEditorProps {
 }
 
 function EssayEditorInner({ userId }: EssayEditorProps) {
-  const [redlineSuggestions, setRedlineSuggestions] = useState<RedlineSuggestion[]>([]);
+  const [redlineSuggestions, setRedlineSuggestions] = useState<
+    RedlineSuggestion[]
+  >([]);
   const [isLoadingRedline, setIsLoadingRedline] = useState(false);
 
   const room = useRoom();
@@ -33,10 +35,11 @@ function EssayEditorInner({ userId }: EssayEditorProps) {
         limit: 10000,
       }),
     ],
-    content: '<p>Start writing your essay here...</p>',
+    content: "<p>Start writing your essay here...</p>",
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[400px] p-4',
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[400px] p-4",
       },
     },
   });
@@ -49,10 +52,10 @@ function EssayEditorInner({ userId }: EssayEditorProps) {
 
     setIsLoadingRedline(true);
     try {
-      const response = await fetch('/api/redline', {
-        method: 'POST',
+      const response = await fetch("/api/redline", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ text }),
       });
@@ -61,10 +64,10 @@ function EssayEditorInner({ userId }: EssayEditorProps) {
         const data = await response.json();
         setRedlineSuggestions(data.suggestions || []);
       } else {
-        console.error('Redline request failed');
+        console.error("Redline request failed");
       }
     } catch (error) {
-      console.error('Error calling redline API:', error);
+      console.error("Error calling redline API:", error);
     } finally {
       setIsLoadingRedline(false);
     }
@@ -85,12 +88,12 @@ function EssayEditorInner({ userId }: EssayEditorProps) {
               <Users className="h-4 w-4" />
               <span>Collaborators: you</span>
             </div>
-            
+
             {/* Word Count */}
             <div className="text-sm text-gray-600">
               {wordCount} words • {charCount} characters
             </div>
-            
+
             {/* AI Redline Button */}
             <button
               onClick={handleRedline}
@@ -98,7 +101,7 @@ function EssayEditorInner({ userId }: EssayEditorProps) {
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <Wand2 className="h-4 w-4" />
-              {isLoadingRedline ? 'Analyzing...' : 'AI Redline'}
+              {isLoadingRedline ? "Analyzing..." : "AI Redline"}
             </button>
           </div>
         </div>
@@ -119,10 +122,12 @@ function EssayEditorInner({ userId }: EssayEditorProps) {
               {redlineSuggestions.map((suggestion, index) => (
                 <div key={index} className="bg-white rounded-lg border p-3">
                   <div className="text-sm text-gray-600 mb-2">
-                    <span className="font-medium">Original:</span> &quot;{suggestion.text}&quot;
+                    <span className="font-medium">Original:</span> &quot;
+                    {suggestion.text}&quot;
                   </div>
                   <div className="text-sm text-gray-900 mb-2">
-                    <span className="font-medium">Suggestion:</span> &quot;{suggestion.suggestion}&quot;
+                    <span className="font-medium">Suggestion:</span> &quot;
+                    {suggestion.suggestion}&quot;
                   </div>
                   <div className="text-xs text-gray-500">
                     {suggestion.reason}
@@ -141,19 +146,16 @@ export default function EssayEditor({ userId }: EssayEditorProps) {
   const roomId = getRoomId(userId);
 
   return (
-    <RoomProvider
-      id={roomId}
-      initialPresence={{}}
-    >
-      <ClientSideSuspense fallback={
-        <div className="h-screen flex items-center justify-center">
-          <div className="text-gray-600">Loading editor...</div>
-        </div>
-      }>
-        {() => (
-          <EssayEditorInner userId={userId} />
-        )}
+    <RoomProvider id={roomId} initialPresence={{}}>
+      <ClientSideSuspense
+        fallback={
+          <div className="h-screen flex items-center justify-center">
+            <div className="text-gray-600">Loading editor...</div>
+          </div>
+        }
+      >
+        {() => <EssayEditorInner userId={userId} />}
       </ClientSideSuspense>
     </RoomProvider>
   );
-} 
+}

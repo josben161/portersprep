@@ -23,21 +23,29 @@ export type School = {
 
 const DATA_DIR = path.join(process.cwd(), "data", "schools");
 
-export async function listSchoolsData(): Promise<Pick<School,"id"|"name">[]> {
+export async function listSchoolsData(): Promise<
+  Pick<School, "id" | "name">[]
+> {
   const files = await fs.readdir(DATA_DIR);
   return Promise.all(
-    files.filter(f=>f.endsWith(".json")).map(async f=>{
-      const json = JSON.parse(await fs.readFile(path.join(DATA_DIR,f),"utf8"));
-      return { id: json.id, name: json.name };
-    })
+    files
+      .filter((f) => f.endsWith(".json"))
+      .map(async (f) => {
+        const json = JSON.parse(
+          await fs.readFile(path.join(DATA_DIR, f), "utf8"),
+        );
+        return { id: json.id, name: json.name };
+      }),
   );
 }
 
 export async function getSchoolData(id: string): Promise<School | null> {
   try {
-    const json = JSON.parse(await fs.readFile(path.join(DATA_DIR, `${id}.json`), "utf8"));
+    const json = JSON.parse(
+      await fs.readFile(path.join(DATA_DIR, `${id}.json`), "utf8"),
+    );
     return json as School;
   } catch {
     return null;
   }
-} 
+}

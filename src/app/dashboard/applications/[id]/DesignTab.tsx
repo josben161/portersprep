@@ -47,19 +47,21 @@ interface Outline {
   sections: OutlineSection[];
 }
 
-export default function DesignTab({ 
-  appId, 
-  questions, 
-  answers, 
-  application 
-}: { 
-  appId: string; 
-  questions: Question[]; 
-  answers: Answer[]; 
-  application: Application; 
+export default function DesignTab({
+  appId,
+  questions,
+  answers,
+  application,
+}: {
+  appId: string;
+  questions: Question[];
+  answers: Answer[];
+  application: Application;
 }) {
   const [stories, setStories] = useState<Story[]>([]);
-  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(
+    null,
+  );
   const [selectedStoryIds, setSelectedStoryIds] = useState<string[]>([]);
   const [outline, setOutline] = useState<Outline | null>(null);
   const [generatingOutline, setGeneratingOutline] = useState(false);
@@ -86,11 +88,11 @@ export default function DesignTab({
   }
 
   function getAnswerForQuestion(questionId: string): Answer | null {
-    return answers.find(a => a.question_id === questionId) || null;
+    return answers.find((a) => a.question_id === questionId) || null;
   }
 
   function getQuestionById(questionId: string): Question | null {
-    return questions.find(q => q.id === questionId) || null;
+    return questions.find((q) => q.id === questionId) || null;
   }
 
   async function generateOutline() {
@@ -119,8 +121,8 @@ export default function DesignTab({
         body: JSON.stringify({
           selectedStoryIds,
           wordLimit: question.word_limit,
-          prompt: question.prompt
-        })
+          prompt: question.prompt,
+        }),
       });
 
       if (res.ok) {
@@ -163,8 +165,8 @@ export default function DesignTab({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           outline,
-          wordLimit: question.word_limit
-        })
+          wordLimit: question.word_limit,
+        }),
       });
 
       if (res.ok) {
@@ -181,10 +183,10 @@ export default function DesignTab({
   }
 
   function toggleStorySelection(storyId: string) {
-    setSelectedStoryIds(prev => 
-      prev.includes(storyId) 
-        ? prev.filter(id => id !== storyId)
-        : [...prev, storyId]
+    setSelectedStoryIds((prev) =>
+      prev.includes(storyId)
+        ? prev.filter((id) => id !== storyId)
+        : [...prev, storyId],
     );
   }
 
@@ -207,14 +209,14 @@ export default function DesignTab({
             {questions.map((question, index) => {
               const answer = getAnswerForQuestion(question.id);
               const isSelected = selectedQuestionId === question.id;
-              
+
               return (
                 <button
                   key={question.id}
                   onClick={() => setSelectedQuestionId(question.id)}
                   className={`w-full text-left p-3 rounded-md border transition ${
-                    isSelected 
-                      ? "border-primary bg-primary/5" 
+                    isSelected
+                      ? "border-primary bg-primary/5"
                       : "border-border hover:bg-muted"
                   }`}
                 >
@@ -224,7 +226,9 @@ export default function DesignTab({
                         {question.metadata?.title || `Essay ${index + 1}`}
                       </div>
                       <div className="text-sm text-muted-foreground mt-1">
-                        {question.word_limit ? `${question.word_limit} words` : "No limit"}
+                        {question.word_limit
+                          ? `${question.word_limit} words`
+                          : "No limit"}
                       </div>
                     </div>
                     {answer && answer.word_count > 0 && (
@@ -245,27 +249,32 @@ export default function DesignTab({
             <div className="rounded-lg border bg-card p-4">
               <h3 className="font-medium mb-3">Select Stories</h3>
               <div className="grid gap-3 sm:grid-cols-2">
-                {stories.map(story => {
+                {stories.map((story) => {
                   const isSelected = selectedStoryIds.includes(story.id);
                   return (
                     <div
                       key={story.id}
                       onClick={() => toggleStorySelection(story.id)}
                       className={`p-3 rounded-md border cursor-pointer transition ${
-                        isSelected 
-                          ? "border-primary bg-primary/5" 
+                        isSelected
+                          ? "border-primary bg-primary/5"
                           : "border-border hover:bg-muted"
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="font-medium text-sm">{story.title}</div>
+                          <div className="font-medium text-sm">
+                            {story.title}
+                          </div>
                           <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
                             {story.summary}
                           </div>
                           <div className="flex flex-wrap gap-1 mt-2">
-                            {story.tags.map(tag => (
-                              <span key={tag} className="text-[10px] bg-secondary px-2 py-0.5 rounded">
+                            {story.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-[10px] bg-secondary px-2 py-0.5 rounded"
+                              >
                                 {tag}
                               </span>
                             ))}
@@ -282,7 +291,10 @@ export default function DesignTab({
               {stories.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   <div className="text-sm">No stories found</div>
-                  <a href="/dashboard/stories" className="text-primary hover:underline text-sm">
+                  <a
+                    href="/dashboard/stories"
+                    className="text-primary hover:underline text-sm"
+                  >
                     Create your first story
                   </a>
                 </div>
@@ -301,19 +313,28 @@ export default function DesignTab({
                   {generatingOutline ? "Generating..." : "Generate Outline"}
                 </button>
               </div>
-              
+
               {outline && (
                 <div className="space-y-4">
                   <div className="text-xs text-muted-foreground">
-                    Version {outlineVersion} • {selectedStoryIds.length} stories selected
+                    Version {outlineVersion} • {selectedStoryIds.length} stories
+                    selected
                   </div>
                   <div className="space-y-3">
                     {outline.sections.map((section, index) => (
-                      <div key={index} className="border-l-2 border-primary/20 pl-4">
-                        <div className="font-medium text-sm mb-2">{section.title}</div>
+                      <div
+                        key={index}
+                        className="border-l-2 border-primary/20 pl-4"
+                      >
+                        <div className="font-medium text-sm mb-2">
+                          {section.title}
+                        </div>
                         <ul className="space-y-1">
                           {section.bullets.map((bullet, bulletIndex) => (
-                            <li key={bulletIndex} className="text-sm text-muted-foreground">
+                            <li
+                              key={bulletIndex}
+                              className="text-sm text-muted-foreground"
+                            >
                               • {bullet}
                             </li>
                           ))}
@@ -321,20 +342,24 @@ export default function DesignTab({
                       </div>
                     ))}
                   </div>
-                  
+
                   <button
                     onClick={generateDraft}
                     disabled={generatingDraft}
                     className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:opacity-95 disabled:pointer-events-none disabled:opacity-50"
                   >
-                    {generatingDraft ? "Generating Draft..." : "Generate Coaching Draft"}
+                    {generatingDraft
+                      ? "Generating Draft..."
+                      : "Generate Coaching Draft"}
                   </button>
                 </div>
               )}
-              
+
               {!outline && (
                 <div className="text-center py-8 text-muted-foreground">
-                  <div className="text-sm">Select stories and generate an outline to get started</div>
+                  <div className="text-sm">
+                    Select stories and generate an outline to get started
+                  </div>
                 </div>
               )}
             </div>
@@ -348,4 +373,4 @@ export default function DesignTab({
       </div>
     </div>
   );
-} 
+}

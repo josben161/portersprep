@@ -6,7 +6,12 @@ export default function AppShell({
   top,
   right,
   children,
-}: { left: ReactNode; top: ReactNode; right: ReactNode; children: ReactNode }) {
+}: {
+  left: ReactNode;
+  top: ReactNode;
+  right: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <div className="min-h-[100vh] bg-background text-foreground">
       {/* Top Bar */}
@@ -27,4 +32,4 @@ export default function AppShell({
       </div>
     </div>
   );
-} 
+}

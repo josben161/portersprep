@@ -7,7 +7,7 @@ const secret = process.env.LIVEBLOCKS_SECRET_KEY!;
 const lb = new Liveblocks({ secret });
 
 export async function POST(req: NextRequest) {
-  const body = await req.json().catch(()=> ({}));
+  const body = await req.json().catch(() => ({}));
   const { room, shareToken } = body || {};
 
   if (!room) return new Response("Missing room", { status: 400 });
@@ -31,15 +31,19 @@ export async function POST(req: NextRequest) {
 
   // Validate share token maps to an answer -> room
   const sb = getAdminSupabase();
-  const { data: link } = await sb.from("answer_share_links").select("answer_id, role").eq("token", shareToken).maybeSingle();
+  const { data: link } = await sb
+    .from("answer_share_links")
+    .select("answer_id, role")
+    .eq("token", shareToken)
+    .maybeSingle();
   if (!link) return new Response("Invalid token", { status: 401 });
 
   // Minimal identity for anonymous collaborator
-  const anonId = `anon_${shareToken.slice(0,8)}`;
+  const anonId = `anon_${shareToken.slice(0, 8)}`;
   // Note: Liveblocks v3 API may differ - this is a placeholder
-  return Response.json({ 
+  return Response.json({
     room,
     userId: anonId,
     groupIds: [link.role === "editor" ? "editors" : "viewers"],
   });
-} 
+}

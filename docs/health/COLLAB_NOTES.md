@@ -1,7 +1,9 @@
 # Collaboration & School-specific Recs
 
 ## Overview
+
 This update adds three major features:
+
 1. **Updated Dashboard Sidebar** - Reflects the four-step applicant journey
 2. **Collaborative Essay Editing** - Share links for anonymous collaboration
 3. **School-specific Recommendations** - Contextual recommender management
@@ -9,12 +11,14 @@ This update adds three major features:
 ## Share Links System
 
 ### How it Works
+
 - **Owners** can create "anyone with the link can edit/view" URLs for a single answer
 - **Anonymous collaborators** never hit Supabase directly; all operations go through `/api/answers/share/*`
 - **Liveblocks** is authorized with `shareToken` for real-time editing
 - **Security**: Server-enforced role validation and expiration
 
 ### Key Components
+
 - `src/lib/share.ts` - Token generation and passcode hashing
 - `src/app/api/answers/share/route.ts` - Create share links (owner only)
 - `src/app/api/answers/share/[token]/route.ts` - Fetch/save through server
@@ -22,6 +26,7 @@ This update adds three major features:
 - `src/components/ide/ShareAnswerButton.tsx` - Share button for IDE
 
 ### Database Schema
+
 ```sql
 -- Store Liveblocks room on answers
 alter table if exists application_answers
@@ -43,6 +48,7 @@ create table if not exists answer_share_links (
 ## Updated Dashboard Sidebar
 
 ### Navigation Structure
+
 1. **Profile** - Resume & Story Bank
 2. **Predict** - Fit by school
 3. **Applications** - Essays & tasks
@@ -50,6 +56,7 @@ create table if not exists answer_share_links (
 5. **Coach** - Ask anything
 
 ### Implementation
+
 - Updated `src/components/layout/SideNav.tsx` with new structure
 - Added descriptions for each section
 - Improved active state detection
@@ -57,12 +64,14 @@ create table if not exists answer_share_links (
 ## School-specific Recommendations
 
 ### Features
+
 - **School Selection**: Choose application to view school-specific requirements
 - **LOR Requirements**: Display letter count, format, and video assessment info
 - **Recommender Assignment**: Assign recommenders to specific schools
 - **Contextual Data**: Show school requirements from JSON data
 
 ### Components
+
 - `src/app/dashboard/recommendations/page.tsx` - Main recommendations page
 - `src/app/api/applications/[id]/school/route.ts` - Fetch school data for app
 - School data integration with existing `src/lib/schools.ts`
@@ -70,6 +79,7 @@ create table if not exists answer_share_links (
 ## QA Checklist
 
 ### 1. Share Links Testing
+
 - [ ] In IDE, click **Share** → **Create link**
 - [ ] Open link in incognito window
 - [ ] Verify anonymous user can edit (editor role)
@@ -78,12 +88,14 @@ create table if not exists answer_share_links (
 - [ ] Verify changes persist in original answer
 
 ### 2. Dashboard Navigation
+
 - [ ] Verify sidebar shows new four-step structure
 - [ ] Test navigation between sections
 - [ ] Verify active states work correctly
 - [ ] Check responsive behavior
 
 ### 3. School-specific Recommendations
+
 - [ ] Visit `/dashboard/recommendations`
 - [ ] Select a school from dropdown
 - [ ] Verify school LOR requirements display
@@ -92,6 +104,7 @@ create table if not exists answer_share_links (
 - [ ] Verify school-specific guidance
 
 ### 4. Integration Testing
+
 - [ ] Run **Predict** and confirm fit badges show on application tiles
 - [ ] Test **Requirements Panel** "Start Draft" creates answer and navigates to IDE
 - [ ] Verify **Applications Grid** shows progress rings and fit badges
@@ -147,4 +160,4 @@ create policy asl_owner_delete on answer_share_links
 2. **Passcode Protection**: Add optional passcode to share links
 3. **Expiration Management**: Add UI for managing link expiration
 4. **Activity Tracking**: Track who accessed shared links
-5. **Advanced Permissions**: More granular role-based access control 
+5. **Advanced Permissions**: More granular role-based access control

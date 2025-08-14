@@ -21,9 +21,11 @@ interface Application {
 export default function ApplicationPage() {
   const params = useParams();
   const appId = params.id as string;
-  
+
   const [application, setApplication] = useState<Application | null>(null);
-  const [activeTab, setActiveTab] = useState<'workspace' | 'progress' | 'recommendations'>('workspace');
+  const [activeTab, setActiveTab] = useState<
+    "workspace" | "progress" | "recommendations"
+  >("workspace");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -70,7 +72,9 @@ export default function ApplicationPage() {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">{application.schools?.name || 'Application'}</h1>
+            <h1 className="text-2xl font-semibold">
+              {application.schools?.name || "Application"}
+            </h1>
             <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
               <span>Round {application.round}</span>
               <span>•</span>
@@ -84,31 +88,31 @@ export default function ApplicationPage() {
       <div className="mb-6">
         <div className="flex space-x-1 bg-muted p-1 rounded-lg">
           <button
-            onClick={() => setActiveTab('workspace')}
+            onClick={() => setActiveTab("workspace")}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-              activeTab === 'workspace'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+              activeTab === "workspace"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Essays
           </button>
           <button
-            onClick={() => setActiveTab('recommendations')}
+            onClick={() => setActiveTab("recommendations")}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-              activeTab === 'recommendations'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+              activeTab === "recommendations"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Recommendations
           </button>
           <button
-            onClick={() => setActiveTab('progress')}
+            onClick={() => setActiveTab("progress")}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-              activeTab === 'progress'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+              activeTab === "progress"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Progress
@@ -116,9 +120,9 @@ export default function ApplicationPage() {
         </div>
       </div>
 
-      {activeTab === 'workspace' ? (
+      {activeTab === "workspace" ? (
         <ApplicationWorkspace appId={appId} />
-      ) : activeTab === 'recommendations' ? (
+      ) : activeTab === "recommendations" ? (
         <RecommendationsManager appId={appId} />
       ) : (
         <div className="max-w-4xl">
@@ -127,11 +131,11 @@ export default function ApplicationPage() {
             answers={[]}
             application={{
               ...application,
-              round: application.round.toString()
+              round: application.round.toString(),
             }}
           />
         </div>
       )}
     </div>
   );
-} 
+}

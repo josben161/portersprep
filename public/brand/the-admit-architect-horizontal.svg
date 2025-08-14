@@ -1,0 +1,54 @@
+<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Building Illustration -->
+  <g transform="translate(10, 10)">
+    <!-- Central section -->
+    <path d="M25 50 L25 20 L35 15 L45 20 L45 50 Z" fill="#F5F5DC" stroke="#8B4513" stroke-width="1"/>
+    <!-- Central roof -->
+    <path d="M25 20 L35 15 L45 20 L45 25 L25 25 Z" fill="#F5F5DC" stroke="#8B4513" stroke-width="1"/>
+    <!-- Central cross -->
+    <path d="M34 15 L34 12 M32 13 L36 13" stroke="#8B4513" stroke-width="1"/>
+    
+    <!-- Left wing -->
+    <path d="M5 50 L5 25 L15 20 L25 25 L25 50 Z" fill="#F5F5DC" stroke="#8B4513" stroke-width="1"/>
+    <!-- Left roof -->
+    <path d="M5 25 L15 20 L25 25 L25 30 L5 30 Z" fill="#F5F5DC" stroke="#8B4513" stroke-width="1"/>
+    <!-- Left spire -->
+    <path d="M12 20 L12 17 L18 17 L18 20" fill="#F5F5DC" stroke="#8B4513" stroke-width="1"/>
+    
+    <!-- Right wing -->
+    <path d="M45 50 L45 25 L55 20 L65 25 L65 50 Z" fill="#F5F5DC" stroke="#8B4513" stroke-width="1"/>
+    <!-- Right roof -->
+    <path d="M45 25 L55 20 L65 25 L65 30 L45 30 Z" fill="#F5F5DC" stroke="#8B4513" stroke-width="1"/>
+    <!-- Right spire -->
+    <path d="M52 20 L52 17 L58 17 L58 20" fill="#F5F5DC" stroke="#8B4513" stroke-width="1"/>
+    
+    <!-- Windows -->
+    <!-- Central windows -->
+    <rect x="28" y="30" width="4" height="6" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    <rect x="33" y="30" width="4" height="6" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    <rect x="30" y="35" width="2" height="2" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    <rect x="33" y="35" width="2" height="2" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    
+    <!-- Left wing windows -->
+    <rect x="8" y="35" width="3" height="4" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    <rect x="13" y="35" width="3" height="4" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    <rect x="18" y="35" width="3" height="4" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    
+    <!-- Right wing windows -->
+    <rect x="48" y="35" width="3" height="4" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    <rect x="53" y="35" width="3" height="4" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    <rect x="58" y="35" width="3" height="4" fill="none" stroke="#8B4513" stroke-width="0.5"/>
+    
+    <!-- Entrance -->
+    <rect x="32" y="45" width="6" height="5" fill="none" stroke="#8B4513" stroke-width="1"/>
+    <path d="M32 45 L35 42 L38 45" fill="none" stroke="#8B4513" stroke-width="1"/>
+    
+    <!-- Decorative elements -->
+    <circle cx="35" cy="40" r="1" fill="#8B4513"/>
+    <path d="M5 50 L65 50" stroke="#8B4513" stroke-width="1"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="90" y="35" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#8B4513">THE ADMIT</text>
+  <text x="90" y="55" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#8B4513">ARCHITECT</text>
+</svg> 

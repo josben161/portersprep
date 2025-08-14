@@ -4,4 +4,4 @@ export async function apiFetch(input: RequestInfo | URL, init?: RequestInit) {
     window.dispatchEvent(new CustomEvent("pp-upgrade-required"));
   }
   return res;
-} 
+}

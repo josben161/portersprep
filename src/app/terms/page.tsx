@@ -1,4 +1,4 @@
-export default function Terms(){ 
+export default function Terms() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="text-3xl font-semibold">Terms</h1>
@@ -6,5 +6,5 @@ export default function Terms(){
         Terms of service and acceptable use. (Add your terms text.)
       </p>
     </div>
-  ); 
-} 
+  );
+}

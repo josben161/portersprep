@@ -1,6 +1,7 @@
 # Immediate Fix for All Application Creation Issues
 
 ## The Problem
+
 We've been getting multiple database errors when creating applications. This comprehensive fix addresses all issues:
 
 1. Foreign key constraint error (TEXT vs UUID)
@@ -28,22 +29,22 @@ DROP POLICY IF EXISTS applications_admin_all ON applications;
 
 -- 5. Fix the status check constraint
 ALTER TABLE applications DROP CONSTRAINT IF EXISTS applications_status_check;
-ALTER TABLE applications ADD CONSTRAINT applications_status_check 
+ALTER TABLE applications ADD CONSTRAINT applications_status_check
   CHECK (status IN ('planning', 'in_progress', 'submitted', 'accepted', 'rejected'));
 ALTER TABLE applications ALTER COLUMN status SET DEFAULT 'planning';
 
 -- 6. Verify all fixes worked
-SELECT column_name, data_type, is_nullable 
-FROM information_schema.columns 
+SELECT column_name, data_type, is_nullable
+FROM information_schema.columns
 WHERE table_name = 'applications' AND column_name = 'school_id';
 
-SELECT schemaname, tablename, rowsecurity 
-FROM pg_tables 
+SELECT schemaname, tablename, rowsecurity
+FROM pg_tables
 WHERE tablename = 'applications';
 
-SELECT conname, pg_get_constraintdef(oid) 
-FROM pg_constraint 
-WHERE conrelid = 'applications'::regclass 
+SELECT conname, pg_get_constraintdef(oid)
+FROM pg_constraint
+WHERE conrelid = 'applications'::regclass
   AND conname = 'applications_status_check';
 ```
 
@@ -68,4 +69,4 @@ WHERE conrelid = 'applications'::regclass
 - **No Foreign Key Issues** - Removed problematic constraint
 - **Admin Client Access** - RLS disabled allows service role to insert
 - **Valid Status Values** - Constraint allows 'planning', 'in_progress', etc.
-- **Clean Database State** - No conflicting policies or constraints 
+- **Clean Database State** - No conflicting policies or constraints

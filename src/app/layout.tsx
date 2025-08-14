@@ -12,21 +12,25 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-poppins",
-  display: "swap"
+  display: "swap",
 });
 
 export const metadata = {
   title: "The Admit Architect — MBA Admissions Copilot",
   description: "Assess • Edit • Coach",
-  icons: { 
+  icons: {
     icon: [
       { url: "/brand/square_logo.png?v=2", type: "image/png" },
-      { url: "/favicon.png", type: "image/png" }
-    ]
-  }
+      { url: "/favicon.png", type: "image/png" },
+    ],
+  },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <ClerkProvider>
       <html lang="en" className={poppins.variable} suppressHydrationWarning>
@@ -45,4 +49,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </html>
     </ClerkProvider>
   );
-} 
+}

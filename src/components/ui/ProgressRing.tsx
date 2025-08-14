@@ -8,11 +8,11 @@ interface ProgressRingProps {
   className?: string;
 }
 
-export default function ProgressRing({ 
-  value, 
-  size = 32, 
-  strokeWidth = 3, 
-  className = "" 
+export default function ProgressRing({
+  value,
+  size = 32,
+  strokeWidth = 3,
+  className = "",
 }: ProgressRingProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
@@ -51,4 +51,4 @@ export default function ProgressRing({
       />
     </svg>
   );
-} 
+}

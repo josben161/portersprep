@@ -8,29 +8,28 @@ const corsRules = [
     AllowedMethods: ["GET", "PUT", "POST", "DELETE", "HEAD"],
     AllowedOrigins: [
       "https://The Admit Architect.vercel.app",
-      "https://The Admit Architect.com", 
-      "http://localhost:3000"
+      "https://The Admit Architect.com",
+      "http://localhost:3000",
     ],
     ExposeHeaders: ["ETag"],
-    MaxAgeSeconds: 3000
-  }
+    MaxAgeSeconds: 3000,
+  },
 ];
 
 async function configureCors() {
   try {
     console.log("Configuring CORS for S3 bucket:", process.env.S3_BUCKET);
-    
+
     const command = new PutBucketCorsCommand({
       Bucket: process.env.S3_BUCKET,
       CORSConfiguration: {
-        CORSRules: corsRules
-      }
+        CORSRules: corsRules,
+      },
     });
-    
+
     await s3.send(command);
     console.log("✅ CORS configured successfully!");
     console.log("Allowed origins:", corsRules[0].AllowedOrigins);
-    
   } catch (error) {
     console.error("❌ Failed to configure CORS:", error);
     console.log("\n📋 Manual CORS Configuration:");
@@ -43,4 +42,4 @@ async function configureCors() {
   }
 }
 
-configureCors(); 
+configureCors();

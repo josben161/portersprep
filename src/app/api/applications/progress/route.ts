@@ -9,4 +9,4 @@ export async function GET() {
     .select("*");
   if (error) return new Response(error.message, { status: 400 });
   return Response.json(data ?? []);
-} 
+}

@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   const system = "You are an MBA admissions coach. Return concise JSON only.";
   const user = `
 Applicant strengths:
-${(stories ?? []).map(s => `- ${s.title}: ${s.summary ?? ""}`).join("\n")}
+${(stories ?? []).map((s) => `- ${s.title}: ${s.summary ?? ""}`).join("\n")}
 
 Recommender: ${rec.name} (${rec.relationship || "relationship not set"})
 Target school: ${app.school_id}
@@ -43,7 +43,9 @@ Return JSON:
   `.trim();
 
   const result = await chatJson({ system, user, temperature: 0.3 });
-  const packet = result?.outline ? result : { outline: [], draft_md: "## Draft\n\n(Generation failed, try again.)" };
+  const packet = result?.outline
+    ? result
+    : { outline: [], draft_md: "## Draft\n\n(Generation failed, try again.)" };
 
   const { data, error } = await sb
     .from("recommender_packets")
@@ -52,11 +54,14 @@ Return JSON:
       recommender_id,
       application_id,
       packet_json: packet,
-      draft_md: packet.draft_md
+      draft_md: packet.draft_md,
     })
     .select("*")
     .single();
-  if (error) return new Response((error as any).message ?? "Insert error", { status: 400 });
+  if (error)
+    return new Response((error as any).message ?? "Insert error", {
+      status: 400,
+    });
 
   return Response.json(data);
-} 
+}

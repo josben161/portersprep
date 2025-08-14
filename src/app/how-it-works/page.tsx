@@ -1,59 +1,71 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { CheckCircle, ArrowRight, Target, FileText, Sparkles, Users } from "lucide-react";
+import {
+  CheckCircle,
+  ArrowRight,
+  Target,
+  FileText,
+  Sparkles,
+  Users,
+} from "lucide-react";
 
 const steps = [
   {
     icon: Target,
     title: "1. Assess Your Chances",
-    description: "Get a detailed analysis of your admission probability for each target school based on your profile, experience, and goals.",
+    description:
+      "Get a detailed analysis of your admission probability for each target school based on your profile, experience, and goals.",
     details: [
       "Upload your resume and background",
       "Receive school-specific likelihood bands",
-      "Get personalized strategy recommendations"
-    ]
+      "Get personalized strategy recommendations",
+    ],
   },
   {
     icon: FileText,
     title: "2. Set Up Your Applications",
-    description: "Create application workspaces for each school with their specific requirements, deadlines, and essay prompts.",
+    description:
+      "Create application workspaces for each school with their specific requirements, deadlines, and essay prompts.",
     details: [
       "Import school requirements automatically",
       "Track deadlines and progress",
-      "Organize by round and priority"
-    ]
+      "Organize by round and priority",
+    ],
   },
   {
     icon: Sparkles,
     title: "3. Build Your Story Bank",
-    description: "Organize your key experiences, achievements, and stories that you'll adapt for different essay prompts.",
+    description:
+      "Organize your key experiences, achievements, and stories that you'll adapt for different essay prompts.",
     details: [
       "Create anchor stories with tags",
       "Rate story strength and relevance",
-      "Track usage across applications"
-    ]
+      "Track usage across applications",
+    ],
   },
   {
     icon: FileText,
     title: "4. Draft with AI Guidance",
-    description: "Write essays with AI-powered suggestions that preserve your voice while improving clarity and impact.",
+    description:
+      "Write essays with AI-powered suggestions that preserve your voice while improving clarity and impact.",
     details: [
       "Get real-time feedback as you write",
       "AI suggests improvements and alternatives",
-      "Maintain your authentic voice"
-    ]
+      "Maintain your authentic voice",
+    ],
   },
   {
     icon: Users,
     title: "5. Get Expert Review",
-    description: "Submit your drafts for review by MBA admissions experts who understand each school's unique criteria.",
+    description:
+      "Submit your drafts for review by MBA admissions experts who understand each school's unique criteria.",
     details: [
       "School-specific feedback",
       "Detailed improvement suggestions",
-      "Mock interview preparation"
-    ]
-  }
+      "Mock interview preparation",
+    ],
+  },
 ];
 
 export default function HowItWorksPage() {
@@ -73,17 +85,26 @@ export default function HowItWorksPage() {
             className="mx-auto max-w-3xl text-center"
           >
             <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-500" /> Step-by-step process
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />{" "}
+              Step-by-step process
             </span>
             <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
-              How <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">The Admit Architect Works</span>
+              How{" "}
+              <span className="bg-gradient-to-r from-brand-400 to-brand-600 bg-clip-text text-transparent">
+                The Admit Architect Works
+              </span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
-              From initial assessment to final submission, we guide you through every step of your MBA application journey with AI-powered tools and expert insights.
+              From initial assessment to final submission, we guide you through
+              every step of your MBA application journey with AI-powered tools
+              and expert insights.
             </p>
 
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/sign-up" className="rounded-md bg-blue-600 px-4 py-2 text-white text-sm font-medium shadow-sm hover:bg-blue-700 transition-colors">
+              <Link
+                href="/sign-up"
+                className="rounded-md bg-blue-600 px-4 py-2 text-white text-sm font-medium shadow-sm hover:bg-blue-700 transition-colors"
+              >
                 Start your journey
               </Link>
               <Link href="/pricing" className="btn btn-outline">
@@ -108,7 +129,7 @@ export default function HowItWorksPage() {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
                   className={`grid gap-8 md:grid-cols-2 md:gap-12 ${
-                    index % 2 === 1 ? 'md:[&>div:first-child]:order-2' : ''
+                    index % 2 === 1 ? "md:[&>div:first-child]:order-2" : ""
                   }`}
                 >
                   <div className="flex flex-col justify-center">
@@ -123,9 +144,14 @@ export default function HowItWorksPage() {
                     </p>
                     <ul className="space-y-3">
                       {step.details.map((detail, detailIndex) => (
-                        <li key={detailIndex} className="flex items-start gap-3">
+                        <li
+                          key={detailIndex}
+                          className="flex items-start gap-3"
+                        >
                           <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-muted-foreground">{detail}</span>
+                          <span className="text-muted-foreground">
+                            {detail}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -152,12 +178,18 @@ export default function HowItWorksPage() {
       {/* CTA Section */}
       <section className="py-20 bg-muted/30">
         <div className="mx-auto max-w-4xl px-6 text-center">
-          <h2 className="text-3xl font-semibold mb-4">Ready to start your MBA journey?</h2>
+          <h2 className="text-3xl font-semibold mb-4">
+            Ready to start your MBA journey?
+          </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join thousands of applicants who have used The Admit Architect to get into their dream MBA programs.
+            Join thousands of applicants who have used The Admit Architect to
+            get into their dream MBA programs.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/sign-up" className="rounded-md bg-blue-600 px-6 py-3 text-white font-medium shadow-sm hover:bg-blue-700 transition-colors">
+            <Link
+              href="/sign-up"
+              className="rounded-md bg-blue-600 px-6 py-3 text-white font-medium shadow-sm hover:bg-blue-700 transition-colors"
+            >
               Get started free
             </Link>
             <Link href="/pricing" className="btn btn-outline">
@@ -168,4 +200,4 @@ export default function HowItWorksPage() {
       </section>
     </div>
   );
-} 
+}

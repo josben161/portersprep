@@ -1,1 +1,1 @@
-export { getTierByClerkId as getTier } from "./profile"; 
+export { getTierByClerkId as getTier } from "./profile";

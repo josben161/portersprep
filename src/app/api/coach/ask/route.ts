@@ -5,7 +5,7 @@ import { chatJson } from "@/lib/ai";
 export async function POST(req: NextRequest) {
   const { profile } = await requireAuthedProfile();
   const { question } = await req.json();
-  
+
   if (!question || typeof question !== "string") {
     return new Response("Missing question", { status: 400 });
   }
@@ -26,7 +26,7 @@ Key areas of expertise:
 
 Always provide specific, actionable advice. Be encouraging but realistic. Focus on practical steps the applicant can take.`,
       user: question,
-      model: "gpt-4-turbo-preview"
+      model: "gpt-4-turbo-preview",
     });
 
     return Response.json({ response: response.content });
@@ -34,4 +34,4 @@ Always provide specific, actionable advice. Be encouraging but realistic. Focus 
     console.error("Coach API error:", error);
     return new Response("Failed to get response", { status: 500 });
   }
-} 
+}

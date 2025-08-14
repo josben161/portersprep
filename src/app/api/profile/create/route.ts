@@ -11,10 +11,13 @@ export async function POST(req: NextRequest) {
 
     const user = await currentUser();
     const email = user?.emailAddresses?.[0]?.emailAddress ?? "";
-    const name = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || user?.firstName || "";
+    const name =
+      [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+      user?.firstName ||
+      "";
 
     const sb = getAdminSupabase();
-    
+
     // Check if profile already exists
     const { data: existing } = await sb
       .from("profiles")
@@ -23,10 +26,10 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (existing) {
-      return Response.json({ 
-        success: true, 
+      return Response.json({
+        success: true,
         profile: existing,
-        message: "Profile already exists" 
+        message: "Profile already exists",
       });
     }
 
@@ -37,24 +40,28 @@ export async function POST(req: NextRequest) {
         clerk_user_id: userId,
         email,
         name,
-        subscription_tier: "free"
+        subscription_tier: "free",
       })
       .select("*")
       .single();
 
     if (error) {
       console.error("Profile creation error:", error);
-      return new Response(`Failed to create profile: ${error.message}`, { status: 500 });
+      return new Response(`Failed to create profile: ${error.message}`, {
+        status: 500,
+      });
     }
 
-    return Response.json({ 
-      success: true, 
+    return Response.json({
+      success: true,
       profile,
-      message: "Profile created successfully" 
+      message: "Profile created successfully",
     });
-
   } catch (error) {
     console.error("Profile creation error:", error);
-    return new Response(`Profile creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });
+    return new Response(
+      `Profile creation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      { status: 500 },
+    );
   }
-} 
+}

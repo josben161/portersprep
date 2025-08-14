@@ -12,7 +12,7 @@ export interface CoachConversation {
 export interface CoachMemory {
   id: string;
   user_id: string;
-  memory_type: 'preference' | 'insight' | 'progress' | 'goal';
+  memory_type: "preference" | "insight" | "progress" | "goal";
   content: Record<string, any>;
   created_at: string;
   updated_at: string;
@@ -39,7 +39,7 @@ export interface CoachContext {
 }
 
 export interface CoachMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   timestamp?: string;
 }
@@ -49,4 +49,4 @@ export interface CoachResponse {
   context?: Record<string, any>;
   nextSteps?: string[];
   insights?: string[];
-} 
+}

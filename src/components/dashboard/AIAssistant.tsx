@@ -2,7 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, ChevronRight, Clock, CheckCircle, AlertCircle, Target, TrendingUp, Award, AlertTriangle, User, Info } from "lucide-react";
+import {
+  Sparkles,
+  ChevronRight,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Target,
+  TrendingUp,
+  Award,
+  AlertTriangle,
+  User,
+  Info,
+} from "lucide-react";
 import { AIInsightsEngine, type AIInsight } from "@/lib/aiInsights";
 
 interface Application {
@@ -25,7 +37,7 @@ interface Essay {
 
 interface Assignment {
   id: string;
-  status: 'pending' | 'requested' | 'in_progress' | 'completed' | 'declined';
+  status: "pending" | "requested" | "in_progress" | "completed" | "declined";
   due_date?: string;
   applications: {
     id: string;
@@ -34,8 +46,6 @@ interface Assignment {
     };
   };
 }
-
-
 
 export default function AIAssistant() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -67,10 +77,12 @@ export default function AIAssistant() {
           const essaysRes = await fetch(`/api/applications/${app.id}/answers`);
           if (essaysRes.ok) {
             const appEssays = await essaysRes.json();
-            essaysData.push(...appEssays.map((e: any) => ({
-              ...e,
-              application_id: app.id
-            })));
+            essaysData.push(
+              ...appEssays.map((e: any) => ({
+                ...e,
+                application_id: app.id,
+              })),
+            );
           }
         }
       }
@@ -81,14 +93,18 @@ export default function AIAssistant() {
       if (appsRes.ok) {
         const apps = await appsRes.json();
         for (const app of apps) {
-          const assignmentsRes = await fetch(`/api/applications/${app.id}/recommendations`);
+          const assignmentsRes = await fetch(
+            `/api/applications/${app.id}/recommendations`,
+          );
           if (assignmentsRes.ok) {
             const data = await assignmentsRes.json();
             if (data.assignments && Array.isArray(data.assignments)) {
-              assignmentsData.push(...data.assignments.map((a: any) => ({
-                ...a,
-                applications: app
-              })));
+              assignmentsData.push(
+                ...data.assignments.map((a: any) => ({
+                  ...a,
+                  applications: app,
+                })),
+              );
             }
           }
         }
@@ -104,7 +120,7 @@ export default function AIAssistant() {
         applications,
         essaysData,
         assignmentsData,
-        profileData
+        profileData,
       );
       const generatedInsights = await insightsEngine.generateAIInsights();
       setInsights(generatedInsights);
@@ -121,25 +137,39 @@ export default function AIAssistant() {
 
   function getUrgencyColor(urgency: string) {
     switch (urgency) {
-      case 'high': return 'border-l-red-500 bg-red-50';
-      case 'medium': return 'border-l-yellow-500 bg-yellow-50';
-      case 'low': return 'border-l-green-500 bg-green-50';
-      default: return 'border-l-gray-500 bg-gray-50';
+      case "high":
+        return "border-l-red-500 bg-red-50";
+      case "medium":
+        return "border-l-yellow-500 bg-yellow-50";
+      case "low":
+        return "border-l-green-500 bg-green-50";
+      default:
+        return "border-l-gray-500 bg-gray-50";
     }
   }
 
   function getIconComponent(iconName: string) {
     switch (iconName) {
-      case 'trending-up': return <TrendingUp className="w-4 h-4" />;
-      case 'target': return <Target className="w-4 h-4" />;
-      case 'clock': return <Clock className="w-4 h-4" />;
-      case 'check-circle': return <CheckCircle className="w-4 h-4" />;
-      case 'alert-circle': return <AlertCircle className="w-4 h-4" />;
-      case 'alert-triangle': return <AlertTriangle className="w-4 h-4" />;
-      case 'award': return <Award className="w-4 h-4" />;
-      case 'user': return <User className="w-4 h-4" />;
-      case 'info': return <Info className="w-4 h-4" />;
-      default: return <Sparkles className="w-4 h-4" />;
+      case "trending-up":
+        return <TrendingUp className="w-4 h-4" />;
+      case "target":
+        return <Target className="w-4 h-4" />;
+      case "clock":
+        return <Clock className="w-4 h-4" />;
+      case "check-circle":
+        return <CheckCircle className="w-4 h-4" />;
+      case "alert-circle":
+        return <AlertCircle className="w-4 h-4" />;
+      case "alert-triangle":
+        return <AlertTriangle className="w-4 h-4" />;
+      case "award":
+        return <Award className="w-4 h-4" />;
+      case "user":
+        return <User className="w-4 h-4" />;
+      case "info":
+        return <Info className="w-4 h-4" />;
+      default:
+        return <Sparkles className="w-4 h-4" />;
     }
   }
 
@@ -173,28 +203,38 @@ export default function AIAssistant() {
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">AI Assistant</h3>
-            <p className="text-sm text-gray-600">Your personalized MBA application guide</p>
+            <p className="text-sm text-gray-600">
+              Your personalized MBA application guide
+            </p>
           </div>
         </div>
         <button
           onClick={() => setExpanded(!expanded)}
           className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
         >
-          {expanded ? 'Show less' : 'Show more'}
-          <ChevronRight className={`w-4 h-4 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+          {expanded ? "Show less" : "Show more"}
+          <ChevronRight
+            className={`w-4 h-4 transition-transform ${expanded ? "rotate-90" : ""}`}
+          />
         </button>
       </div>
 
       {/* Primary Insight */}
       {topInsight && (
-        <div className={`border-l-4 p-4 rounded-r-lg mb-4 ${getUrgencyColor(topInsight.urgency)}`}>
-                     <div className="flex items-start gap-3">
-             <div className="text-blue-600 mt-0.5">
-               {getIconComponent(topInsight.icon)}
-             </div>
+        <div
+          className={`border-l-4 p-4 rounded-r-lg mb-4 ${getUrgencyColor(topInsight.urgency)}`}
+        >
+          <div className="flex items-start gap-3">
+            <div className="text-blue-600 mt-0.5">
+              {getIconComponent(topInsight.icon)}
+            </div>
             <div className="flex-1">
-              <h4 className="font-medium text-gray-900 mb-1">{topInsight.title}</h4>
-              <p className="text-sm text-gray-600 mb-3">{topInsight.description}</p>
+              <h4 className="font-medium text-gray-900 mb-1">
+                {topInsight.title}
+              </h4>
+              <p className="text-sm text-gray-600 mb-3">
+                {topInsight.description}
+              </p>
               {topInsight.action && (
                 <button
                   onClick={() => handleActionClick(topInsight.action!.href)}
@@ -213,14 +253,21 @@ export default function AIAssistant() {
       {expanded && remainingInsights.length > 0 && (
         <div className="space-y-3">
           {remainingInsights.map((insight, index) => (
-            <div key={index} className={`border-l-4 p-3 rounded-r-lg ${getUrgencyColor(insight.urgency)}`}>
-                             <div className="flex items-start gap-3">
-                 <div className="text-blue-600 mt-0.5">
-                   {getIconComponent(insight.icon)}
-                 </div>
+            <div
+              key={index}
+              className={`border-l-4 p-3 rounded-r-lg ${getUrgencyColor(insight.urgency)}`}
+            >
+              <div className="flex items-start gap-3">
+                <div className="text-blue-600 mt-0.5">
+                  {getIconComponent(insight.icon)}
+                </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 text-sm mb-1">{insight.title}</h4>
-                  <p className="text-xs text-gray-600 mb-2">{insight.description}</p>
+                  <h4 className="font-medium text-gray-900 text-sm mb-1">
+                    {insight.title}
+                  </h4>
+                  <p className="text-xs text-gray-600 mb-2">
+                    {insight.description}
+                  </p>
                   {insight.action && (
                     <button
                       onClick={() => handleActionClick(insight.action!.href)}
@@ -241,10 +288,11 @@ export default function AIAssistant() {
       {!expanded && insights.length > 1 && (
         <div className="text-center pt-3 border-t border-blue-200">
           <p className="text-xs text-gray-600">
-            +{insights.length - 1} more insight{insights.length > 2 ? 's' : ''} available
+            +{insights.length - 1} more insight{insights.length > 2 ? "s" : ""}{" "}
+            available
           </p>
         </div>
       )}
     </div>
   );
-} 
+}

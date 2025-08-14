@@ -7,18 +7,23 @@ export default async function Requirements({ appId }: { appId: string }) {
   // Get application and school data
   const app = await getApplication(appId);
   const sb = getAdminSupabase();
-  const { data: sch } = await sb.from("schools").select("slug,name").eq("id", app.school_id).single();
-  
+  const { data: sch } = await sb
+    .from("schools")
+    .select("slug,name")
+    .eq("id", app.school_id)
+    .single();
+
   // Load school JSON data using the slug
   const json = sch?.slug ? await getSchoolData(sch.slug) : null;
 
   if (!json) {
     return (
       <div className="p-6 text-sm text-muted-foreground">
-        No local data for this school yet. Please check back later or contact support.
+        No local data for this school yet. Please check back later or contact
+        support.
       </div>
     );
   }
 
   return <RequirementsPanel school={json} applicationId={appId} />;
-} 
+}

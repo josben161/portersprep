@@ -10,20 +10,22 @@ async function seedSchools() {
     website: "https://www.hbs.edu/mba",
     brief: {
       values: ["leadership", "impact", "innovation", "global perspective"],
-      tone: "aspirational, confident, community-focused"
-    }
+      tone: "aspirational, confident, community-focused",
+    },
   });
 
   await addSchoolQuestion(hbsId, {
-    prompt: "What more would you like us to know as we consider your candidacy for the Harvard Business School MBA program?",
+    prompt:
+      "What more would you like us to know as we consider your candidacy for the Harvard Business School MBA program?",
     archetype: "open_ended",
-    word_limit: 500
+    word_limit: 500,
   });
 
   await addSchoolQuestion(hbsId, {
-    prompt: "Briefly describe an experience you had that was important to you and what you learned from it.",
+    prompt:
+      "Briefly describe an experience you had that was important to you and what you learned from it.",
     archetype: "reflection",
-    word_limit: 300
+    word_limit: 300,
   });
 
   // Stanford GSB
@@ -32,21 +34,26 @@ async function seedSchools() {
     slug: "stanford-gsb",
     website: "https://www.gsb.stanford.edu/programs/mba",
     brief: {
-      values: ["innovation", "entrepreneurship", "social impact", "collaboration"],
-      tone: "creative, purpose-driven, collaborative"
-    }
+      values: [
+        "innovation",
+        "entrepreneurship",
+        "social impact",
+        "collaboration",
+      ],
+      tone: "creative, purpose-driven, collaborative",
+    },
   });
 
   await addSchoolQuestion(stanfordId, {
     prompt: "What matters most to you, and why?",
     archetype: "values",
-    word_limit: 650
+    word_limit: 650,
   });
 
   await addSchoolQuestion(stanfordId, {
     prompt: "Why Stanford?",
     archetype: "fit",
-    word_limit: 400
+    word_limit: 400,
   });
 
   // Wharton
@@ -55,21 +62,28 @@ async function seedSchools() {
     slug: "wharton",
     website: "https://mba.wharton.upenn.edu/",
     brief: {
-      values: ["analytics", "business fundamentals", "global business", "leadership"],
-      tone: "analytical, strategic, results-oriented"
-    }
+      values: [
+        "analytics",
+        "business fundamentals",
+        "global business",
+        "leadership",
+      ],
+      tone: "analytical, strategic, results-oriented",
+    },
   });
 
   await addSchoolQuestion(whartonId, {
-    prompt: "How do you plan to use the Wharton MBA program to help you achieve your future professional goals?",
+    prompt:
+      "How do you plan to use the Wharton MBA program to help you achieve your future professional goals?",
     archetype: "goals",
-    word_limit: 500
+    word_limit: 500,
   });
 
   await addSchoolQuestion(whartonId, {
-    prompt: "Describe an impactful experience or accomplishment that is not reflected elsewhere in your application.",
+    prompt:
+      "Describe an impactful experience or accomplishment that is not reflected elsewhere in your application.",
     archetype: "achievement",
-    word_limit: 400
+    word_limit: 400,
   });
 
   // MIT Sloan
@@ -79,20 +93,22 @@ async function seedSchools() {
     website: "https://mitsloan.mit.edu/mba",
     brief: {
       values: ["innovation", "technology", "analytics", "sustainability"],
-      tone: "technical, innovative, data-driven"
-    }
+      tone: "technical, innovative, data-driven",
+    },
   });
 
   await addSchoolQuestion(mitId, {
-    prompt: "The mission of the MIT Sloan School of Management is to develop principled, innovative leaders who improve the world and generate ideas that advance management practice. Discuss how you will contribute toward advancing the mission based on examples of past work and activities.",
+    prompt:
+      "The mission of the MIT Sloan School of Management is to develop principled, innovative leaders who improve the world and generate ideas that advance management practice. Discuss how you will contribute toward advancing the mission based on examples of past work and activities.",
     archetype: "mission_alignment",
-    word_limit: 500
+    word_limit: 500,
   });
 
   await addSchoolQuestion(mitId, {
-    prompt: "Describe a time when you went beyond what was defined, expected, or established.",
+    prompt:
+      "Describe a time when you went beyond what was defined, expected, or established.",
     archetype: "innovation",
-    word_limit: 300
+    word_limit: 300,
   });
 
   // Columbia Business School
@@ -101,21 +117,27 @@ async function seedSchools() {
     slug: "columbia",
     website: "https://www8.gsb.columbia.edu/mba",
     brief: {
-      values: ["global business", "finance", "entrepreneurship", "social responsibility"],
-      tone: "sophisticated, global, ambitious"
-    }
+      values: [
+        "global business",
+        "finance",
+        "entrepreneurship",
+        "social responsibility",
+      ],
+      tone: "sophisticated, global, ambitious",
+    },
   });
 
   await addSchoolQuestion(columbiaId, {
-    prompt: "Through your resume and recommendations, we have a clear sense of your professional path to date. What are your career goals over the next 3-5 years and what, in your imagination, would be your long-term dream job?",
+    prompt:
+      "Through your resume and recommendations, we have a clear sense of your professional path to date. What are your career goals over the next 3-5 years and what, in your imagination, would be your long-term dream job?",
     archetype: "career_goals",
-    word_limit: 500
+    word_limit: 500,
   });
 
   await addSchoolQuestion(columbiaId, {
     prompt: "Who is a leader you admire, and why?",
     archetype: "leadership",
-    word_limit: 300
+    word_limit: 300,
   });
 
   console.log("✅ Schools and questions seeded successfully!");
@@ -128,4 +150,4 @@ async function seedSchools() {
 }
 
 // Run the seed function
-seedSchools().catch(console.error); 
+seedSchools().catch(console.error);

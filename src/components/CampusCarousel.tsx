@@ -14,7 +14,7 @@ const campusImages = [
   "/images/campuses/tuck.png",
   "/images/campuses/baker.png",
   "/images/campuses/melbourne.png",
-  "/images/campuses/sydney.png"
+  "/images/campuses/sydney.png",
 ];
 
 export default function CampusCarousel() {
@@ -25,7 +25,7 @@ export default function CampusCarousel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setIsTransitioning(true);
-      
+
       setTimeout(() => {
         setCurrentIndex(nextIndex);
         setNextIndex((nextIndex + 1) % campusImages.length);
@@ -50,7 +50,7 @@ export default function CampusCarousel() {
           }`}
           priority
         />
-        
+
         {/* Next Image (preloaded) */}
         <Image
           src={campusImages[nextIndex]}
@@ -60,14 +60,15 @@ export default function CampusCarousel() {
           className="absolute inset-0 w-full h-full object-cover opacity-0"
           priority
         />
-        
+
         {/* Overlay with success text and rounded bottom */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-4 rounded-b-xl">
           <p className="text-white text-sm font-medium">
-            Our users have been accepted to Harvard Business School, GSB, and more! See how you can join them.
+            Our users have been accepted to Harvard Business School, GSB, and
+            more! See how you can join them.
           </p>
         </div>
       </div>
     </div>
   );
-} 
+}

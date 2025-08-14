@@ -1,7 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, Target, MessageSquare, Lightbulb, AlertTriangle } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  TrendingUp,
+  TrendingDown,
+  Target,
+  MessageSquare,
+  Lightbulb,
+  AlertTriangle,
+} from "lucide-react";
 
 interface AnalysisData {
   rubric?: {
@@ -33,17 +42,20 @@ interface AnalysisResultsProps {
   onClose?: () => void;
 }
 
-export default function AnalysisResults({ analysis, onClose }: AnalysisResultsProps) {
+export default function AnalysisResults({
+  analysis,
+  onClose,
+}: AnalysisResultsProps) {
   const [expandedSections, setExpandedSections] = useState({
     schoolFocus: true,
     narrative: true,
-    sentences: false
+    sentences: false,
   });
 
   function toggleSection(section: keyof typeof expandedSections) {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
+      [section]: !prev[section],
     }));
   }
 
@@ -88,7 +100,7 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
       {analysis.rubric?.school_focus && (
         <div className="rounded-lg border bg-card">
           <button
-            onClick={() => toggleSection('schoolFocus')}
+            onClick={() => toggleSection("schoolFocus")}
             className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
           >
             <div className="flex items-center gap-3">
@@ -101,13 +113,20 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBackground(analysis.rubric.school_focus.score)} ${getScoreColor(analysis.rubric.school_focus.score)}`}>
-                {analysis.rubric.school_focus.score}/5 - {getScoreLabel(analysis.rubric.school_focus.score)}
+              <div
+                className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBackground(analysis.rubric.school_focus.score)} ${getScoreColor(analysis.rubric.school_focus.score)}`}
+              >
+                {analysis.rubric.school_focus.score}/5 -{" "}
+                {getScoreLabel(analysis.rubric.school_focus.score)}
               </div>
-              {expandedSections.schoolFocus ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              {expandedSections.schoolFocus ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
             </div>
           </button>
-          
+
           {expandedSections.schoolFocus && (
             <div className="px-4 pb-4 space-y-4">
               {/* Score Visualization */}
@@ -118,12 +137,17 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
                     <span>{analysis.rubric.school_focus.score}/5</span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
-                    <div 
+                    <div
                       className={`h-2 rounded-full transition-all ${
-                        analysis.rubric.school_focus.score >= 4 ? 'bg-green-500' :
-                        analysis.rubric.school_focus.score >= 3 ? 'bg-amber-500' : 'bg-red-500'
+                        analysis.rubric.school_focus.score >= 4
+                          ? "bg-green-500"
+                          : analysis.rubric.school_focus.score >= 3
+                            ? "bg-amber-500"
+                            : "bg-red-500"
                       }`}
-                      style={{ width: `${(analysis.rubric.school_focus.score / 5) * 100}%` }}
+                      style={{
+                        width: `${(analysis.rubric.school_focus.score / 5) * 100}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -138,29 +162,43 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
                   </div>
                   <ul className="space-y-2">
                     {analysis.rubric.school_focus.hits?.map((hit, i) => (
-                      <li key={i} className="text-sm text-green-700 bg-green-50 p-2 rounded">
+                      <li
+                        key={i}
+                        className="text-sm text-green-700 bg-green-50 p-2 rounded"
+                      >
                         • {hit}
                       </li>
                     ))}
-                    {(!analysis.rubric.school_focus.hits || analysis.rubric.school_focus.hits.length === 0) && (
-                      <li className="text-sm text-muted-foreground italic">No specific strengths identified</li>
+                    {(!analysis.rubric.school_focus.hits ||
+                      analysis.rubric.school_focus.hits.length === 0) && (
+                      <li className="text-sm text-muted-foreground italic">
+                        No specific strengths identified
+                      </li>
                     )}
                   </ul>
                 </div>
-                
+
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <TrendingDown className="h-4 w-4 text-red-600" />
-                    <div className="font-medium text-red-700">Areas to Improve</div>
+                    <div className="font-medium text-red-700">
+                      Areas to Improve
+                    </div>
                   </div>
                   <ul className="space-y-2">
                     {analysis.rubric.school_focus.misses?.map((miss, i) => (
-                      <li key={i} className="text-sm text-red-700 bg-red-50 p-2 rounded">
+                      <li
+                        key={i}
+                        className="text-sm text-red-700 bg-red-50 p-2 rounded"
+                      >
                         • {miss}
                       </li>
                     ))}
-                    {(!analysis.rubric.school_focus.misses || analysis.rubric.school_focus.misses.length === 0) && (
-                      <li className="text-sm text-muted-foreground italic">No major areas for improvement</li>
+                    {(!analysis.rubric.school_focus.misses ||
+                      analysis.rubric.school_focus.misses.length === 0) && (
+                      <li className="text-sm text-muted-foreground italic">
+                        No major areas for improvement
+                      </li>
                     )}
                   </ul>
                 </div>
@@ -174,7 +212,7 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
       {analysis.rubric?.narrative && (
         <div className="rounded-lg border bg-card">
           <button
-            onClick={() => toggleSection('narrative')}
+            onClick={() => toggleSection("narrative")}
             className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
           >
             <div className="flex items-center gap-3">
@@ -187,13 +225,20 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBackground(analysis.rubric.narrative.cohesion)} ${getScoreColor(analysis.rubric.narrative.cohesion)}`}>
-                {analysis.rubric.narrative.cohesion}/5 - {getScoreLabel(analysis.rubric.narrative.cohesion)}
+              <div
+                className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBackground(analysis.rubric.narrative.cohesion)} ${getScoreColor(analysis.rubric.narrative.cohesion)}`}
+              >
+                {analysis.rubric.narrative.cohesion}/5 -{" "}
+                {getScoreLabel(analysis.rubric.narrative.cohesion)}
               </div>
-              {expandedSections.narrative ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              {expandedSections.narrative ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
             </div>
           </button>
-          
+
           {expandedSections.narrative && (
             <div className="px-4 pb-4 space-y-4">
               {/* Score Visualization */}
@@ -204,12 +249,17 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
                     <span>{analysis.rubric.narrative.cohesion}/5</span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
-                    <div 
+                    <div
                       className={`h-2 rounded-full transition-all ${
-                        analysis.rubric.narrative.cohesion >= 4 ? 'bg-green-500' :
-                        analysis.rubric.narrative.cohesion >= 3 ? 'bg-amber-500' : 'bg-red-500'
+                        analysis.rubric.narrative.cohesion >= 4
+                          ? "bg-green-500"
+                          : analysis.rubric.narrative.cohesion >= 3
+                            ? "bg-amber-500"
+                            : "bg-red-500"
                       }`}
-                      style={{ width: `${(analysis.rubric.narrative.cohesion / 5) * 100}%` }}
+                      style={{
+                        width: `${(analysis.rubric.narrative.cohesion / 5) * 100}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -220,11 +270,16 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle className="h-4 w-4 text-amber-600" />
-                    <div className="font-medium text-amber-700">Narrative Gaps</div>
+                    <div className="font-medium text-amber-700">
+                      Narrative Gaps
+                    </div>
                   </div>
                   <ul className="space-y-2">
                     {analysis.rubric.narrative.gaps.map((gap, i) => (
-                      <li key={i} className="text-sm text-amber-700 bg-amber-50 p-2 rounded">
+                      <li
+                        key={i}
+                        className="text-sm text-amber-700 bg-amber-50 p-2 rounded"
+                      >
                         • {gap}
                       </li>
                     ))}
@@ -240,7 +295,10 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
                   </div>
                   <ul className="space-y-2">
                     {analysis.rubric.narrative.notes.map((note, i) => (
-                      <li key={i} className="text-sm text-blue-700 bg-blue-50 p-2 rounded">
+                      <li
+                        key={i}
+                        className="text-sm text-blue-700 bg-blue-50 p-2 rounded"
+                      >
                         • {note}
                       </li>
                     ))}
@@ -256,7 +314,7 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
       {analysis.sentences && analysis.sentences.length > 0 && (
         <div className="rounded-lg border bg-card">
           <button
-            onClick={() => toggleSection('sentences')}
+            onClick={() => toggleSection("sentences")}
             className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
           >
             <div className="flex items-center gap-3">
@@ -272,19 +330,28 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
               <div className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
                 {analysis.sentences.length} suggestions
               </div>
-              {expandedSections.sentences ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              {expandedSections.sentences ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
             </div>
           </button>
-          
+
           {expandedSections.sentences && (
             <div className="px-4 pb-4 space-y-3">
               {analysis.sentences.slice(0, 5).map((sentence, i) => (
                 <div key={i} className="p-3 bg-muted/30 rounded-lg">
                   <div className="flex items-start justify-between mb-2">
-                    <div className="text-sm font-medium">Sentence {sentence.idx + 1}</div>
+                    <div className="text-sm font-medium">
+                      Sentence {sentence.idx + 1}
+                    </div>
                     <div className="flex gap-1">
                       {sentence.tags?.map((tag, j) => (
-                        <span key={j} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded">
+                        <span
+                          key={j}
+                          className="px-2 py-1 bg-primary/10 text-primary text-xs rounded"
+                        >
                           {tag}
                         </span>
                       ))}
@@ -300,13 +367,20 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
                   </div>
                   {sentence.suggestions?.length > 0 && (
                     <div>
-                      <div className="text-xs font-medium text-muted-foreground mb-1">Suggestions:</div>
+                      <div className="text-xs font-medium text-muted-foreground mb-1">
+                        Suggestions:
+                      </div>
                       <ul className="space-y-1">
-                        {sentence.suggestions.slice(0, 2).map((suggestion, j) => (
-                          <li key={j} className="text-xs text-muted-foreground bg-background p-2 rounded">
-                            • {suggestion.text}
-                          </li>
-                        ))}
+                        {sentence.suggestions
+                          .slice(0, 2)
+                          .map((suggestion, j) => (
+                            <li
+                              key={j}
+                              className="text-xs text-muted-foreground bg-background p-2 rounded"
+                            >
+                              • {suggestion.text}
+                            </li>
+                          ))}
                       </ul>
                     </div>
                   )}
@@ -331,4 +405,4 @@ export default function AnalysisResults({ analysis, onClose }: AnalysisResultsPr
       </div>
     </div>
   );
-} 
+}

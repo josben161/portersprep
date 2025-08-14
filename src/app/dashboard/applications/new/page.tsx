@@ -63,7 +63,7 @@ export default function NewApplicationPage() {
   // Load detailed school data when selected
   useEffect(() => {
     if (!selectedSchool?.id) return;
-    
+
     async function loadSchoolDetails() {
       try {
         const response = await fetch(`/api/schools/${selectedSchool?.id}`);
@@ -79,8 +79,8 @@ export default function NewApplicationPage() {
   }, [selectedSchool?.id]);
 
   // Filter schools based on search
-  const filteredSchools = schools.filter(school =>
-    school.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredSchools = schools.filter((school) =>
+    school.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Get default deadline based on round
@@ -88,7 +88,7 @@ export default function NewApplicationPage() {
     if (!selectedSchool?.deadlines) {
       const now = new Date();
       const currentYear = now.getFullYear();
-      
+
       switch (round) {
         case "1":
           return `${currentYear}-09-15`;
@@ -100,7 +100,7 @@ export default function NewApplicationPage() {
           return "";
       }
     }
-    
+
     // Use real deadlines from school data
     switch (round) {
       case "1":
@@ -121,20 +121,20 @@ export default function NewApplicationPage() {
 
   async function createApplication() {
     if (!selectedSchool) return;
-    
+
     setCreating(true);
     try {
       console.log("Creating application with school:", selectedSchool);
       console.log("School ID being sent:", selectedSchool.id);
-      
+
       const response = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           school_id: selectedSchool.id,
           round: parseInt(round),
-          deadline: deadline || getDefaultDeadline(round)
-        })
+          deadline: deadline || getDefaultDeadline(round),
+        }),
       });
 
       if (response.ok) {
@@ -186,12 +186,22 @@ export default function NewApplicationPage() {
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-4">
-              <Link 
-                href="/dashboard/applications" 
+              <Link
+                href="/dashboard/applications"
                 className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
                 Back to Applications
               </Link>
@@ -210,7 +220,7 @@ export default function NewApplicationPage() {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Select School
               </h2>
-              
+
               {/* Search */}
               <div className="mb-4">
                 <input
@@ -227,7 +237,19 @@ export default function NewApplicationPage() {
                 {filteredSchools.map((school) => (
                   <button
                     key={school.id}
-                    onClick={() => setSelectedSchool({ ...school, essays: [], video_assessment: null, lor: null, verify_in_portal: false, last_checked: "", country: "", cycle: "", deadlines: { round1: "", round2: "", round3: "" } })}
+                    onClick={() =>
+                      setSelectedSchool({
+                        ...school,
+                        essays: [],
+                        video_assessment: null,
+                        lor: null,
+                        verify_in_portal: false,
+                        last_checked: "",
+                        country: "",
+                        cycle: "",
+                        deadlines: { round1: "", round2: "", round3: "" },
+                      })
+                    }
                     className={`w-full text-left p-4 rounded-lg border transition-all ${
                       selectedSchool?.id === school.id
                         ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
@@ -250,7 +272,7 @@ export default function NewApplicationPage() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                     {selectedSchool.name}
                   </h2>
-                  
+
                   <div className="space-y-4">
                     {/* Round Selection */}
                     <div>
@@ -288,25 +310,57 @@ export default function NewApplicationPage() {
                       </h3>
                       <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                         <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          <svg
+                            className="w-4 h-4 text-green-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
                           </svg>
                           Essays: {selectedSchool.essays?.length || 0} required
                         </div>
                         {selectedSchool.lor && (
                           <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg
+                              className="w-4 h-4 text-green-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
                             </svg>
-                            Letters of Recommendation: {selectedSchool.lor.count} required
+                            Letters of Recommendation:{" "}
+                            {selectedSchool.lor.count} required
                           </div>
                         )}
                         {selectedSchool.video_assessment && (
                           <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            <svg
+                              className="w-4 h-4 text-blue-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
                             </svg>
-                            Video Assessment: {selectedSchool.video_assessment.provider}
+                            Video Assessment:{" "}
+                            {selectedSchool.video_assessment.provider}
                           </div>
                         )}
                       </div>
@@ -329,8 +383,18 @@ export default function NewApplicationPage() {
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
                       </svg>
                       Create Application
                     </>
@@ -353,4 +417,4 @@ export default function NewApplicationPage() {
       </div>
     </div>
   );
-} 
+}

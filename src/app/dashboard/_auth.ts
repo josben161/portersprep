@@ -5,6 +5,10 @@ export async function requireProfile() {
   const { userId } = auth();
   if (!userId) return null;
   const user = await currentUser();
-  const profile = await getOrCreateProfileByClerkId(userId, user?.emailAddresses?.[0]?.emailAddress, user?.firstName ?? undefined);
+  const profile = await getOrCreateProfileByClerkId(
+    userId,
+    user?.emailAddresses?.[0]?.emailAddress,
+    user?.firstName ?? undefined,
+  );
   return profile;
-} 
+}

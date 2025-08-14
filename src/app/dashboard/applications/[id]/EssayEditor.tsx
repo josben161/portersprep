@@ -26,7 +26,11 @@ interface EssayEditorProps {
   onSave: () => void;
 }
 
-export default function EssayEditor({ appId, question, answer }: EssayEditorProps) {
+export default function EssayEditor({
+  appId,
+  question,
+  answer,
+}: EssayEditorProps) {
   const [content, setContent] = useState("");
   const [wordCount, setWordCount] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -43,7 +47,7 @@ export default function EssayEditor({ appId, question, answer }: EssayEditorProp
     if (saveTimer.current) {
       clearTimeout(saveTimer.current);
     }
-    
+
     if (content.trim()) {
       saveTimer.current = setTimeout(() => {
         saveContent();
@@ -58,7 +62,10 @@ export default function EssayEditor({ appId, question, answer }: EssayEditorProp
   }, [content]);
 
   function countWords(text: string): number {
-    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    return text
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length;
   }
 
   async function loadContent() {
@@ -88,11 +95,11 @@ export default function EssayEditor({ appId, question, answer }: EssayEditorProp
       const res = await fetch(`/api/answers/${answer.id}/content`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: content })
+        body: JSON.stringify({ text: content }),
       });
 
       if (!res.ok) throw new Error("Failed to save");
-      
+
       setWordCount(countWords(content));
       toast.success("Saved");
     } catch (error) {
@@ -111,11 +118,11 @@ export default function EssayEditor({ appId, question, answer }: EssayEditorProp
     setAnalyzing(true);
     try {
       const res = await fetch(`/api/answers/${answer.id}/analyze`, {
-        method: "POST"
+        method: "POST",
       });
 
       if (!res.ok) throw new Error("Analysis failed");
-      
+
       const data = await res.json();
       setAnalysis(data);
       toast.success("Analysis complete!");
@@ -127,7 +134,8 @@ export default function EssayEditor({ appId, question, answer }: EssayEditorProp
   }
 
   const isOverLimit = question.word_limit && wordCount > question.word_limit;
-  const isNearLimit = question.word_limit && wordCount > question.word_limit * 0.9;
+  const isNearLimit =
+    question.word_limit && wordCount > question.word_limit * 0.9;
 
   return (
     <div className="space-y-4">
@@ -135,17 +143,25 @@ export default function EssayEditor({ appId, question, answer }: EssayEditorProp
       <div className="rounded-lg border bg-card p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h3 className="font-medium">{question.metadata?.title || "Essay"}</h3>
+            <h3 className="font-medium">
+              {question.metadata?.title || "Essay"}
+            </h3>
             <div className="mt-1 text-sm text-muted-foreground">
-              {question.word_limit ? `${question.word_limit} words` : "No word limit"}
+              {question.word_limit
+                ? `${question.word_limit} words`
+                : "No word limit"}
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-sm font-medium ${
-              isOverLimit ? "text-red-600" : 
-              isNearLimit ? "text-amber-600" : 
-              "text-muted-foreground"
-            }`}>
+            <div
+              className={`text-sm font-medium ${
+                isOverLimit
+                  ? "text-red-600"
+                  : isNearLimit
+                    ? "text-amber-600"
+                    : "text-muted-foreground"
+              }`}
+            >
               {wordCount} words
             </div>
             {question.word_limit && (
@@ -184,18 +200,18 @@ export default function EssayEditor({ appId, question, answer }: EssayEditorProp
             onChange={(e) => setContent(e.target.value)}
             placeholder="Start writing your essay here..."
             className="w-full h-96 resize-none border-0 focus:outline-none focus:ring-0 text-sm leading-relaxed"
-            style={{ fontFamily: 'inherit' }}
+            style={{ fontFamily: "inherit" }}
           />
         </div>
       </div>
 
       {/* Analysis Results */}
       {analysis && (
-        <AnalysisResults 
-          analysis={analysis} 
+        <AnalysisResults
+          analysis={analysis}
           onClose={() => setAnalysis(null)}
         />
       )}
     </div>
   );
-} 
+}
