@@ -78,7 +78,11 @@ export async function POST(req: NextRequest) {
       const { error: insertError } = await sb.from("profiles")
         .insert({ 
           clerk_user_id: userId,
-          resume_key: key
+          resume_key: key,
+          resume_filename: originalFileName,
+          email: "user@example.com", // Provide default email to satisfy constraint
+          name: "User",
+          subscription_tier: "free"
         });
       
       if (insertError) {
