@@ -41,7 +41,7 @@ export default function TopNav() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center">
+        <Link href={isSignedIn ? "/dashboard" : "/"} className="flex items-center">
           <Image
             src="/brand/long_logo.png"
             alt="The Admit Architect"
