@@ -56,10 +56,10 @@ export async function POST(request: NextRequest) {
         // Handle function call with user ID for memory storage
         functionCall = aiResponse.message.function_call;
         response = await handleFunctionCall(functionCall, profile.id);
-      } else if (aiResponse && "content" in aiResponse) {
+      } else if (aiResponse && "message" in aiResponse && aiResponse.message && "content" in aiResponse.message) {
         // Handle regular response
         response =
-          aiResponse.content ||
+          aiResponse.message.content ||
           "I apologize, but I encountered an error processing your request.";
       } else {
         console.error("Unexpected AI response format:", aiResponse);
