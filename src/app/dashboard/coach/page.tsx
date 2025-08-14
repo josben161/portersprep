@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getPersonalizedGreeting } from "@/lib/coach-personalization";
 
 interface Message {
   id: string;
@@ -35,17 +34,14 @@ export default function CoachPage() {
     // Load personalized greeting
     const loadGreeting = async () => {
       try {
-        const response = await fetch("/api/me");
+        const response = await fetch('/api/coach/greeting');
         const data = await response.json();
-        if (data.profile?.id) {
-          const greeting = await getPersonalizedGreeting(data.profile.id);
-          setPersonalizedGreeting(greeting);
+        if (data.greeting) {
+          setPersonalizedGreeting(data.greeting);
         }
       } catch (error) {
-        console.error("Error loading greeting:", error);
-        setPersonalizedGreeting(
-          "Hello! I'm The Admit Planner, and I'm here to help you with your college application process.",
-        );
+        console.error('Error loading greeting:', error);
+        setPersonalizedGreeting("Hello! I'm The Admit Planner, and I'm here to help you with your college application process.");
       }
     };
 
