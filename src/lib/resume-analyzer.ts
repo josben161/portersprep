@@ -133,7 +133,7 @@ ${resumeText}
 Provide a comprehensive analysis in JSON format.`;
 
     const response = await openai!.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
@@ -223,7 +223,7 @@ Provide 5-7 specific, actionable insights for improving MBA application chances.
 Format as a numbered list.`;
 
     const response = await openai!.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
