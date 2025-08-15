@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 import { getOrCreateProfileByClerkId } from "@/lib/db";
 import { getApplication, listSchoolQuestions } from "@/lib/apps";
+import { callGateway } from "@/lib/ai";
 
 export async function POST(req: Request) {
   const { userId } = auth();
@@ -58,23 +59,21 @@ Guidelines:
 - Produce tight, essay‑ready prose (no meta commentary).
 - If a metric is missing, ask for [ADD METRIC] rather than inventing it.`;
 
-  const r = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY!}`,
+  const { content } = await callGateway("coach", {
+    userId: p.id,
+    params: {
+      storyId: body.storyId,
+      applicationId: body.applicationId,
+      storySummary: story.summary,
+      schoolName: schoolRow?.name,
+      tone: body?.tone,
+      focusTags: body?.focusTags,
+      wordLimit: body?.wordLimit,
+      schoolBrief: schoolRow?.brief,
+      questions,
     },
-    body: JSON.stringify({
-      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      temperature: 0.5,
-    }),
   });
-  const j = await r.json();
-  const adapted = j.choices?.[0]?.message?.content ?? story.summary;
+  const adapted = content ?? story.summary;
 
   // upsert variant (unique by story_id + application_id)
   const style = {

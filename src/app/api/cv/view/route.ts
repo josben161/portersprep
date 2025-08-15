@@ -22,22 +22,21 @@ export async function GET(request: NextRequest) {
     const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET,
       Key: profile.resume_key,
-      ResponseContentDisposition: `inline; filename="${profile.resume_filename || 'CV.pdf'}"`,
+      ResponseContentDisposition: `inline; filename="${profile.resume_filename || "CV.pdf"}"`,
     });
 
     const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // 1 hour
 
     return NextResponse.json({
       url: presignedUrl,
-      filename: profile.resume_filename || 'CV.pdf',
-      key: profile.resume_key
+      filename: profile.resume_filename || "CV.pdf",
+      key: profile.resume_key,
     });
-
   } catch (error) {
     console.error("CV view error:", error);
     return NextResponse.json(
       { error: "Failed to generate CV URL" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

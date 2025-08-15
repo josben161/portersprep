@@ -34,14 +34,16 @@ export default function CoachPage() {
     // Load personalized greeting
     const loadGreeting = async () => {
       try {
-        const response = await fetch('/api/coach/greeting');
+        const response = await fetch("/api/coach/greeting");
         const data = await response.json();
         if (data.greeting) {
           setPersonalizedGreeting(data.greeting);
         }
       } catch (error) {
-        console.error('Error loading greeting:', error);
-        setPersonalizedGreeting("Hello! I'm The Admit Planner, and I'm here to help you with your college application process.");
+        console.error("Error loading greeting:", error);
+        setPersonalizedGreeting(
+          "Hello! I'm The Admit Planner, and I'm here to help you with your college application process.",
+        );
       }
     };
 
@@ -70,7 +72,11 @@ export default function CoachPage() {
                 functionCall: conv.context?.functionCall,
               },
             ])
-            .sort((a: Message, b: Message) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+            .sort(
+              (a: Message, b: Message) =>
+                new Date(a.timestamp).getTime() -
+                new Date(b.timestamp).getTime(),
+            );
           setMessages(formattedMessages);
         }
       })

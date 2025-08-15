@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     // Try to use the function first, fallback to direct insert if function doesn't exist
     let data, error;
-    
+
     try {
       const result = await sb.rpc("create_story", {
         p_user_id: profile.id,
@@ -48,7 +48,10 @@ export async function POST(req: NextRequest) {
       data = result.data;
       error = result.error;
     } catch (functionError) {
-      console.log("Function not available, using direct insert:", functionError);
+      console.log(
+        "Function not available, using direct insert:",
+        functionError,
+      );
       // Fallback to direct insert
       const result = await sb
         .from("anchor_stories")

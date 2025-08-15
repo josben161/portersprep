@@ -5,11 +5,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint && npm run check:openai",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "seed": "tsx src/scripts/seed-schools.ts",
     "health:env": "tsx scripts/health/check-env.ts",
-    "s3:cors": "tsx scripts/configure-s3-cors.js"
+    "s3:cors": "tsx scripts/configure-s3-cors.js",
+    "check:openai": "node tools/check-openai-usage.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.569.0",
@@ -25,6 +26,7 @@
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@stripe/stripe-js": "^7.8.0",
+    "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "2.47.10",
     "@tiptap/extension-character-count": "^3.1.0",
     "@tiptap/react": "^3.1.0",
@@ -45,7 +47,7 @@
     "stripe": "14.21.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "3.23.8"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "20.14.10",

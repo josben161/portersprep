@@ -1,0 +1,49 @@
+{
+  "id": "hbs",
+  "name": "Harvard Business School",
+  "country": "USA",
+  "cycle": "2025-2026",
+  "deadlines": {
+    "round1": "2025-09-04",
+    "round2": "2026-01-06",
+    "round3": "2026-04-01"
+  },
+  "essays": [
+    {
+      "type": "short",
+      "title": "Leadership Example",
+      "prompt": "Briefly describe an example of when you led a team or group.",
+      "word_limit": 300,
+      "source_url": "https://www.hbs.edu/mba/admissions/application-process/Pages/default.aspx"
+    },
+    {
+      "type": "short",
+      "title": "Significant Growth",
+      "prompt": "Briefly describe an example of when you experienced significant growth.",
+      "word_limit": 300,
+      "source_url": "https://www.hbs.edu/mba/admissions/application-process/Pages/default.aspx"
+    },
+    {
+      "type": "short",
+      "title": "Contribution to Community/Diversity",
+      "prompt": "Briefly describe an example of when you contributed to your community or promoted diversity.",
+      "word_limit": 300,
+      "source_url": "https://www.hbs.edu/mba/admissions/application-process/Pages/default.aspx"
+    }
+  ],
+  "video_assessment": null,
+  "lor": {
+    "count": 2,
+    "format": "School form"
+  },
+  "verify_in_portal": true,
+  "last_checked": "2024-12-19",
+  "website": "https://www.hbs.edu/mba",
+  "location": "Boston, MA",
+  "class_size": 1015,
+  "acceptance_rate": "11.5%",
+  "avg_gmat": 730,
+  "avg_gpa": 3.7,
+  "tuition": "$76,410/year",
+  "application_fee": "$250"
+}

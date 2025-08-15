@@ -2,6 +2,7 @@ import { z } from "zod";
 import { requireAuthedProfile } from "@/lib/authz";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 import { getQuotaSnapshot, assertWithinLimit, logAiUse } from "@/lib/quota";
+import { callGateway } from "@/lib/ai";
 
 const Intake = z.object({
   resumeText: z.string().min(50, "Provide at least a short resume summary"),
@@ -53,29 +54,25 @@ Return JSON with:
 - "overall": { "strengths": ["..."], "risks": ["..."], "strategy": ["..."] }
   `.trim();
 
-  const r = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY!}`,
+  const { content } = await callGateway("predict", {
+    userId: profile.id,
+    params: {
+      resumeText: input.resumeText,
+      gmat: input.gmat,
+      gre: input.gre,
+      gpa: input.gpa,
+      yearsExp: input.yearsExp,
+      industry: input.industry,
+      roles: input.roles,
+      targetSchools: input.targetSchools,
+      goals: input.goals,
+      constraints: input.constraints,
     },
-    body: JSON.stringify({
-      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "Respond with strictly valid JSON. No markdown.",
-        },
-        { role: "user", content: prompt },
-      ],
-      temperature: 0.3,
-    }),
   });
 
-  const j = await r.json();
   let parsed: any;
   try {
-    parsed = JSON.parse(j.choices?.[0]?.message?.content ?? "{}");
+    parsed = JSON.parse(content);
   } catch {
     parsed = {
       schools: [],

@@ -18,7 +18,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (!profile.resume_key) {
-      return NextResponse.json({ error: "No resume uploaded" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No resume uploaded" },
+        { status: 400 },
+      );
     }
 
     // Get the resume content from S3
@@ -32,9 +35,12 @@ export async function POST(req: NextRequest) {
       });
 
       const response = await s3.send(command);
-      
+
       if (!response.Body) {
-        return NextResponse.json({ error: "Could not read resume content" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Could not read resume content" },
+          { status: 500 },
+        );
       }
 
       // Get the file as a buffer
@@ -48,20 +54,26 @@ export async function POST(req: NextRequest) {
       let resumeText: string;
       try {
         // Import pdf-parse and use it directly
-        const pdfParse = (await import('pdf-parse')).default;
-        
+        const pdfParse = (await import("pdf-parse")).default;
+
         // Parse the PDF buffer
         const data = await pdfParse(buffer);
         resumeText = data.text;
-        
+
         if (!resumeText || resumeText.trim().length === 0) {
-          return NextResponse.json({ error: "Could not extract text from PDF" }, { status: 500 });
+          return NextResponse.json(
+            { error: "Could not extract text from PDF" },
+            { status: 500 },
+          );
         }
-        
+
         console.log("Extracted text length:", resumeText.length);
       } catch (pdfError) {
         console.error("PDF extraction error:", pdfError);
-        return NextResponse.json({ error: "Could not extract text from PDF file" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Could not extract text from PDF file" },
+          { status: 500 },
+        );
       }
 
       // Analyze the resume
@@ -81,17 +93,18 @@ export async function POST(req: NextRequest) {
 
       await logAiUse(profile.id, "ai_analyze");
       return NextResponse.json({ analysis });
-
     } catch (s3Error) {
       console.error("S3 error:", s3Error);
-      return NextResponse.json({ error: "Could not access resume file" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Could not access resume file" },
+        { status: 500 },
+      );
     }
-
   } catch (error) {
     console.error("Resume analysis error:", error);
     return NextResponse.json(
       { error: "Failed to analyze resume" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

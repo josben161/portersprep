@@ -11,31 +11,31 @@ export async function chatJson({
   temperature?: number;
   timeoutMs?: number;
 }) {
-  const ctrl = new AbortController();
-  const to = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY!}`,
-      },
-      body: JSON.stringify({
+    const { content } = await callGateway("coach", {
+      userId: "anonymous",
+      params: {
+        system,
+        user,
         model,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
         temperature,
-      }),
-      signal: ctrl.signal,
+      },
     });
-    const j = await res.json();
-    const txt = j.choices?.[0]?.message?.content ?? "{}";
-    return JSON.parse(txt);
+    return JSON.parse(content);
   } catch (e) {
     return { error: "ai_timeout_or_error" };
-  } finally {
-    clearTimeout(to);
   }
+}
+
+export async function callGateway(
+  mode: "coach" | "predict" | "resume" | "recommender",
+  body: any,
+) {
+  const res = await fetch("/api/ai/gateway", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body ? { ...body, mode } : { mode }),
+  });
+  if (!res.ok) throw new Error(`Gateway error ${res.status}`);
+  return res.json();
 }

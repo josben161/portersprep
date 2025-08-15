@@ -1,37 +1,28 @@
 import { NextRequest } from "next/server";
 import { requireAuthedProfile } from "@/lib/authz";
-import { chatJson } from "@/lib/ai";
+import { callGateway } from "@/lib/ai";
 
 export async function POST(req: NextRequest) {
   const { profile } = await requireAuthedProfile();
   const { question } = await req.json();
+  const traceId = `ask-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
   if (!question || typeof question !== "string") {
     return new Response("Missing question", { status: 400 });
   }
 
   try {
-    const response = await chatJson({
-      system: `You are an expert MBA admissions coach with deep knowledge of business school applications, essays, interviews, and the overall admissions process. You provide practical, actionable advice to help applicants succeed.
-
-Key areas of expertise:
-- Essay writing strategies and structure
-- School selection and fit assessment
-- Application timeline planning
-- Interview preparation
-- Resume optimization
-- Letter of recommendation guidance
-- GMAT/GRE strategy
-- Career goals articulation
-
-Always provide specific, actionable advice. Be encouraging but realistic. Focus on practical steps the applicant can take.`,
-      user: question,
-      model: "gpt-4-turbo-preview",
+    const { content } = await callGateway("coach", {
+      userId: profile.id,
+      params: {
+        question,
+        mode: "expert_advice",
+      },
     });
 
-    return Response.json({ response: response.content });
+    return Response.json({ response: content });
   } catch (error) {
-    console.error("Coach API error:", error);
+    console.error(`Coach API error [${traceId}]:`, error);
     return new Response("Failed to get response", { status: 500 });
   }
 }

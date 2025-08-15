@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 import { requireAuthedProfile } from "@/lib/authz";
-import { generateCoachResponse, handleFunctionCall } from "@/lib/openai";
-import { aiContextManager } from "@/lib/ai-context-manager";
+import { callGateway } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
+  const traceId = `chat-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   try {
     const { profile } = await requireAuthedProfile();
     const { message, context } = await request.json();
@@ -31,43 +32,33 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Gather user context using the central AI context manager
-    const userContext = await aiContextManager.getUserContext(profile.id);
-
     let response: string;
     let functionCall: any = null;
 
-    // Generate AI response
-    const messages = [{ role: "user" as const, content: message }];
-
+    // Generate AI response using the gateway
     try {
       console.log("Generating coach response...");
-      const aiResponse = await generateCoachResponse(messages, userContext);
-      console.log("AI Response received:", aiResponse);
+      const { content } = await callGateway("coach", {
+        userId: profile.id,
+        params: {
+          message,
+          context,
+        },
+      });
 
-      // Check if response has function_call (OpenAI Choice type)
-      if (
-        aiResponse &&
-        "message" in aiResponse &&
-        aiResponse.message &&
-        "function_call" in aiResponse.message &&
-        aiResponse.message.function_call
-      ) {
-        // Handle function call with user ID for memory storage
-        functionCall = aiResponse.message.function_call;
-        response = await handleFunctionCall(functionCall, profile.id);
-      } else if (aiResponse && "message" in aiResponse && aiResponse.message && "content" in aiResponse.message) {
-        // Handle regular response
-        response =
-          aiResponse.message.content ||
-          "I apologize, but I encountered an error processing your request.";
-      } else {
-        console.error("Unexpected AI response format:", aiResponse);
-        response =
-          "I apologize, but I encountered an error processing your request.";
-      }
+      response =
+        content ||
+        "I apologize, but I encountered an error processing your request.";
+      console.log("AI Response received:", response);
     } catch (error) {
-      console.error("OpenAI error:", error);
+      console.error(`OpenAI error [${traceId}]:`, error);
+      // Check if it's a gateway error with traceId
+      if (error && typeof error === "object" && "traceId" in error) {
+        return NextResponse.json(
+          { error: "AI service error", traceId: error.traceId },
+          { status: 500 },
+        );
+      }
       // Fallback response
       response = `I'm here to help you with your college application process. I can assist with essay writing, application strategy, school selection, and more. What specific area would you like to work on?`;
     }
@@ -84,7 +75,6 @@ export async function POST(request: NextRequest) {
             response,
             context: {
               ...context,
-              userContext: userContext,
               functionCall: functionCall,
             },
           })
@@ -101,32 +91,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Store insights in memory if function was called and Supabase is available
-    if (functionCall && supabase) {
-      try {
-        await aiContextManager.storeMemory(profile.id, {
-          memory_type: "insight",
-          content: {
-            function: functionCall.name,
-            arguments: functionCall.arguments,
-            timestamp: new Date().toISOString(),
-          },
-          context: { source: "planner_chat" },
-        });
-      } catch (error) {
-        console.error("Error storing memory:", error);
-      }
-    }
-
     return NextResponse.json({
       message: response,
       conversationId: conversation?.id,
       functionCall: functionCall,
     });
   } catch (error) {
-    console.error("Coach chat error:", error);
+    console.error(`Coach chat error [${traceId}]:`, error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", traceId },
       { status: 500 },
     );
   }

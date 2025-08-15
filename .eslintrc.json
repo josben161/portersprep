@@ -1,6 +1,28 @@
 {
-  "extends": "next/core-web-vitals",
+  "extends": ["next/core-web-vitals"],
   "rules": {
-    "react/no-unescaped-entities": "off"
+    "react/no-unescaped-entities": "off",
+    // Prefer the gateway: disallow importing 'openai' directly
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ImportDeclaration[source.value='openai']",
+        "message": "Use /api/ai/gateway instead of importing 'openai' directly."
+      }
+    ],
+    // Prevent Node-only modules in client components
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          { "name": "fs", "message": "Node 'fs' is server-only." },
+          { "name": "path", "message": "Node 'path' is server-only." },
+          {
+            "name": "pdf-parse",
+            "message": "pdf-parse is server-only — use the API route."
+          }
+        ]
+      }
+    ]
   }
 }

@@ -38,7 +38,9 @@ export async function GET() {
     try {
       const { data: extendedData } = await sb
         .from("profiles")
-        .select("resume_key, resume_filename, resume_analysis, goals, industry, years_exp, gpa, gmat")
+        .select(
+          "resume_key, resume_filename, resume_analysis, goals, industry, years_exp, gpa, gmat",
+        )
         .eq("id", profile.id)
         .single();
 
@@ -81,7 +83,14 @@ export async function PUT(req: NextRequest) {
     const safeFields = ["name", "resume_key"]; // Start with fields we know exist
 
     // Try to include additional fields if they exist
-    const additionalFields = ["goals", "industry", "years_exp", "gpa", "gmat", "resume_filename"];
+    const additionalFields = [
+      "goals",
+      "industry",
+      "years_exp",
+      "gpa",
+      "gmat",
+      "resume_filename",
+    ];
 
     for (const k of [...safeFields, ...additionalFields]) {
       if (k in body) {

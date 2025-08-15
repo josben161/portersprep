@@ -10,14 +10,14 @@ export default function RunPredictModal({ onDone }: { onDone?: () => void }) {
   async function runPrediction() {
     setLoading(true);
     setInsufficientContext(null);
-    
+
     try {
       const r = await apiFetch("/api/predict/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       });
-      
+
       if (r.ok) {
         onDone?.();
       } else {
@@ -45,7 +45,7 @@ export default function RunPredictModal({ onDone }: { onDone?: () => void }) {
       >
         {loading ? "Running..." : "Run Prediction"}
       </button>
-      
+
       {insufficientContext && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
@@ -64,14 +64,17 @@ export default function RunPredictModal({ onDone }: { onDone?: () => void }) {
                 ✕
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 {insufficientContext.message}
               </p>
-              
+
               <div className="bg-muted/50 rounded-lg p-4">
-                <div className="text-sm font-medium mb-2">Profile Completeness: {insufficientContext.profileCompleteness}%</div>
+                <div className="text-sm font-medium mb-2">
+                  Profile Completeness:{" "}
+                  {insufficientContext.profileCompleteness}%
+                </div>
                 <div className="space-y-2 text-sm">
                   {insufficientContext.missing.resume && (
                     <div className="flex items-center gap-2">
@@ -99,7 +102,7 @@ export default function RunPredictModal({ onDone }: { onDone?: () => void }) {
                   )}
                 </div>
               </div>
-              
+
               <div className="flex gap-2">
                 <Link
                   href="/dashboard"

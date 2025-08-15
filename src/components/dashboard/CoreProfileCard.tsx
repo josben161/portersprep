@@ -40,7 +40,6 @@ export default function CoreProfileCard() {
   } | null>(null);
   const [stories, setStories] = useState<Story[]>([]);
 
-
   useEffect(() => {
     (async () => {
       try {
@@ -126,10 +125,10 @@ export default function CoreProfileCard() {
       console.log("CV upload completed successfully:", result);
 
       // Update local state with new resume_key and filename
-      setP((prev: any) => ({ 
-        ...prev, 
+      setP((prev: any) => ({
+        ...prev,
         resume_key: result.key,
-        resume_filename: file.name // Store the original filename
+        resume_filename: file.name, // Store the original filename
       }));
 
       setMessage({ type: "success", text: `CV uploaded successfully!` });
@@ -191,7 +190,11 @@ export default function CoreProfileCard() {
         body: JSON.stringify({ ...p, resume_key: null, resume_filename: null }),
       });
 
-      setP((prev: any) => ({ ...prev, resume_key: null, resume_filename: null }));
+      setP((prev: any) => ({
+        ...prev,
+        resume_key: null,
+        resume_filename: null,
+      }));
       setMessage({ type: "success", text: "CV removed successfully" });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
@@ -213,7 +216,7 @@ export default function CoreProfileCard() {
       const response = await fetch("/api/cv/view");
       if (response.ok) {
         const data = await response.json();
-        window.open(data.url, '_blank');
+        window.open(data.url, "_blank");
       } else {
         setMessage({ type: "error", text: "Failed to open CV" });
       }
@@ -234,20 +237,38 @@ export default function CoreProfileCard() {
     setMessage(null);
 
     try {
-      const response = await fetch("/api/resume/analyze", {
+      // Call the server-side API that handles PDF parsing and analysis
+      const response = await fetch("/api/resume/assess", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: p.id,
+          resumeKey: p.resume_key,
+        }),
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const result = await response.json();
+
+        // Parse the content as JSON analysis
+        let analysis;
+        try {
+          analysis = JSON.parse(result.content);
+        } catch (parseError) {
+          // If it's not JSON, treat it as a text response
+          analysis = { summary: result.content };
+        }
+
         // Update local state with the analysis
-        setP((prev: any) => ({ ...prev, resume_analysis: data.analysis }));
+        setP((prev: any) => ({ ...prev, resume_analysis: analysis }));
         setMessage({ type: "success", text: "Resume analysis completed!" });
         setTimeout(() => setMessage(null), 3000);
       } else {
         const errorData = await response.json();
-        setMessage({ type: "error", text: errorData.error || "Failed to analyze resume" });
+        setMessage({
+          type: "error",
+          text: errorData.error || "Failed to analyze resume",
+        });
       }
     } catch (error) {
       console.error("Resume analysis error:", error);

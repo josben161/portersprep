@@ -3,6 +3,8 @@ import { getAdminSupabase } from "@/lib/supabaseAdmin";
 import { requireAuthedProfile } from "@/lib/authz";
 
 export async function POST(request: NextRequest) {
+  const traceId = `memory-post-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   try {
     const { profile } = await requireAuthedProfile();
     const { memory_type, content } = await request.json();
@@ -49,7 +51,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error("Error storing memory:", error);
+      console.error(`Error storing memory [${traceId}]:`, error);
       return NextResponse.json(
         { error: "Failed to store memory" },
         { status: 500 },
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ memory });
   } catch (error) {
-    console.error("Coach memory error:", error);
+    console.error(`Coach memory error [${traceId}]:`, error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -67,6 +69,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const traceId = `memory-get-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   try {
     const { profile } = await requireAuthedProfile();
     const { searchParams } = new URL(request.url);
@@ -103,13 +107,13 @@ export async function GET(request: NextRequest) {
     const { data: memory, error } = await query.limit(20);
 
     if (error) {
-      console.error("Error fetching memory:", error);
+      console.error(`Error fetching memory [${traceId}]:`, error);
       return NextResponse.json({ memory: [] });
     }
 
     return NextResponse.json({ memory: memory || [] });
   } catch (error) {
-    console.error("Coach memory error:", error);
+    console.error(`Coach memory error [${traceId}]:`, error);
     return NextResponse.json({ memory: [] });
   }
 }
