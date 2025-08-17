@@ -170,22 +170,48 @@ export default function CoreProfileCard() {
       const result = await r.json();
       console.log("CV upload completed successfully:", result);
 
-      // Update local state with new resume_key, filename, and extracted text
+      // Now upload the extracted text to the JSON blob in S3
+      if (result.textKey && resumeText) {
+        try {
+          const textData = {
+            extracted_text: resumeText,
+            extracted_at: new Date().toISOString(),
+            original_filename: file.name,
+            pdf_key: result.key
+          };
+
+          const textResponse = await fetch("/api/upload-text", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              textKey: result.textKey,
+              textData: textData
+            }),
+          });
+
+          if (textResponse.ok) {
+            console.log("Text JSON uploaded successfully");
+          } else {
+            console.error("Failed to upload text JSON");
+          }
+        } catch (textError) {
+          console.error("Text upload error:", textError);
+        }
+      }
+
+      // Update local state with new resume_key and filename (no need to store text locally)
       const updatedProfile = {
         ...p,
         resume_key: result.key,
         resume_filename: file.name,
-        resume_text: resumeText, // Store the extracted text
+        // Don't store resume_text locally anymore - it's in S3
       };
       
-      console.log("Updating profile with resume text:", {
-        resumeTextLength: resumeText.length,
-        updatedProfile
-      });
+      console.log("Updating profile:", updatedProfile);
       
       setP(updatedProfile);
 
-      // Save the profile with the extracted text
+      // Save the profile (without resume_text)
       const saveResponse = await apiFetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -298,11 +324,10 @@ export default function CoreProfileCard() {
   // Function to analyze resume
   async function analyzeResume() {
     console.log("Analyze resume called, profile data:", p);
-    console.log("Resume text available:", !!p?.resume_text);
-    console.log("Resume text length:", p?.resume_text?.length);
+    console.log("Resume key available:", !!p?.resume_key);
     
-    if (!p?.resume_text) {
-      setMessage({ type: "error", text: "No resume text available to analyze" });
+    if (!p?.resume_key) {
+      setMessage({ type: "error", text: "No resume uploaded to analyze" });
       return;
     }
 
@@ -310,13 +335,13 @@ export default function CoreProfileCard() {
     setMessage(null);
 
     try {
-      // Call the server-side API that uses stored text for analysis
+      // Call the server-side API that fetches text from S3 for analysis
       const response = await fetch("/api/resume/assess", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: p.id,
-          resumeText: p.resume_text, // Use the stored text directly
+          resumeKey: p.resume_key, // Use the resume key to fetch text from S3
         }),
       });
 

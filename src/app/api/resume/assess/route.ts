@@ -29,72 +29,56 @@ export async function POST(req: NextRequest) {
 
     let finalResumeText = resumeText;
 
-    // If resumeKey is provided but no resumeText, try to get the stored text from the profile
+    // If resumeKey is provided but no resumeText, fetch the text from S3 JSON blob
     if (resumeKey && !resumeText) {
-      console.log(`Getting stored resume text from profile [${traceId}]`);
+      console.log(`Fetching resume text from S3 JSON blob [${traceId}]`);
       
-      // Get the profile to see if we have stored resume text
-      const { data: profile, error: profileError } = await supabaseAdmin
-        .from("users_profile")
-        .select("resume_text")
-        .eq("user_id", userId)
-        .single();
-      
-      if (profileError) {
-        console.error(`Profile fetch error [${traceId}]:`, profileError);
-        return NextResponse.json(
-          { error: "Could not fetch profile data", traceId },
-          { status: 500 },
-        );
-      }
-      
-      if (profile?.resume_text) {
-        finalResumeText = profile.resume_text;
-        console.log(`Using stored resume text [${traceId}]: ${finalResumeText?.length || 0} characters`);
-      } else {
-        // If no stored text, extract from the PDF file
-        console.log(`No stored resume text found [${traceId}], extracting from PDF`);
-        
-        try {
-          const { S3Client, GetObjectCommand } = await import("@aws-sdk/client-s3");
-          const s3 = new S3Client({ region: process.env.AWS_REGION });
+      try {
+        const { S3Client, GetObjectCommand } = await import("@aws-sdk/client-s3");
+        const s3 = new S3Client({ region: process.env.AWS_REGION });
 
-          const command = new GetObjectCommand({
-            Bucket: process.env.S3_BUCKET,
-            Key: resumeKey,
-          });
+        // Construct the text JSON key from the PDF key
+        const textKey = resumeKey.replace(/\.[^/.]+$/, '.json');
 
-          const response = await s3.send(command);
+        const command = new GetObjectCommand({
+          Bucket: process.env.S3_BUCKET,
+          Key: textKey,
+        });
 
-          if (!response.Body) {
-            return NextResponse.json(
-              { error: "Could not read resume content", traceId },
-              { status: 500 },
-            );
-          }
+        const response = await s3.send(command);
 
-          // Get the file as a buffer
-          const chunks: Uint8Array[] = [];
-          for await (const chunk of response.Body as any) {
-            chunks.push(chunk);
-          }
-          const buffer = Buffer.concat(chunks);
+        if (!response.Body) {
+          return NextResponse.json(
+            { error: "Could not read resume text data", traceId },
+            { status: 500 },
+          );
+        }
 
-          // If we get here, it means the PDF was uploaded but no text was extracted
-          // This shouldn't happen with our new client-side extraction, but handle gracefully
-          console.log(`No text available for PDF [${traceId}], returning error`);
+        // Get the JSON data
+        const chunks: Uint8Array[] = [];
+        for await (const chunk of response.Body as any) {
+          chunks.push(chunk);
+        }
+        const jsonBuffer = Buffer.concat(chunks);
+        const textData = JSON.parse(jsonBuffer.toString());
+
+        if (textData.extracted_text) {
+          finalResumeText = textData.extracted_text;
+          console.log(`Using S3 resume text [${traceId}]: ${finalResumeText?.length || 0} characters`);
+        } else {
+          console.log(`No extracted text found in S3 JSON [${traceId}], returning error`);
           return NextResponse.json(
             { error: "No resume text available for analysis. Please re-upload your resume.", traceId },
             { status: 400 },
           );
-          
-        } catch (s3Error) {
-          console.error(`S3 error [${traceId}]:`, s3Error);
-          return NextResponse.json(
-            { error: "Could not access resume file", traceId },
-            { status: 500 },
-          );
         }
+        
+      } catch (s3Error) {
+        console.error(`S3 text fetch error [${traceId}]:`, s3Error);
+        return NextResponse.json(
+          { error: "Could not access resume text data", traceId },
+          { status: 500 },
+        );
       }
     }
 

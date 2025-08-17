@@ -69,6 +69,28 @@ export async function POST(req: NextRequest) {
 
     await s3.send(command);
 
+    // Also upload the extracted text as a JSON blob alongside the PDF
+    const textKey = key.replace(/\.[^/.]+$/, '.json'); // Replace extension with .json
+    const textData = {
+      extracted_text: "", // Will be populated by client
+      extracted_at: new Date().toISOString(),
+      original_filename: originalFileName,
+      pdf_key: key
+    };
+
+    const textCommand = new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET!,
+      Key: textKey,
+      Body: JSON.stringify(textData, null, 2),
+      ContentType: "application/json",
+      Metadata: {
+        "original-filename": originalFileName,
+        "pdf-key": key
+      },
+    });
+
+    await s3.send(textCommand);
+
     // Update profile with resume_key and original filename
     const { getAdminSupabase } = await import("@/lib/supabaseAdmin");
     const sb = getAdminSupabase();
@@ -103,6 +125,7 @@ export async function POST(req: NextRequest) {
     return Response.json({
       success: true,
       key,
+      textKey: textKey, // Include the text JSON key
       message: "CV uploaded successfully!",
     });
   } catch (error) {
