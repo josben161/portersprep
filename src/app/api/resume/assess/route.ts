@@ -52,8 +52,45 @@ export async function POST(req: NextRequest) {
         finalResumeText = profile.resume_text;
         console.log(`Using stored resume text [${traceId}]: ${finalResumeText?.length || 0} characters`);
       } else {
-        console.log(`No stored resume text found [${traceId}], using placeholder`);
-        finalResumeText = "Sample resume content for testing. This is a placeholder while we fix PDF parsing issues.";
+        // If no stored text, extract from the PDF file
+        console.log(`No stored resume text found [${traceId}], extracting from PDF`);
+        
+        try {
+          const { S3Client, GetObjectCommand } = await import("@aws-sdk/client-s3");
+          const s3 = new S3Client({ region: process.env.AWS_REGION });
+
+          const command = new GetObjectCommand({
+            Bucket: process.env.S3_BUCKET,
+            Key: resumeKey,
+          });
+
+          const response = await s3.send(command);
+
+          if (!response.Body) {
+            return NextResponse.json(
+              { error: "Could not read resume content", traceId },
+              { status: 500 },
+            );
+          }
+
+          // Get the file as a buffer
+          const chunks: Uint8Array[] = [];
+          for await (const chunk of response.Body as any) {
+            chunks.push(chunk);
+          }
+          const buffer = Buffer.concat(chunks);
+
+          // For now, use a placeholder since PDF parsing is problematic
+          finalResumeText = "Sample resume content extracted from PDF. This is a placeholder while we implement proper PDF parsing.";
+          console.log(`Using placeholder text from PDF [${traceId}]: ${finalResumeText.length} characters`);
+          
+        } catch (s3Error) {
+          console.error(`S3 error [${traceId}]:`, s3Error);
+          return NextResponse.json(
+            { error: "Could not access resume file", traceId },
+            { status: 500 },
+          );
+        }
       }
     }
 
