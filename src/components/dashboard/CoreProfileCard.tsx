@@ -105,6 +105,52 @@ export default function CoreProfileCard() {
     try {
       console.log("Starting CV upload for file:", file.name);
 
+      // Extract text from PDF on client side first
+      let resumeText = "";
+      if (file.type === "application/pdf") {
+        try {
+          console.log("Extracting text from PDF...");
+          const pdfjsLib = await import("pdfjs-dist");
+          
+          // Set up the worker
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+          
+          // Read the file as ArrayBuffer
+          const arrayBuffer = await file.arrayBuffer();
+          
+          // Load the PDF document
+          const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+          const pdf = await loadingTask.promise;
+          
+          // Extract text from all pages
+          let fullText = "";
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items
+              .map((item: any) => item.str)
+              .join(" ");
+            fullText += pageText + "\n";
+          }
+          
+          resumeText = fullText.trim();
+          console.log(`PDF text extracted: ${resumeText.length} characters from ${pdf.numPages} pages`);
+        } catch (pdfError) {
+          console.error("PDF text extraction failed:", pdfError);
+          setMessage({ type: "error", text: "Failed to extract text from PDF" });
+          return;
+        }
+      } else {
+        // For non-PDF files, try to read as text
+        try {
+          resumeText = await file.text();
+        } catch (textError) {
+          console.error("Text extraction failed:", textError);
+          setMessage({ type: "error", text: "Failed to read file content" });
+          return;
+        }
+      }
+
       // Use server-side upload to avoid CORS issues
       const formData = new FormData();
       formData.append("file", file);
@@ -124,14 +170,27 @@ export default function CoreProfileCard() {
       const result = await r.json();
       console.log("CV upload completed successfully:", result);
 
-      // Update local state with new resume_key and filename
+      // Update local state with new resume_key, filename, and extracted text
       setP((prev: any) => ({
         ...prev,
         resume_key: result.key,
         resume_filename: file.name, // Store the original filename
+        resume_text: resumeText, // Store the extracted text
       }));
 
-      setMessage({ type: "success", text: `CV uploaded successfully!` });
+      // Save the profile with the extracted text
+      await apiFetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...p,
+          resume_key: result.key,
+          resume_filename: file.name,
+          resume_text: resumeText,
+        }),
+      });
+
+      setMessage({ type: "success", text: `CV uploaded and text extracted successfully!` });
 
       // Clear success message after 3 seconds
       setTimeout(() => setMessage(null), 3000);
@@ -228,8 +287,8 @@ export default function CoreProfileCard() {
 
   // Function to analyze resume
   async function analyzeResume() {
-    if (!p?.resume_key) {
-      setMessage({ type: "error", text: "No resume uploaded to analyze" });
+    if (!p?.resume_text) {
+      setMessage({ type: "error", text: "No resume text available to analyze" });
       return;
     }
 
@@ -237,13 +296,13 @@ export default function CoreProfileCard() {
     setMessage(null);
 
     try {
-      // Call the server-side API that handles PDF parsing and analysis
+      // Call the server-side API that uses stored text for analysis
       const response = await fetch("/api/resume/assess", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: p.id,
-          resumeKey: p.resume_key,
+          resumeText: p.resume_text, // Use the stored text directly
         }),
       });
 

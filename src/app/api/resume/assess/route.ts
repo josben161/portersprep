@@ -29,46 +29,31 @@ export async function POST(req: NextRequest) {
 
     let finalResumeText = resumeText;
 
-    // If resumeKey is provided, extract text from S3
+    // If resumeKey is provided but no resumeText, try to get the stored text from the profile
     if (resumeKey && !resumeText) {
-      const { S3Client, GetObjectCommand } = await import("@aws-sdk/client-s3");
-      const s3 = new S3Client({ region: process.env.AWS_REGION });
-
-      const command = new GetObjectCommand({
-        Bucket: process.env.S3_BUCKET,
-        Key: resumeKey,
-      });
-
-      const response = await s3.send(command);
-
-      if (!response.Body) {
+      console.log(`Getting stored resume text from profile [${traceId}]`);
+      
+      // Get the profile to see if we have stored resume text
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from("users_profile")
+        .select("resume_text")
+        .eq("user_id", userId)
+        .single();
+      
+      if (profileError) {
+        console.error(`Profile fetch error [${traceId}]:`, profileError);
         return NextResponse.json(
-          { error: "Could not read resume content", traceId },
+          { error: "Could not fetch profile data", traceId },
           { status: 500 },
         );
       }
-
-      // Get the file as a buffer
-      const chunks: Uint8Array[] = [];
-      for await (const chunk of response.Body as any) {
-        chunks.push(chunk);
-      }
-      const buffer = Buffer.concat(chunks);
-
-      // For now, skip PDF parsing and use a placeholder
-      // This avoids the test file access issues with pdf-parse
-      console.log(`Skipping PDF parsing for now [${traceId}], buffer size: ${buffer.length} bytes`);
       
-      // Use a placeholder text for now to test the AI analysis
-      finalResumeText = "Sample resume content for testing. This is a placeholder while we fix PDF parsing issues.";
-      
-      console.log(`Using placeholder text [${traceId}]: ${finalResumeText.length} characters`);
-
-      if (!finalResumeText || finalResumeText.trim().length === 0) {
-        return NextResponse.json(
-          { error: "Could not extract text from PDF", traceId },
-          { status: 500 },
-        );
+      if (profile?.resume_text) {
+        finalResumeText = profile.resume_text;
+        console.log(`Using stored resume text [${traceId}]: ${finalResumeText?.length || 0} characters`);
+      } else {
+        console.log(`No stored resume text found [${traceId}], using placeholder`);
+        finalResumeText = "Sample resume content for testing. This is a placeholder while we fix PDF parsing issues.";
       }
     }
 
