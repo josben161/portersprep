@@ -228,14 +228,14 @@ export default function CoreProfileCard() {
     if (p && !loading) {
       const timeoutId = setTimeout(() => {
         // Only auto-save if there are actual changes
-        if (p.name || p.goals || p.industry || p.years_exp || p.gpa || p.gmat) {
+        if (p.name || p.goals || p.industry || p.years_exp || p.gpa || p.gmat || p.resume_text) {
           saveProfile();
         }
       }, 2000); // Debounce for 2 seconds
 
       return () => clearTimeout(timeoutId);
     }
-  }, [p?.name, p?.goals, p?.industry, p?.years_exp, p?.gpa, p?.gmat]);
+  }, [p?.name, p?.goals, p?.industry, p?.years_exp, p?.gpa, p?.gmat, p?.resume_text]);
 
   async function removeCV() {
     if (!confirm("Remove CV from profile?")) return;
@@ -246,13 +246,19 @@ export default function CoreProfileCard() {
       await apiFetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...p, resume_key: null, resume_filename: null }),
+        body: JSON.stringify({ 
+          ...p, 
+          resume_key: null, 
+          resume_filename: null,
+          resume_text: null, // Also remove the extracted text
+        }),
       });
 
       setP((prev: any) => ({
         ...prev,
         resume_key: null,
         resume_filename: null,
+        resume_text: null, // Also remove from local state
       }));
       setMessage({ type: "success", text: "CV removed successfully" });
       setTimeout(() => setMessage(null), 3000);
