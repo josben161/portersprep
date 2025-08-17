@@ -105,10 +105,51 @@ export default function CoreProfileCard() {
     try {
       console.log("Starting CV upload for file:", file.name);
 
-      // For now, skip client-side text extraction to avoid PDF parsing issues
-      // The text will be extracted on the server when needed for analysis
+      // Extract text from PDF on client side
       let resumeText = "";
-      console.log("Skipping client-side text extraction for now");
+      if (file.type === "application/pdf") {
+        try {
+          console.log("Extracting text from PDF...");
+          const pdfjsLib = await import("pdfjs-dist");
+          
+          // Use a local worker to avoid CORS issues
+          pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+          
+          // Read the file as ArrayBuffer
+          const arrayBuffer = await file.arrayBuffer();
+          
+          // Load the PDF document
+          const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+          const pdf = await loadingTask.promise;
+          
+          // Extract text from all pages
+          let fullText = "";
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items
+              .map((item: any) => item.str)
+              .join(" ");
+            fullText += pageText + "\n";
+          }
+          
+          resumeText = fullText.trim();
+          console.log(`PDF text extracted: ${resumeText.length} characters from ${pdf.numPages} pages`);
+        } catch (pdfError) {
+          console.error("PDF text extraction failed:", pdfError);
+          setMessage({ type: "error", text: "Failed to extract text from PDF" });
+          return;
+        }
+      } else {
+        // For non-PDF files, try to read as text
+        try {
+          resumeText = await file.text();
+        } catch (textError) {
+          console.error("Text extraction failed:", textError);
+          setMessage({ type: "error", text: "Failed to read file content" });
+          return;
+        }
+      }
 
       // Use server-side upload to avoid CORS issues
       const formData = new FormData();

@@ -80,9 +80,13 @@ export async function POST(req: NextRequest) {
           }
           const buffer = Buffer.concat(chunks);
 
-          // For now, use a placeholder since PDF parsing is problematic
-          finalResumeText = "Sample resume content extracted from PDF. This is a placeholder while we implement proper PDF parsing.";
-          console.log(`Using placeholder text from PDF [${traceId}]: ${finalResumeText.length} characters`);
+          // If we get here, it means the PDF was uploaded but no text was extracted
+          // This shouldn't happen with our new client-side extraction, but handle gracefully
+          console.log(`No text available for PDF [${traceId}], returning error`);
+          return NextResponse.json(
+            { error: "No resume text available for analysis. Please re-upload your resume.", traceId },
+            { status: 400 },
+          );
           
         } catch (s3Error) {
           console.error(`S3 error [${traceId}]:`, s3Error);
