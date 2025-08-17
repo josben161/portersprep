@@ -112,8 +112,8 @@ export default function CoreProfileCard() {
           console.log("Extracting text from PDF...");
           const pdfjsLib = await import("pdfjs-dist");
           
-          // Set up the worker
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+          // Disable worker to avoid CORS issues
+          pdfjsLib.GlobalWorkerOptions.workerSrc = "";
           
           // Read the file as ArrayBuffer
           const arrayBuffer = await file.arrayBuffer();
