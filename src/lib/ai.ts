@@ -31,7 +31,12 @@ export async function callGateway(
   mode: "coach" | "predict" | "resume" | "recommender",
   body: any,
 ) {
-  const res = await fetch("/api/ai/gateway", {
+  // Use absolute URL when running server-side
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
+                  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+  const url = `${baseUrl}/api/ai/gateway`;
+  
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body ? { ...body, mode } : { mode }),

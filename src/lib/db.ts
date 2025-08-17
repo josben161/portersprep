@@ -4,19 +4,40 @@ import { createClient } from "@supabase/supabase-js";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 
 export function supabaseServer() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!url || !key) {
+    console.error("Missing Supabase environment variables for server client:", {
+      url: !!url,
+      key: !!key,
+    });
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  }
+  
   const cookieStore = cookies();
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    key,
     { cookies: { get: (k: string) => cookieStore.get(k)?.value } },
   );
 }
 
 // Admin client for scripts/server-only tasks (never ship to client)
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+export const supabaseAdmin = (() => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!url || !key) {
+    console.error("Missing Supabase environment variables for admin client:", {
+      url: !!url,
+      key: !!key,
+    });
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+  }
+  
+  return createClient(url, key);
+})();
 
 // Legacy functions for backward compatibility
 export async function getOrCreateProfileByClerkId(
