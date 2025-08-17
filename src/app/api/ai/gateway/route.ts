@@ -62,7 +62,9 @@ function buildPrompt(mode: string, ctx: any, params: any) {
   }
   if (mode === "resume") {
     return {
-      system: `You are an MBA resume evaluator. Analyze the resume and return a JSON object with the following structure:
+      system: `You are an MBA resume evaluator. You MUST return ONLY a valid JSON object, nothing else.
+
+Analyze the provided resume and return a JSON object with this EXACT structure:
 {
   "summary": "Brief overview of the candidate",
   "strengths": ["strength1", "strength2", "strength3"],
@@ -84,7 +86,7 @@ function buildPrompt(mode: string, ctx: any, params: any) {
   }
 }
 
-IMPORTANT: Return ONLY valid JSON. Do not include any explanatory text, markdown, or other formatting. Start with { and end with }.`,
+CRITICAL: Return ONLY the JSON object. No explanations, no markdown, no additional text. Just the JSON starting with { and ending with }.`,
       user: JSON.stringify({ 
         profile: ctx.profile,
         resumeText: ctx.profile?.resume_text || "No resume text available"
@@ -139,6 +141,7 @@ export async function POST(req: NextRequest) {
     const resp = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.2,
+      response_format: mode === "resume" ? { type: "json_object" } : undefined,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
