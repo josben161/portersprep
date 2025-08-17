@@ -171,24 +171,28 @@ export default function CoreProfileCard() {
       console.log("CV upload completed successfully:", result);
 
       // Update local state with new resume_key, filename, and extracted text
-      setP((prev: any) => ({
-        ...prev,
+      const updatedProfile = {
+        ...p,
         resume_key: result.key,
-        resume_filename: file.name, // Store the original filename
+        resume_filename: file.name,
         resume_text: resumeText, // Store the extracted text
-      }));
+      };
+      
+      console.log("Updating profile with resume text:", {
+        resumeTextLength: resumeText.length,
+        updatedProfile
+      });
+      
+      setP(updatedProfile);
 
       // Save the profile with the extracted text
-      await apiFetch("/api/profile", {
+      const saveResponse = await apiFetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...p,
-          resume_key: result.key,
-          resume_filename: file.name,
-          resume_text: resumeText,
-        }),
+        body: JSON.stringify(updatedProfile),
       });
+      
+      console.log("Profile save response:", saveResponse);
 
       setMessage({ type: "success", text: `CV uploaded and text extracted successfully!` });
 
@@ -293,6 +297,10 @@ export default function CoreProfileCard() {
 
   // Function to analyze resume
   async function analyzeResume() {
+    console.log("Analyze resume called, profile data:", p);
+    console.log("Resume text available:", !!p?.resume_text);
+    console.log("Resume text length:", p?.resume_text?.length);
+    
     if (!p?.resume_text) {
       setMessage({ type: "error", text: "No resume text available to analyze" });
       return;
