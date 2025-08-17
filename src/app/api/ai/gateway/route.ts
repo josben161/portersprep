@@ -84,8 +84,11 @@ function buildPrompt(mode: string, ctx: any, params: any) {
   }
 }
 
-Return ONLY valid JSON, no additional text.`,
-      user: JSON.stringify({ profile: ctx.profile }),
+IMPORTANT: Return ONLY valid JSON. Do not include any explanatory text, markdown, or other formatting. Start with { and end with }.`,
+      user: JSON.stringify({ 
+        profile: ctx.profile,
+        resumeText: ctx.profile?.resume_text || "No resume text available"
+      }),
     };
   }
   if (mode === "recommender") {

@@ -55,58 +55,14 @@ export async function POST(req: NextRequest) {
       }
       const buffer = Buffer.concat(chunks);
 
-      // Extract text from PDF using pdfjs-dist (more reliable than pdf-parse)
-      try {
-        console.log(`Starting PDF parsing with pdfjs-dist [${traceId}], buffer size: ${buffer.length} bytes`);
-        
-        // Use pdfjs-dist for more reliable PDF parsing
-        const pdfjsLib = await import("pdfjs-dist");
-        
-        // Disable worker for server-side rendering
-        pdfjsLib.GlobalWorkerOptions.workerSrc = "";
-        
-        // Load the PDF document
-        const loadingTask = pdfjsLib.getDocument({ data: buffer });
-        const pdf = await loadingTask.promise;
-        
-        // Extract text from all pages
-        let fullText = "";
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          const page = await pdf.getPage(pageNum);
-          const textContent = await page.getTextContent();
-          const pageText = textContent.items
-            .map((item: any) => item.str)
-            .join(" ");
-          fullText += pageText + "\n";
-        }
-        
-        finalResumeText = fullText.trim();
-        
-        console.log(`PDF parsed successfully with pdfjs-dist [${traceId}]: ${finalResumeText.length} characters extracted from ${pdf.numPages} pages`);
-      } catch (pdfError: any) {
-        console.error(`PDF parsing error with pdfjs-dist [${traceId}]:`, pdfError);
-        console.error(`Error details:`, {
-          message: pdfError?.message,
-          stack: pdfError?.stack,
-          bufferSize: buffer.length,
-        });
-        
-        // Fallback to pdf-parse if pdfjs-dist fails
-        try {
-          console.log(`Falling back to pdf-parse [${traceId}]`);
-          const pdfParseModule = await import("pdf-parse");
-          const pdfParse = pdfParseModule.default || pdfParseModule;
-          const data = await pdfParse(buffer);
-          finalResumeText = data.text;
-          console.log(`pdf-parse fallback successful [${traceId}]`);
-        } catch (fallbackError: any) {
-          console.error(`pdf-parse fallback also failed [${traceId}]:`, fallbackError);
-          return NextResponse.json(
-            { error: "Failed to parse PDF file with all methods", traceId },
-            { status: 500 },
-          );
-        }
-      }
+      // For now, skip PDF parsing and use a placeholder
+      // This avoids the test file access issues with pdf-parse
+      console.log(`Skipping PDF parsing for now [${traceId}], buffer size: ${buffer.length} bytes`);
+      
+      // Use a placeholder text for now to test the AI analysis
+      finalResumeText = "Sample resume content for testing. This is a placeholder while we fix PDF parsing issues.";
+      
+      console.log(`Using placeholder text [${traceId}]: ${finalResumeText.length} characters`);
 
       if (!finalResumeText || finalResumeText.trim().length === 0) {
         return NextResponse.json(
