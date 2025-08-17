@@ -57,15 +57,47 @@ export async function POST(req: NextRequest) {
 
       // Extract text from PDF
       try {
-        const pdfParse = (await import("pdf-parse")).default;
+        console.log(`Starting PDF parsing [${traceId}], buffer size: ${buffer.length} bytes`);
+        
+        // Try to parse without options first
+        const pdfParseModule = await import("pdf-parse");
+        const pdfParse = pdfParseModule.default || pdfParseModule;
+        
         const data = await pdfParse(buffer);
         finalResumeText = data.text;
-      } catch (pdfError) {
+        
+        console.log(`PDF parsed successfully [${traceId}]: ${finalResumeText.length} characters extracted`);
+      } catch (pdfError: any) {
         console.error(`PDF parsing error [${traceId}]:`, pdfError);
-        return NextResponse.json(
-          { error: "Failed to parse PDF file", traceId },
-          { status: 500 },
-        );
+        console.error(`Error details:`, {
+          message: pdfError?.message,
+          stack: pdfError?.stack,
+          bufferSize: buffer.length,
+        });
+        
+        // If the error mentions test files, try a different approach
+        if (pdfError?.message?.includes('test/data') || pdfError?.message?.includes('05-versions-space.pdf')) {
+          console.log(`Detected test file error, trying alternative approach [${traceId}]`);
+          
+          try {
+            // Try with a different import method
+            const pdfParse = require("pdf-parse");
+            const data = await pdfParse(buffer);
+            finalResumeText = data.text;
+            console.log(`Alternative PDF parsing successful [${traceId}]`);
+          } catch (altError) {
+            console.error(`Alternative PDF parsing also failed [${traceId}]:`, altError);
+            return NextResponse.json(
+              { error: "Failed to parse PDF file - test file access issue", traceId },
+              { status: 500 },
+            );
+          }
+        } else {
+          return NextResponse.json(
+            { error: "Failed to parse PDF file", traceId },
+            { status: 500 },
+          );
+        }
       }
 
       if (!finalResumeText || finalResumeText.trim().length === 0) {
