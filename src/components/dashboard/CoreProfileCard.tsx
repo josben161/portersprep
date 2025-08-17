@@ -322,12 +322,19 @@ export default function CoreProfileCard() {
 
       if (response.ok) {
         const result = await response.json();
+        
+        console.log("AI response result:", result);
+        console.log("AI response content:", result.content);
+        console.log("AI response content type:", typeof result.content);
 
         // Parse the content as JSON analysis
         let analysis;
         try {
           analysis = JSON.parse(result.content);
+          console.log("Parsed analysis:", analysis);
         } catch (parseError) {
+          console.error("JSON parse error:", parseError);
+          console.log("Raw content that failed to parse:", result.content);
           // If it's not JSON, treat it as a text response
           analysis = { summary: result.content };
         }
