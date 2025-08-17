@@ -62,7 +62,29 @@ function buildPrompt(mode: string, ctx: any, params: any) {
   }
   if (mode === "resume") {
     return {
-      system: "You are an MBA resume evaluator. Be specific and constructive.",
+      system: `You are an MBA resume evaluator. Analyze the resume and return a JSON object with the following structure:
+{
+  "summary": "Brief overview of the candidate",
+  "strengths": ["strength1", "strength2", "strength3"],
+  "weaknesses": ["weakness1", "weakness2"],
+  "recommendations": ["recommendation1", "recommendation2", "recommendation3"],
+  "mbaReadiness": {
+    "fit_score": 85,
+    "comments": "Assessment of MBA readiness"
+  },
+  "experience": {
+    "years": 5,
+    "leadership": true,
+    "international": false
+  },
+  "education": {
+    "major": "Computer Science",
+    "institution": "University of Example",
+    "gpa": 3.8
+  }
+}
+
+Return ONLY valid JSON, no additional text.`,
       user: JSON.stringify({ profile: ctx.profile }),
     };
   }

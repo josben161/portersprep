@@ -56,9 +56,17 @@ export async function POST(req: NextRequest) {
       const buffer = Buffer.concat(chunks);
 
       // Extract text from PDF
-      const pdfParse = (await import("pdf-parse")).default;
-      const data = await pdfParse(buffer);
-      finalResumeText = data.text;
+      try {
+        const pdfParse = (await import("pdf-parse")).default;
+        const data = await pdfParse(buffer);
+        finalResumeText = data.text;
+      } catch (pdfError) {
+        console.error(`PDF parsing error [${traceId}]:`, pdfError);
+        return NextResponse.json(
+          { error: "Failed to parse PDF file", traceId },
+          { status: 500 },
+        );
+      }
 
       if (!finalResumeText || finalResumeText.trim().length === 0) {
         return NextResponse.json(
@@ -105,8 +113,22 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ content, usage, traceId });
   } catch (e: any) {
+    console.error(`Resume assess error [${traceId}]:`, e);
+    
+    // Provide more specific error messages
+    let errorMessage = "Unknown error";
+    if (e?.message?.includes("pdf-parse")) {
+      errorMessage = "Failed to parse PDF file";
+    } else if (e?.message?.includes("S3")) {
+      errorMessage = "Failed to access resume file";
+    } else if (e?.message?.includes("Supabase")) {
+      errorMessage = "Failed to save resume data";
+    } else if (e?.message) {
+      errorMessage = e.message;
+    }
+    
     return NextResponse.json(
-      { error: e?.message ?? "Unknown error", traceId },
+      { error: errorMessage, traceId },
       { status: 500 },
     );
   }
