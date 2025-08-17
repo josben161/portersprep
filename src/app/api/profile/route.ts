@@ -39,7 +39,7 @@ export async function GET() {
       const { data: extendedData } = await sb
         .from("profiles")
         .select(
-          "resume_key, resume_filename, resume_analysis, goals, industry, years_exp, gpa, gmat",
+          "resume_key, resume_filename, resume_text, resume_analysis, goals, industry, years_exp, gpa, gmat",
         )
         .eq("id", profile.id)
         .single();
@@ -60,6 +60,7 @@ export async function GET() {
       subscription_tier: data.subscription_tier || "free",
       resume_key: additionalFields.resume_key || null,
       resume_filename: additionalFields.resume_filename || null,
+      resume_text: additionalFields.resume_text || null,
       resume_analysis: additionalFields.resume_analysis || null,
       goals: additionalFields.goals || "",
       industry: additionalFields.industry || "",
@@ -90,6 +91,7 @@ export async function PUT(req: NextRequest) {
       "gpa",
       "gmat",
       "resume_filename",
+      "resume_text",
     ];
 
     for (const k of [...safeFields, ...additionalFields]) {
