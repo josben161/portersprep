@@ -199,7 +199,7 @@ export default function CoreProfileCard() {
         }
       }
 
-      // Update local state with new resume_key and filename (preserve all other fields)
+      // Update local state with new resume_key and filename (no need to store text locally)
       const updatedProfile = {
         ...p,
         resume_key: result.key,
@@ -211,7 +211,7 @@ export default function CoreProfileCard() {
       
       setP(updatedProfile);
 
-      // Save the profile with all fields preserved
+      // Save the profile (without resume_text)
       const saveResponse = await apiFetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
