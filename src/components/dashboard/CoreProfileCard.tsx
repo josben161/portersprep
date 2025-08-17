@@ -170,6 +170,25 @@ export default function CoreProfileCard() {
       const result = await r.json();
       console.log("CV upload completed successfully:", result);
 
+      // Clean up old S3 files if they exist
+      if (p?.resume_key) {
+        try {
+          const oldTextKey = p.resume_key.replace(/\.[^/.]+$/, '.json');
+          await fetch("/api/delete-resume", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pdfKey: p.resume_key,
+              textKey: oldTextKey
+            }),
+          });
+          console.log("Old resume files cleaned up");
+        } catch (cleanupError) {
+          console.error("Failed to cleanup old files:", cleanupError);
+          // Continue anyway - new upload should still work
+        }
+      }
+
       // Now upload the extracted text to the JSON blob in S3
       if (result.textKey && resumeText) {
         try {
@@ -258,14 +277,14 @@ export default function CoreProfileCard() {
     if (p && !loading) {
       const timeoutId = setTimeout(() => {
         // Only auto-save if there are actual changes
-        if (p.name || p.goals || p.industry || p.years_exp || p.gpa || p.gmat || p.resume_text) {
+        if (p.name || p.goals || p.industry || p.years_exp || p.gpa || p.gmat || p.resume_key || p.resume_filename) {
           saveProfile();
         }
       }, 2000); // Debounce for 2 seconds
 
       return () => clearTimeout(timeoutId);
     }
-  }, [p?.name, p?.goals, p?.industry, p?.years_exp, p?.gpa, p?.gmat, p?.resume_text]);
+  }, [p?.name, p?.goals, p?.industry, p?.years_exp, p?.gpa, p?.gmat, p?.resume_key, p?.resume_filename]);
 
   async function removeCV() {
     if (!confirm("Remove CV from profile?")) return;
@@ -273,6 +292,20 @@ export default function CoreProfileCard() {
     setMessage(null);
 
     try {
+      // Clean up S3 files first
+      if (p?.resume_key) {
+        const textKey = p.resume_key.replace(/\.[^/.]+$/, '.json');
+        await fetch("/api/delete-resume", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pdfKey: p.resume_key,
+            textKey: textKey
+          }),
+        });
+      }
+
+      // Update database
       await apiFetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -280,7 +313,6 @@ export default function CoreProfileCard() {
           ...p, 
           resume_key: null, 
           resume_filename: null,
-          resume_text: null, // Also remove the extracted text
         }),
       });
 
@@ -288,7 +320,6 @@ export default function CoreProfileCard() {
         ...prev,
         resume_key: null,
         resume_filename: null,
-        resume_text: null, // Also remove from local state
       }));
       setMessage({ type: "success", text: "CV removed successfully" });
       setTimeout(() => setMessage(null), 3000);
