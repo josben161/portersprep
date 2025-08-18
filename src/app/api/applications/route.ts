@@ -7,50 +7,15 @@ export async function GET() {
   try {
     const { profile } = await requireAuthedProfile();
     const sb = getAdminSupabase();
-
-    // Get applications with basic data (removed created_at since it doesn't exist)
-    const { data: apps, error } = await sb
+    const { data, error } = await sb
       .from("applications")
-      .select("id, status, school_id, round")
+      .select("id, school_id, school_name, round, target_year, status")
       .eq("user_id", profile.id)
-      .order("id", { ascending: false }); // Use id instead of created_at for ordering
-
-    if (error) {
-      console.error("Applications fetch error:", error);
-      return Response.json([]);
-    }
-
-    // Enrich with school data from JSON files
-    const enrichedApps = await Promise.all(
-      (apps || []).map(async (app) => {
-        try {
-          const schoolData = await getSchoolData(app.school_id);
-          return {
-            ...app,
-            school: schoolData
-              ? {
-                  name: schoolData.name,
-                  id: schoolData.id,
-                }
-              : null,
-          };
-        } catch (error) {
-          console.error(
-            `Failed to load school data for ${app.school_id}:`,
-            error,
-          );
-          return {
-            ...app,
-            school: null,
-          };
-        }
-      }),
-    );
-
-    return Response.json(enrichedApps);
-  } catch (error) {
-    console.error("Applications API error:", error);
-    return Response.json([]);
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return Response.json({ applications: data ?? [] });
+  } catch (e: any) {
+    return new Response(`Applications API error: ${e?.message || "unknown"}`, { status: 500 });
   }
 }
 

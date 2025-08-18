@@ -11,7 +11,9 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
   );
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
+  db: { schema: "Admitarchitect" },
+});
 
 type Essay = {
   type: "short" | "long";
