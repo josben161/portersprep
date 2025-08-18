@@ -7,8 +7,8 @@ export async function POST(
   _: Request,
   { params }: { params: { answerId: string } },
 ) {
-  const { profile, clerkUserId } = await requireAuthedProfile();
-  const snap = await getQuotaSnapshot(clerkUserId);
+  const { profile } = await requireAuthedProfile();
+  const snap = await getQuotaSnapshot(profile.clerk_user_id);
   try {
     assertWithinLimit("ai_calls", snap);
   } catch (e) {

@@ -6,10 +6,10 @@ import { getQuotaSnapshot, assertWithinLimit, logAiUse } from "@/lib/quota";
 
 export async function POST(req: NextRequest) {
   try {
-    const { profile, clerkUserId } = await requireAuthedProfile();
+    const { profile } = await requireAuthedProfile();
 
     // Check quota
-    const snap = await getQuotaSnapshot(clerkUserId);
+    const snap = await getQuotaSnapshot(profile.clerk_user_id);
     try {
       assertWithinLimit("ai_calls", snap);
     } catch (e) {

@@ -14,11 +14,11 @@ export async function POST(req: NextRequest) {
 
   // If Clerk session present, use it.
   try {
-    const { profile, email, name } = await requireAuthedProfile();
+    const { profile } = await requireAuthedProfile();
     const userInfo = {
       userId: `user_${profile.id}`,
       groupIds: ["authenticated"],
-      userInfo: { name: email || name || "User", role: "owner" },
+      userInfo: { name: profile.email || profile.name || "User", role: "owner" },
     };
     const auth = await lb.identifyUser(userInfo);
     // Note: Liveblocks v3 API may differ - this is a placeholder

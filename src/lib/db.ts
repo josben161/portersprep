@@ -36,7 +36,10 @@ export const supabaseAdmin = (() => {
     throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
   }
   
-  return createClient(url, key);
+  return createClient(url, key, {
+    db: { schema: "Admitarchitect" },
+    auth: { persistSession: false },
+  });
 })();
 
 // Legacy functions for backward compatibility

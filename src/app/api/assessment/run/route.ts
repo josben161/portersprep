@@ -24,11 +24,11 @@ const Intake = z.object({
 });
 
 export async function POST(req: Request) {
-  const { profile, clerkUserId } = await requireAuthedProfile();
+  const { profile } = await requireAuthedProfile();
   const body = await req.json();
   const input = Intake.parse(body);
 
-  const snap = await getQuotaSnapshot(clerkUserId);
+  const snap = await getQuotaSnapshot(profile.clerk_user_id);
   try {
     assertWithinLimit("ai_calls", snap);
   } catch (e) {

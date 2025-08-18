@@ -2,51 +2,32 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 
 export async function requireAuthedProfile() {
-  const { userId } = auth();
-  if (!userId) throw new Response("Unauthorized", { status: 401 });
   const user = await currentUser();
-  const email = user?.emailAddresses?.[0]?.emailAddress ?? "";
-  const name =
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
-    user?.firstName ||
-    "";
+  if (!user) throw new Error("unauthorized");
 
   const sb = getAdminSupabase();
-
-  // First try to get existing profile
   const { data: existing } = await sb
     .from("profiles")
-    .select("*")
-    .eq("clerk_user_id", userId)
+    .select("id, clerk_user_id, email, name, subscription_tier")
+    .eq("clerk_user_id", user.id)
     .maybeSingle();
 
-  if (existing) {
-    return { clerkUserId: userId, profile: existing, email, name };
-  }
+  if (existing) return { profile: existing };
 
-  // If no profile exists, create one with proper UUID
-  try {
-    const { data: profile, error } = await sb
-      .from("profiles")
-      .insert({
-        clerk_user_id: userId,
-        email,
-        name,
-        subscription_tier: "free",
-      })
-      .select("*")
-      .single();
+  const email = user.emailAddresses?.[0]?.emailAddress ?? "";
+  const name =
+    user.firstName || user.lastName
+      ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+      : user.username ?? "New User";
 
-    if (error) {
-      console.error("Profile creation error:", error);
-      throw new Error(`Failed to create profile: ${error.message}`);
-    }
+  const { data: created, error } = await sb
+    .from("profiles")
+    .insert({ clerk_user_id: user.id, email, name })
+    .select()
+    .single();
 
-    return { clerkUserId: userId, profile, email, name };
-  } catch (err) {
-    console.error("Profile creation exception:", err);
-    throw new Response("Failed to create user profile", { status: 500 });
-  }
+  if (error) throw error;
+  return { profile: created };
 }
 
 export async function requireAuth() {

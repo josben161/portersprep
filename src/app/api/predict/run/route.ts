@@ -7,10 +7,10 @@ import { callGateway } from "@/lib/ai";
 export async function POST(req: NextRequest) {
   const traceId = `predict_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   try {
-    const { profile, clerkUserId } = await requireAuthedProfile();
+    const { profile } = await requireAuthedProfile();
 
     // Check quota
-    const snap = await getQuotaSnapshot(clerkUserId);
+          const snap = await getQuotaSnapshot(profile.clerk_user_id);
     try {
       assertWithinLimit("ai_calls", snap);
     } catch (e) {
