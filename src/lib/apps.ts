@@ -1,96 +1,46 @@
 import { getAdminSupabase } from "@/lib/supabaseAdmin";
 
-export async function listSchools() {
-  const sb = getAdminSupabase();
-  const { data } = await sb
-    .from("schools")
-    .select("id,name,slug,website,brief")
-    .order("name");
-  return data ?? [];
-}
-
-export async function listSchoolQuestions(schoolId: string) {
-  const sb = getAdminSupabase();
-  const { data } = await sb
-    .from("school_questions")
-    .select("id, prompt, archetype, word_limit, metadata")
-    .eq("school_id", schoolId)
-    .order("created_at", { ascending: true });
-  return data ?? [];
-}
-
-export async function upsertSchool(input: {
-  name: string;
-  slug: string;
-  website?: string;
-  brief?: any;
-}) {
-  const sb = getAdminSupabase();
-  const { data, error } = await sb
-    .from("schools")
-    .upsert({
-      name: input.name,
-      slug: input.slug,
-      website: input.website,
-      brief: input.brief,
-    })
-    .select("id")
-    .single();
-  if (error) throw error;
-  return data.id as string;
-}
-
-export async function addSchoolQuestion(
-  schoolId: string,
-  q: {
-    prompt: string;
-    archetype: string;
-    word_limit?: number | null;
-    metadata?: any;
-  },
-) {
-  const sb = getAdminSupabase();
-  const { data, error } = await sb
-    .from("school_questions")
-    .insert({
-      school_id: schoolId,
-      prompt: q.prompt,
-      archetype: q.archetype,
-      word_limit: q.word_limit ?? null,
-      metadata: q.metadata ?? null,
-    })
-    .select("id")
-    .single();
-  if (error) throw error;
-  return data.id as string;
-}
+// Note: schools and school_questions tables don't exist in the new schema
+// These functions have been removed to prevent 500 errors
 
 export async function createApplication(
   userId: string,
   schoolId: string,
   round?: string | null,
 ) {
-  const sb = getAdminSupabase();
+  try {
+    console.log(`Apps: Creating application for user ${userId}, school ${schoolId}, round ${round}`);
+    const sb = getAdminSupabase();
 
-  // Validate UUIDs
-  const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  if (!uuidRegex.test(userId)) {
-    console.error("Invalid userId format:", userId);
-    throw new Error("Invalid user profile");
-  }
-  if (!uuidRegex.test(schoolId)) {
-    console.error("Invalid schoolId format:", schoolId);
-    throw new Error("Invalid school");
-  }
+    // Validate UUIDs
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      console.error("Apps: Invalid userId format:", userId);
+      throw new Error("Invalid user profile");
+    }
+    if (!uuidRegex.test(schoolId)) {
+      console.error("Apps: Invalid schoolId format:", schoolId);
+      throw new Error("Invalid school");
+    }
 
-  const { data, error } = await sb
-    .from("applications")
-    .insert({ user_id: userId, school_id: schoolId, round: round ?? null })
-    .select("id")
-    .single();
-  if (error) throw error;
-  return data.id as string;
+    const { data, error } = await sb
+      .from("applications")
+      .insert({ user_id: userId, school_id: schoolId, round: round ?? null })
+      .select("id")
+      .single();
+    
+    if (error) {
+      console.error("Apps: Error creating application:", error);
+      throw error;
+    }
+    
+    console.log(`Apps: Successfully created application ${data.id}`);
+    return data.id as string;
+  } catch (error) {
+    console.error("Apps: Error in createApplication:", error);
+    throw error;
+  }
 }
 
 export async function listApplications(userId: string) {

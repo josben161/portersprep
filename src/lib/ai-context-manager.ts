@@ -96,15 +96,13 @@ class AIContextManager {
       const supabase = getAdminSupabase();
 
       // Gather all user data in parallel
+      console.log(`AI Context: Loading context for user ${userId}`);
+      
       const [
         profileResult,
         applicationsResult,
-        essaysResult,
         recommendationsResult,
         resumeResult,
-        schoolsResult,
-        memoryResult,
-        conversationsResult,
       ] = await Promise.all([
         // User profile
         supabase.from("profiles").select("*").eq("id", userId).single(),
@@ -112,24 +110,7 @@ class AIContextManager {
         // Applications
         supabase
           .from("applications")
-          .select(
-            `
-            *,
-            schools (*)
-          `,
-          )
-          .eq("user_id", userId),
-
-        // Essays/Answers
-        supabase
-          .from("answers")
-          .select(
-            `
-            *,
-            questions (*),
-            applications (*)
-          `,
-          )
+          .select("*")
           .eq("user_id", userId),
 
         // Recommendations
@@ -150,36 +131,19 @@ class AIContextManager {
           .select("resume_key, resume_analysis")
           .eq("id", userId)
           .single(),
-
-        // Schools
-        supabase.from("schools").select("*"),
-
-        // AI Memory
-        supabase
-          .from("coach_memory")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(50),
-
-        // Recent conversations
-        supabase
-          .from("coach_conversations")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(20),
       ]);
 
       // Extract data and handle errors gracefully
       const profile = profileResult.data || {};
       const applications = applicationsResult.data || [];
-      const essays = essaysResult.data || [];
       const recommendations = recommendationsResult.data || [];
       const resume = resumeResult.data || {};
-      const schools = schoolsResult.data || [];
-      const memory = memoryResult.data || [];
-      const conversations = conversationsResult.data || [];
+      
+      // Note: essays, schools, memory, conversations tables don't exist in new schema
+      const essays: any[] = [];
+      const schools: any[] = [];
+      const memory: any[] = [];
+      const conversations: any[] = [];
 
       // Calculate progress metrics
       const progress = this.calculateProgress(

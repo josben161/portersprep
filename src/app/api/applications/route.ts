@@ -5,16 +5,26 @@ import { getSchoolData } from "@/lib/schools";
 
 export async function GET() {
   try {
+    console.log("Applications API: GET request received");
     const { profile } = await requireAuthedProfile();
+    console.log(`Applications API: Loading applications for user ${profile.id}`);
+    
     const sb = getAdminSupabase();
     const { data, error } = await sb
       .from("applications")
       .select("id, school_id, school_name, round, target_year, status")
       .eq("user_id", profile.id)
       .order("created_at", { ascending: false });
-    if (error) throw error;
+    
+    if (error) {
+      console.error("Applications API: Error loading applications:", error);
+      throw error;
+    }
+    
+    console.log(`Applications API: Successfully loaded ${data?.length || 0} applications`);
     return Response.json({ applications: data ?? [] });
   } catch (e: any) {
+    console.error("Applications API: Error in GET:", e);
     return new Response(`Applications API error: ${e?.message || "unknown"}`, { status: 500 });
   }
 }

@@ -4,14 +4,13 @@ export async function gatherUserContext(userId: string) {
   const supabase = getAdminSupabase();
 
   try {
+    console.log(`Coach Context: Gathering context for user ${userId}`);
+    
     // Gather all user data in parallel
     const [
       profileResult,
       applicationsResult,
-      essaysResult,
       recommendationsResult,
-      conversationsResult,
-      memoryResult,
     ] = await Promise.all([
       // User profile
       supabase.from("profiles").select("*").eq("id", userId).single(),
@@ -19,24 +18,7 @@ export async function gatherUserContext(userId: string) {
       // Applications
       supabase
         .from("applications")
-        .select(
-          `
-          *,
-          schools (*)
-        `,
-        )
-        .eq("user_id", userId),
-
-      // Essays/Answers
-      supabase
-        .from("answers")
-        .select(
-          `
-          *,
-          questions (*),
-          applications (*)
-        `,
-        )
+        .select("*")
         .eq("user_id", userId),
 
       // Recommendations
@@ -50,31 +32,17 @@ export async function gatherUserContext(userId: string) {
         `,
         )
         .eq("user_id", userId),
-
-      // Recent conversations
-      supabase
-        .from("coach_conversations")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(5),
-
-      // Coach memory
-      supabase
-        .from("coach_memory")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(10),
     ]);
 
     // Extract data and handle errors gracefully
     const profile = profileResult.data || {};
     const applications = applicationsResult.data || [];
-    const essays = essaysResult.data || [];
     const recommendations = recommendationsResult.data || [];
-    const conversations = conversationsResult.data || [];
-    const memory = memoryResult.data || [];
+    
+    // Note: essays, conversations, memory tables don't exist in new schema
+    const essays: any[] = [];
+    const conversations: any[] = [];
+    const memory: any[] = [];
 
     // Calculate progress metrics
     const progress = {
