@@ -1,4 +1,4 @@
-import { supabaseServer } from "@/lib/db";
+import { getAdminSupabase } from "@/lib/supabaseAdmin";
 import * as providers from "./providers";
 
 export type ContextScope = {
@@ -11,7 +11,7 @@ export type ContextScope = {
 };
 
 export async function getContext(userId: string, scope: ContextScope) {
-  const db = supabaseServer();
+  const db = getAdminSupabase();
 
   const [profile, apps, essays, recs, mem, sch, prog] = await Promise.all([
     scope.profile ? providers.profile(db, userId) : null,

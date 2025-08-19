@@ -1,6 +1,6 @@
 // src/app/api/resume/assess/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/db";
+import { getAdminSupabase } from "@/lib/supabaseAdmin";
 import { callGateway } from "@/lib/ai";
 import { z } from "zod";
 
@@ -90,7 +90,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Persist parsed resume text
-    const { error: upErr } = await supabaseAdmin
+    const sb = getAdminSupabase();
+    const { error: upErr } = await sb
       .from("profiles")
       .update({
         resume_text: finalResumeText,
