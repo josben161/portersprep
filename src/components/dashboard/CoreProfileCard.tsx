@@ -25,7 +25,7 @@ type Story = {
   id: string;
   title: string;
   summary?: string;
-  tags?: string[];
+  competency_tags?: string[];
 };
 
 export default function CoreProfileCard() {
@@ -685,7 +685,7 @@ export default function CoreProfileCard() {
                     body: JSON.stringify({
                       title,
                       summary: description || "",
-                      tags: [],
+                      competency_tags: [],
                     }),
                   });
                   if (r.ok) {
@@ -749,7 +749,7 @@ export default function CoreProfileCard() {
                     body: JSON.stringify({
                       title,
                       summary: description || "",
-                      tags: [],
+                      competency_tags: [],
                     }),
                   });
                   if (r.ok) {
@@ -789,9 +789,9 @@ export default function CoreProfileCard() {
                   {story.summary}
                 </div>
               )}
-              {story.tags && story.tags.length > 0 && (
+              {story.competency_tags && story.competency_tags.length > 0 && (
                 <div className="flex gap-1 mt-2">
-                  {story.tags.map((tag, index) => (
+                  {story.competency_tags.map((tag: string, index: number) => (
                     <span
                       key={index}
                       className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded"
