@@ -91,12 +91,12 @@ export async function POST(req: NextRequest) {
 
     // Persist parsed resume text
     const { error: upErr } = await supabaseAdmin
-      .from("users_profile")
+      .from("profiles")
       .update({
         resume_text: finalResumeText,
         updated_at: new Date().toISOString(),
       })
-      .eq("user_id", userId);
+      .eq("id", userId);
     if (upErr) throw upErr;
 
     // Ask LLM for feedback (context pulled in gateway)
