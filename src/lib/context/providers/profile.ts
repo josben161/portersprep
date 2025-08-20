@@ -1,6 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 
-export async function profile(db: SupabaseClient, userId: string) {
+export async function profile(db: SupabaseClient<any, any, any>, userId: string) {
   try {
     console.log(`Profile Provider: Loading profile for user ${userId}`);
     const { data, error } = await db

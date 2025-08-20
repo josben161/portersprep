@@ -1,7 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export async function applications(
-  db: SupabaseClient,
+  db: SupabaseClient<any, any, any>,
   userId: string,
   scope: any,
 ) {

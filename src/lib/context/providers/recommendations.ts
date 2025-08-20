@@ -1,7 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export async function recommendations(
-  db: SupabaseClient,
+  db: SupabaseClient<any, any, any>,
   _userId: string,
   scope: any,
 ) {
