@@ -14,8 +14,9 @@ export async function requireAuthedProfile() {
 
     console.log(`Auth: Looking up profile for clerk_user_id: ${user.id}`);
     const sb = getAdminSupabase();
-    console.log("Auth: Got admin supabase client");
+    console.log("Auth: Got admin supabase client (service role)");
     
+    // Use service role client to bypass RLS since we're using Clerk auth
     const { data: existing, error: lookupError } = await sb
       .from("profiles")
       .select("id, clerk_user_id, email, name, subscription_tier")
