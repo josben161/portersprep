@@ -3,7 +3,10 @@ import { getAdminSupabase } from "@/lib/supabaseAdmin";
 
 export async function requireAuthedProfile() {
   try {
+    console.log("Auth: Starting requireAuthedProfile");
     const user = await currentUser();
+    console.log("Auth: currentUser result:", user ? `User ID: ${user.id}` : "No user");
+    
     if (!user) {
       console.error("Auth error: No current user found");
       throw new Error("unauthorized");
@@ -11,11 +14,15 @@ export async function requireAuthedProfile() {
 
     console.log(`Auth: Looking up profile for clerk_user_id: ${user.id}`);
     const sb = getAdminSupabase();
+    console.log("Auth: Got admin supabase client");
+    
     const { data: existing, error: lookupError } = await sb
       .from("profiles")
       .select("id, clerk_user_id, email, name, subscription_tier")
       .eq("clerk_user_id", user.id)
       .maybeSingle();
+
+    console.log("Auth: Profile lookup result:", { existing: !!existing, error: lookupError });
 
     if (lookupError) {
       console.error("Auth error: Failed to lookup profile:", lookupError);
@@ -39,6 +46,8 @@ export async function requireAuthedProfile() {
       .insert({ clerk_user_id: user.id, email, name })
       .select()
       .single();
+
+    console.log("Auth: Profile creation result:", { created: !!created, error });
 
     if (error) {
       console.error("Auth error: Failed to create profile:", error);
