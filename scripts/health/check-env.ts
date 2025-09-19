@@ -2,7 +2,7 @@
 
 const requiredEnvVars = [
   "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
-  "CLERK_SECRET_KEY",
+  // Note: CLERK_SECRET_KEY is now handled by backend service
   "NEXT_PUBLIC_SUPABASE_URL",
   "SUPABASE_SERVICE_ROLE_KEY",
   "OPENAI_API_KEY",

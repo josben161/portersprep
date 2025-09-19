@@ -8,7 +8,8 @@ The application requires several environment variables to function properly. Cre
 
 ```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
-CLERK_SECRET_KEY=sk_test_your_clerk_secret_key_here
+# Note: CLERK_SECRET_KEY is now handled by your backend service
+# The frontend only needs the publishable key
 ```
 
 ### Supabase Database
@@ -53,6 +54,9 @@ RESEND_API_KEY=re_your_resend_api_key_here
 
 ```
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_BACKEND_API_URL=https://your-backend-api-url.com
+# or for local development:
+# NEXT_PUBLIC_BACKEND_API_URL=http://localhost:8000
 ```
 
 ## Setup Instructions

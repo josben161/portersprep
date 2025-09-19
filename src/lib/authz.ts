@@ -4,15 +4,26 @@ import { getAdminSupabase } from "@/lib/supabaseAdmin";
 export async function requireAuthedProfile() {
   try {
     console.log("Auth: Starting requireAuthedProfile");
-    const user = await currentUser();
-    console.log("Auth: currentUser result:", user ? `User ID: ${user.id}` : "No user");
     
-    if (!user) {
-      console.error("Auth error: No current user found");
+    // First try to get user from auth() - this works with backend verification
+    const { userId } = auth();
+    if (!userId) {
+      console.error("Auth error: No userId from auth()");
       throw new Error("unauthorized");
     }
 
-    console.log(`Auth: Looking up profile for clerk_user_id: ${user.id}`);
+    console.log(`Auth: Got userId from auth(): ${userId}`);
+    
+    // Try to get full user details
+    let user;
+    try {
+      user = await currentUser();
+      console.log("Auth: currentUser result:", user ? `User ID: ${user.id}` : "No user");
+    } catch (error) {
+      console.warn("Auth: currentUser failed, using userId from auth():", error);
+      // If currentUser fails, we can still proceed with just the userId
+    }
+
     const sb = getAdminSupabase();
     console.log("Auth: Got admin supabase client (service role)");
     
@@ -20,7 +31,7 @@ export async function requireAuthedProfile() {
     const { data: existing, error: lookupError } = await sb
       .from("profiles")
       .select("id, clerk_user_id, email, name, subscription_tier")
-      .eq("clerk_user_id", user.id)
+      .eq("clerk_user_id", userId)
       .maybeSingle();
 
     console.log("Auth: Profile lookup result:", { existing: !!existing, error: lookupError });
@@ -31,20 +42,22 @@ export async function requireAuthedProfile() {
     }
 
     if (existing) {
-      console.log(`Auth: Found existing profile for user ${user.id}`);
+      console.log(`Auth: Found existing profile for user ${userId}`);
       return { profile: existing };
     }
 
-    const email = user.emailAddresses?.[0]?.emailAddress ?? "";
-    const name =
-      user.firstName || user.lastName
-        ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
-        : user.username ?? "New User";
+    // If we have user details, use them; otherwise create with minimal info
+    const email = user?.emailAddresses?.[0]?.emailAddress ?? "";
+    const name = user 
+      ? (user.firstName || user.lastName
+          ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+          : user.username ?? "New User")
+      : "New User";
 
-    console.log(`Auth: Creating new profile for user ${user.id} with email: ${email}`);
+    console.log(`Auth: Creating new profile for user ${userId} with email: ${email}`);
     const { data: created, error } = await sb
       .from("profiles")
-      .insert({ clerk_user_id: user.id, email, name })
+      .insert({ clerk_user_id: userId, email, name })
       .select()
       .single();
 
@@ -55,7 +68,7 @@ export async function requireAuthedProfile() {
       throw error;
     }
     
-    console.log(`Auth: Successfully created profile for user ${user.id}`);
+    console.log(`Auth: Successfully created profile for user ${userId}`);
     return { profile: created };
   } catch (error) {
     console.error("Auth error in requireAuthedProfile:", error);
